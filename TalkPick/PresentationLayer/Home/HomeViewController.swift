@@ -61,6 +61,15 @@ extension HomeViewController {
                 cell.prepare(topic: item)
             }
             .disposed(by: disposeBag)
+        
+        homeView.todayTopicCollectionView.rx.modelSelected(Topic.self)
+            .subscribe(onNext: { [weak self] topicItem in
+                guard let self = self else { return }
+                self.topicViewModel.selectTopicItem = topicItem
+                let todayVC = TodayViewController(viewModel: self.topicViewModel)
+                self.navigationController?.pushViewController(todayVC, animated: true)
+            })
+            .disposed(by: disposeBag)
     }
 }
 

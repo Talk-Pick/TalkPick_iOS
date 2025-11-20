@@ -128,7 +128,7 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
     private func setupViewControllers() {
         let homeVC = HomeViewController()
         let calendarVC = CalendarViewController()
-        let mypageVC = HomeViewController()
+        let mypageVC = MypageViewController()
         
         let navigationHome = UINavigationController(rootViewController: homeVC)
         let navigationCalendar = UINavigationController(rootViewController: calendarVC)

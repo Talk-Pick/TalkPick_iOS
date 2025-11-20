@@ -17,7 +17,7 @@ class UserRepository {
     
     func postAppleLogin(idToken: String, parameters: [String: Any]?) -> Single<APIResponse<User>> {
         let url = APIConstants.appleLogin.path
-        return APIService.shared.post(of: APIResponse<User>.self, url: url, parameters: parameters)
+        return APIService.shared.patch(of: APIResponse<User>.self, url: url, parameters: parameters)
     }
     
     func getMyProfile(token: String) -> Single<APIResponse<Profile>> {
@@ -33,5 +33,10 @@ class UserRepository {
     func getLikedTopics(token: String, parameters: [String: Any]?) -> Single<APIResponse<[LikedTopic]>> {
         let url = APIConstants.myProfile.path
         return APIService.shared.getWithTokenAndParams(of: APIResponse<[LikedTopic]>.self, url: url, parameters: parameters, accessToken: token)
+    }
+    
+    func logOut(token: String) -> Single<Response> {
+        let url = APIConstants.logOut.path
+        return APIService.shared.deleteWithToken(of: Response.self, url: url, parameters: nil, accessToken: token)
     }
 }

@@ -20,5 +20,5 @@ struct Profile: Codable {
     let nickname: String
     let profileImgUrl: String
     let gender: String
-    let mbti: String
+    let mbti: String?
 }

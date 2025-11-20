@@ -12,6 +12,7 @@ enum APIConstants {
     case appleLogin
     case myProfile
     case likedTopics
+    case logOut
     
     case topicLike(Int)
     case topicDetail(Int)
@@ -38,7 +39,8 @@ extension APIConstants {
             return APIConstants.makeEndPoint("/members/me")
         case .likedTopics:
             return APIConstants.makeEndPoint("/members/liked-topics")
-            
+        case .logOut:
+            return APIConstants.makeEndPoint("/members/logout")
             
         case .topicLike(let topicId):
             return APIConstants.makeEndPoint("/topic/\(topicId)/like")

@@ -32,15 +32,14 @@ class LoginViewController: UIViewController {
         loginView.kakaoButton.addTarget(self, action: #selector(kakao_Tapped), for: .touchUpInside)
     }
     
-    @objc private func home_Tapped() {
-        let mainTabVC = MainTabViewController()
-        self.navigationController?.pushViewController(mainTabVC, animated: true)
-    }
-    
     @objc private func apple_Tapped() {
         let provider = ASAuthorizationAppleIDProvider()
         let request = provider.createRequest()
-        request.requestedScopes = [.email]
+        
+        let rawNonce = CryptoHelper.randomNonceString()
+        request.nonce = CryptoHelper.sha256(rawNonce)
+        
+        request.requestedScopes = [.email, .fullName]
         let controller = ASAuthorizationController(authorizationRequests: [request])
         
         controller.delegate = self
@@ -109,34 +108,38 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         switch authorization.credential {
         case let appleIdCredential as ASAuthorizationAppleIDCredential:
-            let userIdentifier = appleIdCredential.user
-            let email = appleIdCredential.email
+            guard
+                let identityToken = appleIdCredential.identityToken,
+                let idTokenString = String(data: identityToken, encoding: .utf8)
+            else {
+                print("idToken 또는 nonce 없음")
+                return
+            }
             
-            let identityToken = appleIdCredential.identityToken
-            let authorizationCode = appleIdCredential.authorizationCode
-            
-            print("Apple ID 로그인에 성공하였습니다.")
-            print("사용자 ID: \(userIdentifier)")
-            print("이메일: \(email ?? "")")
-            print("Token: \(identityToken!)")
-            print("authorizationCode: \(authorizationCode!)")
+            print("Apple ID 로그인에 성공하였습니다.: \(idTokenString)")
             
             // 여기에 로그인 성공 후 수행할 작업을 추가하세요.
-            let mainTabVC = MainTabViewController()
-            self.navigationController?.pushViewController(mainTabVC, animated: true)
+            self.loginViewModel.appleLogin(idToken: idTokenString)
+                .observe(on: MainScheduler.instance)
+                .subscribe(onSuccess: { response in
+                    if response.httpStatus == 200 {
+                        let mainTabVC = MainTabViewController()
+                        self.navigationController?.pushViewController(mainTabVC, animated: true)
+                    } else {
+                        print("서버 응답 실패: \(response.message)")
+                    }
+                },
+                           onFailure: { error in
+                    print("네트워크 또는 시스템 에러: \(error)")
+                })
+                .disposed(by: self.disposeBag)
             
-        // 암호 기반 인증에 성공한 경우(iCloud), 사용자의 인증 정보를 확인하고 필요한 작업을 수행합니다
+            // 암호 기반 인증에 성공한 경우(iCloud), 사용자의 인증 정보를 확인하고 필요한 작업을 수행합니다
         case let passwordCredential as ASPasswordCredential:
-            let userIdentifier = passwordCredential.user
-            let password = passwordCredential.password
+//            let userIdentifier = passwordCredential.user
+//            let password = passwordCredential.password
             
             print("암호 기반 인증에 성공하였습니다.")
-            print("사용자 이름: \(userIdentifier)")
-            print("비밀번호: \(password)")
-            
-            // 여기에 로그인 성공 후 수행할 작업을 추가하세요.
-            let mainTabVC = MainTabViewController()
-            self.navigationController?.pushViewController(mainTabVC, animated: true)
             
         default: break
         }

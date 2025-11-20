@@ -20,17 +20,16 @@ class LoginViewModel {
         return useCase.kakaoLogin(idToken: idToken)
             .do(onSuccess: { data in
                 KeychainHelper.standard.save(data.accessToken, service: "access-token", account: "user")
+                print("토큰 \(data.accessToken)")
             })
             .map { _ in true }
             .catchAndReturn(false)
     }
     
-    func appleLogin(idToken: String) -> Single<Bool> {
+    func appleLogin(idToken: String) -> Single<APIResponse<User>> {
         return useCase.appleLogin(idToken: idToken)
-            .do(onSuccess: { data in
-                KeychainHelper.standard.save(data.accessToken, service: "access-token", account: "user")
+            .do(onSuccess: { response in
+                KeychainHelper.standard.save(response.data.accessToken, service: "access-token", account: "user")
             })
-            .map { _ in true }
-            .catchAndReturn(false)
     }
 }

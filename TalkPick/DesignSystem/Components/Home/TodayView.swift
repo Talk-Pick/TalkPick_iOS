@@ -11,11 +11,12 @@ import SnapKit
 class TodayView: UIView {
     
     let navigationbarView = NavigationBarView(title: "오늘의 톡픽")
+    private var topicViewModel = TopicViewModel()
     
     private let labelView1: UIView = {
         let uv = UIView()
         uv.backgroundColor = .yellow50
-        uv.layer.cornerRadius = 12
+        uv.layer.cornerRadius = 15
         return uv
     }()
     
@@ -30,7 +31,7 @@ class TodayView: UIView {
     private let labelView2: UIView = {
         let uv = UIView()
         uv.backgroundColor = .pink50
-        uv.layer.cornerRadius = 12
+        uv.layer.cornerRadius = 15
         return uv
     }()
     
@@ -93,15 +94,15 @@ class TodayView: UIView {
         return sv
     }()
     
-    private var isFront: Bool = true {
-        didSet {
-            cardView.image = isFront ? UIImage(named: "talkpick_bluecard") : UIImage(named: "talkpick_character1")
-        }
-    }
+    private var isFront: Bool = true
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(viewModel: TopicViewModel) {
+        super.init(frame: .zero)
         backgroundColor = .white
+        self.topicViewModel = viewModel
+//        labelLabel1.text = Label1
+//        labelLabel2.text = Label2
+//        cardView.image = isFront ? UIImage(named: cardImage1) : UIImage(named: cardImage2)
         setupViews()
         setupConstraints()
     }
@@ -121,6 +122,11 @@ class TodayView: UIView {
         addSubview(cardView)
         addSubview(flipButton)
         addSubview(buttonStackView)
+        
+        let selectTopicItem = topicViewModel.selectTopicItem
+        labelLabel1.text = selectTopicItem?.category
+        labelLabel2.text = selectTopicItem?.keywordName
+        cardView.image = isFront ? UIImage(named: selectTopicItem?.keywordIconUrl ?? "talkpick_bluecard") : UIImage(named: selectTopicItem?.keywordIconUrl ?? "talkpick_bluecard")
     }
     
     private func setupConstraints() {

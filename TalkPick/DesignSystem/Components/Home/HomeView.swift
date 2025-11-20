@@ -52,7 +52,6 @@ class HomeView: UIView {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.register(TodayTopicCollectionViewCell.self, forCellWithReuseIdentifier: TodayTopicCollectionViewCell.identifier)
         cv.backgroundColor = .clear
-        cv.allowsSelection = false
         cv.showsHorizontalScrollIndicator = false
         return cv
     }()

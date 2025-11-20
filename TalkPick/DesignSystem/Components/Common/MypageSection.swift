@@ -112,6 +112,7 @@ final class SectionView: UIView {
             $0.trailing.equalToSuperview()
             $0.width.equalTo(66)
             $0.height.equalTo(44)
+            $0.bottom.equalToSuperview()
         }
         
         // row 하나씩 만들어 붙이기
@@ -251,6 +252,7 @@ final class CollectionSectionView: UIView {
             $0.top.equalTo(topSeparator.snp.bottom)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(44)
+            $0.bottom.equalToSuperview()
         }
         
         leftIcon.snp.makeConstraints {
@@ -315,6 +317,7 @@ final class EtcSectionView: UIView {
             $0.top.equalTo(topSeparator.snp.bottom).offset(11)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(56)
+            $0.bottom.equalToSuperview()
         }
         
         rows.forEach { row in

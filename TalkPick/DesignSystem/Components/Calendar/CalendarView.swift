@@ -29,8 +29,12 @@ class CalendarView: UIView {
     
     let calendarBackground: UIView = {
         let uv = UIView()
-        uv.backgroundColor = .gray50
+        uv.backgroundColor = .white
         uv.layer.cornerRadius = 10
+        uv.layer.shadowColor = UIColor.black.cgColor
+        uv.layer.shadowOpacity = 0.2
+        uv.layer.shadowRadius = 6
+        uv.layer.shadowOffset = .zero
         return uv
     }()
     
@@ -95,27 +99,27 @@ class CalendarView: UIView {
     
     private func setConstraints() {
         titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(70)
+            $0.top.equalToSuperview().inset(69)
             $0.centerX.equalToSuperview()
-            $0.height.equalTo(26)
+            $0.height.equalTo(30)
         }
         
         calendarBackground.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(20)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(25)
             $0.leading.trailing.equalToSuperview().inset(24)
         }
         
         leftButton.snp.makeConstraints {
             $0.top.equalToSuperview().offset(14)
-            $0.leading.equalToSuperview().offset(14)
-            $0.width.height.equalTo(20)
+            $0.leading.equalToSuperview().offset(10)
+            $0.width.height.equalTo(24)
         }
         leftButton.addTarget(self, action: #selector(goToPreviousMonth), for: .touchUpInside)
         
         rightButton.snp.makeConstraints {
             $0.centerY.equalTo(leftButton)
-            $0.trailing.equalToSuperview().inset(14)
-            $0.width.height.equalTo(20)
+            $0.trailing.equalToSuperview().inset(10)
+            $0.width.height.equalTo(24)
         }
         rightButton.addTarget(self, action: #selector(goToNextMonth), for: .touchUpInside)
         

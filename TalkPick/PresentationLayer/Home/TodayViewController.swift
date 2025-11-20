@@ -9,10 +9,19 @@ import UIKit
 
 class TodayViewController: UIViewController {
 
-    private let todayView = TodayView()
+    private var todayView = TodayView(viewModel: TopicViewModel())
     
     override func loadView() {
         self.view = todayView
+    }
+    
+    init(viewModel: TopicViewModel) {
+        super.init(nibName: nil, bundle: nil)
+        self.todayView = TodayView(viewModel: viewModel)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func viewDidLoad() {

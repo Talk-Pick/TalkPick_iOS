@@ -99,6 +99,15 @@ struct APIService {
         ]
         return request(of: type, url: url, method: .delete, parameters: parameters, headers: headers)
     }
+    
+    // PATCH 요청
+    func patch<T: Codable>(of type: T.Type, url: URLConvertible, parameters: [String: Any]?) -> Single<T> {
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        ]
+        return request(of: type, url: url, method: .patch, parameters: parameters, headers: headers)
+    }
 
     // PATCH 요청 (토큰 포함)
     func patchWithToken<T: Codable>(of type: T.Type, url: URLConvertible, parameters: [String: Any]?, accessToken: String) -> Single<T> {

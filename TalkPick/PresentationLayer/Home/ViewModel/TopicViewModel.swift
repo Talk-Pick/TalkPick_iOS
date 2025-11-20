@@ -14,6 +14,7 @@ class TopicViewModel {
     private let useCase: TopicUseCase
     
     let todayTopics = BehaviorRelay<[Topic]>(value: [])
+    var selectTopicItem: Topic?
     
     init(useCase: TopicUseCase = TopicUseCase()) {
         self.useCase = useCase
