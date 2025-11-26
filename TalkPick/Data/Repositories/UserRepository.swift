@@ -10,6 +10,11 @@ import RxSwift
 class UserRepository {
     static let shared = UserRepository()
     
+    func postTerm(token: String, parameters: [String: Any]?) -> Single<Term> {
+        let url = APIConstants.term.path
+        return APIService.shared.postWithToken(of: Term.self, url: url, parameters: parameters, accessToken: token)
+    }
+    
     func postKakaoLogin(idToken: String, parameters: [String: Any]?) -> Single<APIResponse<User>> {
         let url = APIConstants.kakaoLogin.path
         return APIService.shared.post(of: APIResponse<User>.self, url: url, parameters: parameters)
@@ -18,6 +23,11 @@ class UserRepository {
     func postAppleLogin(idToken: String, parameters: [String: Any]?) -> Single<APIResponse<User>> {
         let url = APIConstants.appleLogin.path
         return APIService.shared.patch(of: APIResponse<User>.self, url: url, parameters: parameters)
+    }
+    
+    func signUp(token: String, parameters: [String: Any]?) -> Single<SignUp> {
+        let url = APIConstants.signUp.path
+        return APIService.shared.patchWithToken(of: SignUp.self, url: url, parameters: parameters, accessToken: token)
     }
     
     func getMyProfile(token: String) -> Single<APIResponse<Profile>> {

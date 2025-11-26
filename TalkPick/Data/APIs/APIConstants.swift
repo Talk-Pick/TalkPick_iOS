@@ -8,8 +8,11 @@
 import Foundation
 
 enum APIConstants {
+    case tokenRefresh
+    case term
     case kakaoLogin
     case appleLogin
+    case signUp
     case myProfile
     case likedTopics
     case logOut
@@ -31,10 +34,16 @@ extension APIConstants {
     
     var path: String {
         switch self {
+        case .tokenRefresh:
+            return APIConstants.makeEndPoint("/members/token/refresh")
+        case .term:
+            return APIConstants.makeEndPoint("/members/term")
         case .kakaoLogin:
             return APIConstants.makeEndPoint("/members/kakao/login")
         case .appleLogin:
             return APIConstants.makeEndPoint("/members/apple/login")
+        case .signUp:
+            return APIConstants.makeEndPoint("/members/signup")
         case .myProfile:
             return APIConstants.makeEndPoint("/members/me")
         case .likedTopics:

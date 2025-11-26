@@ -1,13 +1,13 @@
 import UIKit
 import SnapKit
 
-class OnboardingCustomViewController: UIViewController {
+class OnboardingViewController: UIViewController {
     private let images = ["talkpick_launch", "talkpick_launch", "talkpick_launch", "talkpick_launch"]
     private var currentIndex = 0
     
     private let currentImageView = UIImageView()
     private let nextImageView = UIImageView()
-    private let pageControl = UIPageControl()
+    private let pageControl = CustomPageControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,32 +26,30 @@ class OnboardingCustomViewController: UIViewController {
         view.addSubview(currentImageView)
         view.addSubview(nextImageView)
         
-        currentImageView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview()
-            make.width.equalToSuperview().multipliedBy(0.8)
-            make.height.equalToSuperview().multipliedBy(0.7)
+        currentImageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.width.equalToSuperview().multipliedBy(0.8)
+            $0.height.equalToSuperview().multipliedBy(0.9)
         }
         
-        nextImageView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview()
-            make.width.equalToSuperview().multipliedBy(0.8)
-            make.height.equalToSuperview().multipliedBy(0.7)
+        nextImageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.width.equalToSuperview().multipliedBy(0.8)
+            $0.height.equalToSuperview().multipliedBy(0.9)
         }
     }
     
     private func setupPageControl() {
         pageControl.numberOfPages = images.count
         pageControl.currentPage = 0
-        pageControl.currentPageIndicatorTintColor = .black
-        pageControl.pageIndicatorTintColor = .lightGray
         
         view.addSubview(pageControl)
         
-        pageControl.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(30)
+        pageControl.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(85)
         }
     }
     
@@ -106,5 +104,83 @@ class OnboardingCustomViewController: UIViewController {
     private func goToLogin() {
         let loginVC = LoginViewController()
         navigationController?.pushViewController(loginVC, animated: true)
+    }
+}
+
+final class CustomPageControl: UIStackView {
+    
+    var numberOfPages: Int = 0 {
+        didSet { configureDots() }
+    }
+
+    var currentPage: Int = 0 {
+        didSet { updateDots() }
+    }
+
+    private var dotViews: [UIView] = []
+        private var widthConstraints: [Constraint] = []
+
+        private let normalWidth: CGFloat = 6
+        private let selectedWidth: CGFloat = 11
+        private let dotHeight: CGFloat = 6
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        commonInit()
+    }
+
+    required init(coder: NSCoder) {
+        super.init(coder: coder)
+        commonInit()
+    }
+
+    private func commonInit() {
+        axis = .horizontal
+        alignment = .center
+        distribution = .equalSpacing
+        spacing = 8
+    }
+
+    private func configureDots() {
+        // 기존 점 제거
+        arrangedSubviews.forEach { $0.removeFromSuperview() }
+        dotViews.removeAll()
+        widthConstraints.removeAll()
+
+        guard numberOfPages > 0 else { return }
+
+        for _ in 0..<numberOfPages {
+            let dot = UIView()
+            addArrangedSubview(dot)
+            
+            dot.layer.cornerRadius = dotHeight / 2
+            dot.layer.masksToBounds = true
+            dot.backgroundColor = .lightGray
+            
+            dot.snp.makeConstraints { make in
+                let width = make.width.equalTo(normalWidth).constraint
+                make.height.equalTo(dotHeight)
+                widthConstraints.append(width)
+            }
+            
+            dotViews.append(dot)
+        }
+
+        updateDots()
+    }
+
+    private func updateDots() {
+        guard !dotViews.isEmpty else { return }
+        
+        for (index, dot) in dotViews.enumerated() {
+            let isCurrent = index == currentPage
+            
+            widthConstraints[index].update(offset: isCurrent ? selectedWidth : normalWidth)
+            dot.backgroundColor = isCurrent ? .black : .lightGray
+        }
+        
+        UIView.animate(withDuration: 0.2) {
+            self.layoutIfNeeded()
+        }
     }
 }

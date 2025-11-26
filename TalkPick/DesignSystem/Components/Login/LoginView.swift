@@ -107,7 +107,7 @@ class LoginView: UIView {
         }
         
         loginButton.snp.makeConstraints {
-            $0.top.equalTo(mainLogo1.snp.bottom).offset(100)
+            $0.bottom.equalToSuperview().offset(-148)
             $0.leading.trailing.equalToSuperview().inset(72)
             $0.height.equalTo(55)
         }
@@ -115,19 +115,19 @@ class LoginView: UIView {
         
         loginSubView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(158)
-            $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(564)
+            $0.leading.trailing.bottom.equalToSuperview()
         }
         loginSubView.isHidden = true
         
         mainLogo2.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
+            $0.top.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(24)
             $0.height.equalTo(342)
         }
         
         buttonsStack.snp.makeConstraints {
-            $0.bottom.equalToSuperview()
-            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview().offset(-122)
+            $0.leading.trailing.equalToSuperview().inset(24)
             $0.height.equalTo(114)
         }
         appleButton.snp.makeConstraints {

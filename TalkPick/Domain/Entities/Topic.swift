@@ -17,6 +17,17 @@ struct Topic: Codable {
     let keywordIconUrl: String
 }
 
+struct TopicDetail: Codable {
+    let topicId: Int
+    let title: String
+    let detail: String
+    let category: String
+    let categoryGroup: String
+    let keywordName: String
+    let keywordImageUrl: String
+    let topicImageUrl: String
+}
+
 struct LikedTopic: Codable {
     let items: LikedDetail
     let hasNext: Bool

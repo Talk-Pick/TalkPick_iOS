@@ -7,6 +7,26 @@
 
 import Foundation
 
+struct Token: Codable {
+    let memberId: Int
+    let role: String
+    let accessToken: String
+    let accessExpiredTime: Int64
+}
+
+struct Term: Codable {
+    let memberId: Int
+    let message: String
+    let talkPickStatus: String
+}
+
+struct SignUp: Codable {
+    let memberId: Int
+    let nickname: String
+    let profileImgUrl: String
+    let mbti: String?
+}
+
 struct User: Codable {
     let memberId: Int
     let role: String

@@ -11,7 +11,6 @@ import SnapKit
 class TodayView: UIView {
     
     let navigationbarView = NavigationBarView(title: "오늘의 톡픽")
-    private var topicViewModel = TopicViewModel()
     
     private let labelView1: UIView = {
         let uv = UIView()
@@ -20,7 +19,7 @@ class TodayView: UIView {
         return uv
     }()
     
-    private let labelLabel1: UILabel = {
+    let labelLabel1: UILabel = {
         let lb = UILabel()
         lb.text = "그룹 첫 모임"
         lb.font = .systemFont(ofSize: 12, weight: .semibold)
@@ -35,7 +34,7 @@ class TodayView: UIView {
         return uv
     }()
     
-    private let labelLabel2: UILabel = {
+    let labelLabel2: UILabel = {
         let lb = UILabel()
         lb.text = "첫 번째"
         lb.font = .systemFont(ofSize: 12, weight: .semibold)
@@ -43,7 +42,7 @@ class TodayView: UIView {
         return lb
     }()
     
-    private let cardView: UIImageView = {
+    let cardView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "talkpick_bluecard"))
         iv.contentMode = .scaleAspectFit
         return iv
@@ -94,15 +93,11 @@ class TodayView: UIView {
         return sv
     }()
     
-    private var isFront: Bool = true
+    var isFront: Bool = true
     
-    init(viewModel: TopicViewModel) {
+    init() {
         super.init(frame: .zero)
         backgroundColor = .white
-        self.topicViewModel = viewModel
-//        labelLabel1.text = Label1
-//        labelLabel2.text = Label2
-//        cardView.image = isFront ? UIImage(named: cardImage1) : UIImage(named: cardImage2)
         setupViews()
         setupConstraints()
     }
@@ -122,11 +117,6 @@ class TodayView: UIView {
         addSubview(cardView)
         addSubview(flipButton)
         addSubview(buttonStackView)
-        
-        let selectTopicItem = topicViewModel.selectTopicItem
-        labelLabel1.text = selectTopicItem?.category
-        labelLabel2.text = selectTopicItem?.keywordName
-        cardView.image = isFront ? UIImage(named: selectTopicItem?.keywordIconUrl ?? "talkpick_bluecard") : UIImage(named: selectTopicItem?.keywordIconUrl ?? "talkpick_bluecard")
     }
     
     private func setupConstraints() {
