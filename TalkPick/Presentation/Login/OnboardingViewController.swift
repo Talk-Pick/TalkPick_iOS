@@ -102,8 +102,16 @@ class OnboardingViewController: UIViewController {
     }
     
     private func goToLogin() {
+        UserDefaults.standard.set(true, forKey: AppStorageKey.hasShownOnboarding)
+        
         let loginVC = LoginViewController()
-        navigationController?.pushViewController(loginVC, animated: true)
+        let nav = UINavigationController(rootViewController: loginVC)
+        
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first {
+            window.rootViewController = nav
+            window.makeKeyAndVisible()
+        }
     }
 }
 

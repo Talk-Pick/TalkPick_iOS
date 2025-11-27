@@ -80,10 +80,8 @@ class LoginViewController: UIViewController {
                     self.loginViewModel.kakaoLogin(idToken: idToken)
                         .observe(on: MainScheduler.instance)
                         .subscribe(onSuccess: { success in
-                            if success {
-                                let mainTabVC = MainTabViewController()
-                                self.navigationController?.pushViewController(mainTabVC, animated: true)
-                            }
+                            let mainTabVC = MainTabViewController()
+                            self.navigationController?.pushViewController(mainTabVC, animated: true)
                         })
                         .disposed(by: self.disposeBag)
                 }
@@ -110,6 +108,7 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
         case let appleIdCredential as ASAuthorizationAppleIDCredential:
             guard
                 let identityToken = appleIdCredential.identityToken,
+                let nickName = appleIdCredential.fullName,
                 let idTokenString = String(data: identityToken, encoding: .utf8)
             else {
                 print("idToken 또는 nonce 없음")
@@ -122,22 +121,15 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
             self.loginViewModel.appleLogin(idToken: idTokenString)
                 .observe(on: MainScheduler.instance)
                 .subscribe(onSuccess: { response in
-                    if response.httpStatus == 200 {
-                        let mainTabVC = MainTabViewController()
-                        self.navigationController?.pushViewController(mainTabVC, animated: true)
-                    } else {
-                        print("서버 응답 실패: \(response.message)")
-                    }
-                },
-                           onFailure: { error in
-                    print("네트워크 또는 시스템 에러: \(error)")
+                    let mainTabVC = MainTabViewController()
+                    self.navigationController?.pushViewController(mainTabVC, animated: true)
                 })
                 .disposed(by: self.disposeBag)
             
             // 암호 기반 인증에 성공한 경우(iCloud), 사용자의 인증 정보를 확인하고 필요한 작업을 수행합니다
         case let passwordCredential as ASPasswordCredential:
-//            let userIdentifier = passwordCredential.user
-//            let password = passwordCredential.password
+            // let userIdentifier = passwordCredential.user
+            // let password = passwordCredential.password
             
             print("암호 기반 인증에 성공하였습니다.")
             

@@ -13,14 +13,15 @@ class MyPageViewModel {
     private let disposeBag = DisposeBag()
     private let useCase: UserUseCase
     
-    let profile = PublishSubject<Profile>()
-    let logout = PublishSubject<Bool>()
-    
     init(useCase: UserUseCase = UserUseCase()) {
         self.useCase = useCase
     }
     
-    func loadMyProfile() {
+    let profile = PublishSubject<Profile>()
+    let profileEdited = PublishSubject<Bool>()
+    let logout = PublishSubject<Bool>()
+    
+    func getMyProfile() {
         useCase.getMyProfile()
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] profile in
@@ -30,8 +31,19 @@ class MyPageViewModel {
             })
             .disposed(by: disposeBag)
     }
+
+    func editMyProfile(mbti: String) {
+        useCase.editMyProfile(mbti: mbti)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] success in
+                self?.profileEdited.onNext(success)
+            }, onFailure: { error in
+                print("오류:", error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
+    }
     
-    func loadLogOut() {
+    func logOut() {
         useCase.logOut()
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] success in

@@ -15,6 +15,21 @@ class UserUseCase {
         self.userRepository = userRepository
     }
     
+    func postTerm(agreeTermIdList: [Int], disagreeTermIdList: [Int]) -> Single<Bool> {
+        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+            return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
+        }
+        
+        let params: [String: Any] = [
+            "agreeTermIdList": agreeTermIdList,
+            "disagreeTermIdList": disagreeTermIdList
+        ]
+        
+        return userRepository.postTerm(token: token, parameters: params)
+            .map { _ in true }
+            .catchAndReturn(false)
+    }
+    
     func kakaoLogin(idToken: String) -> Single<User> {
         let params: [String: Any] = [
             "idToken": idToken
@@ -32,6 +47,21 @@ class UserUseCase {
         return userRepository.postAppleLogin(idToken: idToken, parameters: params)
     }
     
+    func signUp(nickname: String, mbti: String) -> Single<Bool> {
+        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+            return .just(false)
+        }
+        
+        let params: [String: Any] = [
+            "nickname": nickname,
+            "mbti": mbti
+        ]
+        
+        return userRepository.signUp(token: token, parameters: params)
+            .map { _ in true }
+            .catchAndReturn(false)
+    }
+    
     func getMyProfile() -> Single<Profile> {
         guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
             return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
@@ -41,12 +71,16 @@ class UserUseCase {
             .map { $0.data }
     }
     
-    func editMyProfile(parameters: [String : Any]?) -> Single<Bool> {
+    func editMyProfile(mbti: String) -> Single<Bool> {
         guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
             return .just(false)
         }
         
-        return userRepository.editMyProfile(token: token, parameters: parameters)
+        let params: [String: Any] = [
+            "mbti": mbti
+        ]
+        
+        return userRepository.editMyProfile(token: token, parameters: params)
             .map { _ in true }
             .catchAndReturn(false)
     }
