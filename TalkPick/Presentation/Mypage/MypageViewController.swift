@@ -41,7 +41,7 @@ class MypageViewController: UIViewController {
     
     private func setProfile() {
         bindViewModel()
-        viewModel.loadMyProfile()
+        viewModel.getMyProfile()
     }
     
     private func bindViewModel() {

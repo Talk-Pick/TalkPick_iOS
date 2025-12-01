@@ -13,7 +13,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if hasShown {
             window?.rootViewController = UINavigationController(rootViewController: LoginViewController())
         } else {
-            window?.rootViewController = UINavigationController(rootViewController: OnboardingViewController())
+            window?.rootViewController = UINavigationController(rootViewController: AgreeViewController())
         }
         window?.makeKeyAndVisible()
     }
