@@ -85,17 +85,17 @@ class AgreeView: UIView {
         return label
     }()
     
-    private let confirmButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("다음으로", for: .normal)
-        button.backgroundColor = .white
-        button.setTitleColor(.gray200, for: .normal)
-        button.layer.borderColor = UIColor.gray200.cgColor
-        button.layer.borderWidth = 1
-        button.layer.cornerRadius = 10
-        button.isEnabled = false
-        button.titleLabel?.font = .boldSystemFont(ofSize: 18)
-        return button
+    let nextButton: UIButton = {
+        let bt = UIButton()
+        bt.setTitle("다음으로", for: .normal)
+        bt.backgroundColor = .white
+        bt.setTitleColor(.gray200, for: .normal)
+        bt.layer.borderColor = UIColor.gray200.cgColor
+        bt.layer.borderWidth = 1
+        bt.layer.cornerRadius = 10
+        bt.isEnabled = false
+        bt.titleLabel?.font = .boldSystemFont(ofSize: 18)
+        return bt
     }()
     
     private var allAgree = false
@@ -125,7 +125,7 @@ class AgreeView: UIView {
         addSubview(agreementSubLabel)
         addSubview(allAgreeContainer)
         addSubview(ageCheckContainer)
-        addSubview(confirmButton)
+        addSubview(nextButton)
         
         let rows = [row1, row2, row3, row4]
         rows.forEach { addSubview($0) }
@@ -225,7 +225,7 @@ class AgreeView: UIView {
             $0.centerY.equalToSuperview()
         }
         
-        confirmButton.snp.makeConstraints {
+        nextButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.bottom.equalToSuperview().offset(-44)
             $0.height.equalTo(51)
@@ -314,15 +314,15 @@ class AgreeView: UIView {
 
         // 필수 3개 + 만14세 모두 체크해야 활성화
         if agree1 && agree2 && agree3 && agreeAge{
-            confirmButton.isEnabled = true
-            confirmButton.backgroundColor = .purple100
-            confirmButton.setTitleColor(.white, for: .normal)
+            nextButton.isEnabled = true
+            nextButton.backgroundColor = .purple100
+            nextButton.setTitleColor(.white, for: .normal)
         } else {
-            confirmButton.isEnabled = false
-            confirmButton.backgroundColor = .white
-            confirmButton.setTitleColor(.gray200, for: .normal)
-            confirmButton.layer.borderColor = UIColor.gray200.cgColor
-            confirmButton.layer.borderWidth = 1
+            nextButton.isEnabled = false
+            nextButton.backgroundColor = .white
+            nextButton.setTitleColor(.gray200, for: .normal)
+            nextButton.layer.borderColor = UIColor.gray200.cgColor
+            nextButton.layer.borderWidth = 1
         }
     }
     

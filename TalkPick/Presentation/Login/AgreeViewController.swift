@@ -18,5 +18,18 @@ class AgreeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setUI()
+    }
+    
+    private func setUI() {
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        
+        agreeView.navigationbarView.delegate = self
+        agreeView.nextButton.addTarget(self, action: #selector(mbti_Tapped), for: .touchUpInside)
+    }
+    
+    @objc private func mbti_Tapped() {
+        let mbtiVC = MbtiViewController()
+        self.navigationController?.pushViewController(mbtiVC, animated: true)
     }
 }

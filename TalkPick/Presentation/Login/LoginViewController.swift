@@ -5,7 +5,6 @@
 //  Created by jaegu park on 10/2/25.
 //
 
-import UIKit
 import KakaoSDKUser
 import AuthenticationServices
 import RxSwift
@@ -13,6 +12,7 @@ import RxSwift
 class LoginViewController: UIViewController {
     
     private let loginViewModel = LoginViewModel()
+    private let myPageViewModel = MyPageViewModel()
     private let loginView = LoginView()
     private let disposeBag = DisposeBag()
     
@@ -23,6 +23,7 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
+        setBind()
     }
     
     private func setUI() {
@@ -30,6 +31,22 @@ class LoginViewController: UIViewController {
         
         loginView.appleButton.addTarget(self, action: #selector(apple_Tapped), for: .touchUpInside)
         loginView.kakaoButton.addTarget(self, action: #selector(kakao_Tapped), for: .touchUpInside)
+    }
+    
+    private func setBind() {
+        myPageViewModel.profile
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] profile in
+                guard let self = self else { return }
+                if let mbti = profile.mbti, !mbti.isEmpty {
+                    let mainTabVC = MainTabViewController()
+                    self.navigationController?.pushViewController(mainTabVC, animated: true)
+                } else {
+                    let agreeVC = AgreeViewController()
+                    self.navigationController?.pushViewController(agreeVC, animated: true)
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     @objc private func apple_Tapped() {
@@ -61,10 +78,7 @@ class LoginViewController: UIViewController {
                     self.loginViewModel.kakaoLogin(idToken: idToken)
                         .observe(on: MainScheduler.instance)
                         .subscribe(onSuccess: { success in
-                            if success {
-                                let mainTabVC = MainTabViewController()
-                                self.navigationController?.pushViewController(mainTabVC, animated: true)
-                            }
+                            self.myPageViewModel.getMyProfile()
                         })
                         .disposed(by: self.disposeBag)
                 }
@@ -80,8 +94,7 @@ class LoginViewController: UIViewController {
                     self.loginViewModel.kakaoLogin(idToken: idToken)
                         .observe(on: MainScheduler.instance)
                         .subscribe(onSuccess: { success in
-                            let mainTabVC = MainTabViewController()
-                            self.navigationController?.pushViewController(mainTabVC, animated: true)
+                            self.myPageViewModel.getMyProfile()
                         })
                         .disposed(by: self.disposeBag)
                 }
@@ -93,7 +106,7 @@ class LoginViewController: UIViewController {
 extension LoginViewController: ASAuthorizationControllerPresentationContextProviding {
     // 인증창을 보여주기 위한 메서드 (인증창을 보여 줄 화면을 설정)
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        self.view.window ?? UIWindow()
+        return self.view.window ?? UIWindow()
     }
 }
 
@@ -121,16 +134,14 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
             self.loginViewModel.appleLogin(idToken: idTokenString)
                 .observe(on: MainScheduler.instance)
                 .subscribe(onSuccess: { response in
-                    let mainTabVC = MainTabViewController()
-                    self.navigationController?.pushViewController(mainTabVC, animated: true)
+                    self.myPageViewModel.getMyProfile()
                 })
                 .disposed(by: self.disposeBag)
             
-            // 암호 기반 인증에 성공한 경우(iCloud), 사용자의 인증 정보를 확인하고 필요한 작업을 수행합니다
+        // 암호 기반 인증에 성공한 경우(iCloud), 사용자의 인증 정보를 확인하고 필요한 작업을 수행합니다
         case let passwordCredential as ASPasswordCredential:
             // let userIdentifier = passwordCredential.user
             // let password = passwordCredential.password
-            
             print("암호 기반 인증에 성공하였습니다.")
             
         default: break
