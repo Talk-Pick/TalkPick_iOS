@@ -41,7 +41,7 @@ class MbtiView: UIView {
         let bt = UIButton(type: .system)
         bt.setTitle("시작하기", for: .normal)
         bt.layer.borderWidth = 1
-        bt.layer.cornerRadius = 12
+        bt.layer.cornerRadius = 10
         bt.isEnabled = false
         bt.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
         return bt

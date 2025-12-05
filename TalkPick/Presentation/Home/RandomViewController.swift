@@ -32,11 +32,10 @@ class RandomViewController: UIViewController {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
         randomView.navigationbarView.delegate = self
-        randomView.situationView.onSituationSelected = { [weak self] kind in
-            let topicVC = TopicViewController() // 필요에 맞게 init 정의
-            self?.navigationController?.pushViewController(topicVC, animated: true)
-        }
         randomView.navigationbarView.homeButton.addTarget(self, action: #selector(homeButton), for: .touchUpInside)
+        randomView.onExitRequested = { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
     }
     
     @objc private func homeButton() {
@@ -45,5 +44,11 @@ class RandomViewController: UIViewController {
         quitView.alpha = 0
         quitView.snp.makeConstraints { $0.edges.equalToSuperview() }
         UIView.animate(withDuration: 0.3) { quitView.alpha = 1 }
+    }
+}
+
+extension RandomViewController: RandomNavigationBarViewDelegate {
+    func tapBackButton() {
+        randomView.handleBack()
     }
 }

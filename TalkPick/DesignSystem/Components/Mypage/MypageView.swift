@@ -22,7 +22,6 @@ class MypageView: UIView {
         // 1) 내 정보 섹션
         let infoRows: [SectionView.RowType] = [
             .info(icon: "talkpick_nickname", title: "닉네임",   value: "닉네임"),
-            .info(icon: "talkpick_birth", title: "생년월일", value: "2000.00.00"),
             .info(icon: "talkpick_mbti",     title: "MBTI",    value: "INTP")
         ]
         infoSectionView = SectionView(title: "내 정보", rows: infoRows)
@@ -49,8 +48,6 @@ class MypageView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    // MARK: - Setup
     
     private func setupUI() {
         backgroundColor = .white
@@ -82,14 +79,14 @@ class MypageView: UIView {
         
         // 내 정보
         infoSectionView.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(32)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview().inset(24)
         }
         infoSectionView.actionButton.addTarget(self, action: #selector(edit_Tapped), for: .touchUpInside)
         
         // 컬렉션
         collectionSectionView.snp.makeConstraints {
-            $0.top.equalTo(infoSectionView.snp.bottom).offset(40)
+            $0.top.equalTo(infoSectionView.snp.bottom).offset(30)
             $0.leading.trailing.equalTo(infoSectionView)
         }
         

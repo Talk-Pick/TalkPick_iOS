@@ -1,18 +1,18 @@
 //
-//  MbtiViewController.swift
+//  CompleteViewController.swift
 //  TalkPick
 //
-//  Created by jaegu park on 12/1/25.
+//  Created by jaegu park on 12/3/25.
 //
 
 import UIKit
 
-class MbtiViewController: UIViewController {
-    
-    private let mbtiView = MbtiView()
+class CompleteViewController: UIViewController {
+
+    private let completeView = CompleteView()
     
     override func loadView() {
-        self.view = mbtiView
+        self.view = completeView
     }
 
     override func viewDidLoad() {
@@ -24,7 +24,7 @@ class MbtiViewController: UIViewController {
     private func setUI() {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
-        mbtiView.startButton.addTarget(self, action: #selector(home_Tapped), for: .touchUpInside)
+        completeView.finishButton.addTarget(self, action: #selector(home_Tapped), for: .touchUpInside)
     }
     
     @objc private func home_Tapped() {

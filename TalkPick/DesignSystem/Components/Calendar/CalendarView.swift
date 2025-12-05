@@ -50,11 +50,28 @@ class CalendarView: UIView {
         return bb
     }()
     
+    private let dateImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.image = UIImage(named: "talkpick_calendar")
+        iv.contentMode = .scaleAspectFit
+        return iv
+    }()
+    
     private let dateLabel: UILabel = {
         let lb = UILabel()
         lb.font = .systemFont(ofSize: 14, weight: .bold)
         lb.textColor = .black
         return lb
+    }()
+    
+    private lazy var dateStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.addArrangedSubview(dateImageView)
+        sv.addArrangedSubview(dateLabel)
+        sv.axis = .horizontal
+        sv.spacing = 10
+        sv.distribution = .fill
+        return sv
     }()
     
     lazy var weekStackView = UIStackView()
@@ -92,7 +109,7 @@ class CalendarView: UIView {
         addSubview(calendarBackground)
         calendarBackground.addSubview(leftButton)
         calendarBackground.addSubview(rightButton)
-        calendarBackground.addSubview(dateLabel)
+        calendarBackground.addSubview(dateStackView)
         calendarBackground.addSubview(weekStackView)
         calendarBackground.addSubview(calendarCollectionView)
     }
@@ -123,16 +140,17 @@ class CalendarView: UIView {
         }
         rightButton.addTarget(self, action: #selector(goToNextMonth), for: .touchUpInside)
         
-        dateLabel.snp.makeConstraints {
+        dateStackView.snp.makeConstraints {
             $0.centerY.equalTo(leftButton)
-            $0.centerX.equalToSuperview().inset(24)
+            $0.centerX.equalToSuperview()
+            $0.height.equalTo(18)
         }
         
         weekStackView.distribution = .fillEqually
         weekStackView.snp.makeConstraints {
-            $0.top.equalTo(dateLabel.snp.bottom).offset(10)
+            $0.top.equalTo(dateLabel.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(7)
-            $0.height.equalTo(40)
+            $0.height.equalTo(30)
         }
 
         calendarCollectionView.snp.makeConstraints {
@@ -156,7 +174,7 @@ class CalendarView: UIView {
             label.text = dayOfTheWeek[i]
             label.textAlignment = .center
             label.font = .systemFont(ofSize: 10, weight: .bold)
-            label.textColor = .black
+            label.textColor = .gray200
             self.weekStackView.addArrangedSubview(label)
         }
     }

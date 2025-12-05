@@ -126,7 +126,7 @@ class QuitView: UIView {
        UIView.animate(withDuration: 0.3, animations: {
           self.alpha = 0
        }) { _ in
-          self.removeFromSuperview() // 애니메이션 후 뷰에서 제거
+          self.removeFromSuperview()
        }
     }
     

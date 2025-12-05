@@ -1,17 +1,17 @@
 //
-//  TodayView.swift
+//  TopicDetailView.swift
 //  TalkPick
 //
-//  Created by jaegu park on 10/4/25.
+//  Created by jaegu park on 12/5/25.
 //
 
 import UIKit
 import SnapKit
 
-class TodayView: UIView {
-    
-    let navigationbarView = NavigationBarView(title: "오늘의 톡픽")
-    
+class TopicDetailView: UIView {
+    var onNext: (() -> Void)?
+    var onLikeToggled: ((Bool) -> Void)?
+
     private let labelView1: UIView = {
         let uv = UIView()
         uv.backgroundColor = .yellow50
@@ -34,7 +34,7 @@ class TodayView: UIView {
         return uv
     }()
     
-    let labelLabel2: UILabel = {
+    let stepLabel: UILabel = {
         let lb = UILabel()
         lb.text = "첫 번째"
         lb.font = .systemFont(ofSize: 12, weight: .semibold)
@@ -57,11 +57,11 @@ class TodayView: UIView {
         fb.semanticContentAttribute = .forceRightToLeft
         return fb
     }()
-    
-    let likeButton: UIButton = {
+
+    private let likeButton: UIButton = {
         let cb = UIButton(type: .custom)
         cb.clipsToBounds = true
-        cb.layer.cornerRadius = 12
+        cb.layer.cornerRadius = 10
         cb.layer.borderWidth = 1
         cb.layer.borderColor = UIColor.gray200.cgColor
         cb.backgroundColor = .white
@@ -72,40 +72,55 @@ class TodayView: UIView {
         return cb
     }()
     
+    private lazy var nextButton: UIButton = {
+        let cb = UIButton(type: .custom)
+        cb.backgroundColor = .black
+        cb.setTitleColor(.white, for: .normal)
+        cb.setTitle("다음으로", for: .normal)
+        cb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+        cb.layer.cornerRadius = 10
+        cb.addTarget(self, action: #selector(nextTapped), for: .touchUpInside)
+        return cb
+    }()
+    
+    private lazy var buttonsStack: UIStackView = {
+        let sv = UIStackView()
+        sv.addArrangedSubview(likeButton)
+        sv.addArrangedSubview(nextButton)
+        sv.axis = .horizontal
+        sv.spacing = 17
+        sv.distribution = .fillEqually
+        return sv
+    }()
+
     var isFront: Bool = true
-    
-    init() {
-        super.init(frame: .zero)
+    private var isLiked = false
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupUI()
+        setupLayout()
+    }
+
+    required init?(coder: NSCoder) { fatalError() }
+
+    private func setupUI() {
         backgroundColor = .white
-        setupViews()
-        setupConstraints()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private func setupViews() {
-        addSubview(navigationbarView)
-        
+
         addSubview(labelView1)
         labelView1.addSubview(labelLabel1)
         addSubview(labelView2)
-        labelView2.addSubview(labelLabel2)
+        labelView2.addSubview(stepLabel)
         
         addSubview(cardView)
         addSubview(flipButton)
-        addSubview(likeButton)
+        addSubview(buttonsStack)
     }
-    
-    private func setupConstraints() {
-        navigationbarView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
-            $0.height.equalTo(95)
-        }
+
+    private func setupLayout() {
         
         labelView1.snp.makeConstraints {
-            $0.top.equalTo(navigationbarView.snp.bottom).offset(54)
+            $0.top.equalToSuperview().offset(40)
             $0.leading.equalToSuperview().offset(35)
             $0.height.equalTo(31)
         }
@@ -122,18 +137,18 @@ class TodayView: UIView {
             $0.height.equalTo(31)
         }
         
-        labelLabel2.snp.makeConstraints {
+        stepLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(8)
             $0.height.equalTo(14)
         }
-        
+
         cardView.snp.makeConstraints {
-            $0.top.equalTo(labelView1.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(labelView1.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(24)
             $0.height.equalTo(450)
         }
-        
+
         flipButton.snp.makeConstraints {
             $0.top.equalTo(cardView.snp.bottom).offset(6)
             $0.centerX.equalToSuperview()
@@ -142,11 +157,30 @@ class TodayView: UIView {
         }
         flipButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         
-        likeButton.snp.makeConstraints {
+        buttonsStack.snp.makeConstraints {
             $0.top.equalTo(flipButton.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.height.equalTo(51)
         }
+    }
+
+    func configure(stepIndex: Int, topic: TopicModel) {
+        let stepTitles = ["첫 번째 주제", "두 번째 주제", "세 번째 주제", "네 번째 주제"]
+        stepLabel.text = stepTitles.indices.contains(stepIndex) ? stepTitles[stepIndex] : ""
+
+        labelLabel1.text = topic.tagTitle
+        cardView.image = UIImage(named: topic.imageName)
+        
+        print("Detail topic: id=\(topic.id), title=\(topic.tagTitle)")
+    }
+
+    @objc private func toggleLike() {
+        isLiked.toggle()
+        onLikeToggled?(isLiked)
+    }
+
+    @objc private func nextTapped() {
+        onNext?()
     }
     
     @objc func buttonTapped() {

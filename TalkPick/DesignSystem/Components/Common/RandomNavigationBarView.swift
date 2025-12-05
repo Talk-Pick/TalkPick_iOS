@@ -1,18 +1,18 @@
 //
-//  NavigationBarView.swift
+//  RandomNavigationBarView.swift
 //  TalkPick
 //
-//  Created by jaegu park on 10/5/25.
+//  Created by jaegu park on 12/5/25.
 //
 
 import UIKit
 import SnapKit
 
-protocol NavigationBarViewDelegate: AnyObject {
-    func didTapBackButton()
+protocol RandomNavigationBarViewDelegate: AnyObject {
+    func tapBackButton()
 }
 
-final class NavigationBarView: UIView {
+final class RandomNavigationBarView: UIView {
     
     let backButton: UIButton = {
         let bb = UIButton()
@@ -25,8 +25,13 @@ final class NavigationBarView: UIView {
         lb.font = .systemFont(ofSize: 17, weight: .bold)
         return lb
     }()
+    let homeButton: UIButton = {
+        let hb = UIButton()
+        hb.setImage(UIImage(named: "talkpick_home"), for: .normal)
+        return hb
+    }()
     
-    weak var delegate: NavigationBarViewDelegate?
+    weak var delegate: RandomNavigationBarViewDelegate?
     
     init(title: String) {
         super.init(frame: .zero)
@@ -55,16 +60,17 @@ final class NavigationBarView: UIView {
             $0.height.equalTo(19)
         }
         
+        addSubview(homeButton)
+        homeButton.snp.makeConstraints {
+            $0.centerY.equalTo(backButton)
+            $0.trailing.equalToSuperview().inset(20)
+            $0.width.height.equalTo(32)
+        }
+        
         backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
     }
     
     @objc private func backButtonTapped() {
-        delegate?.didTapBackButton()
-    }
-}
-
-extension UIViewController: NavigationBarViewDelegate {
-    func didTapBackButton() {
-        navigationController?.popViewController(animated: true)
+        delegate?.tapBackButton()
     }
 }

@@ -104,7 +104,7 @@ final class SectionView: UIView {
         stackView.snp.makeConstraints {
             $0.top.equalTo(topSeparator.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(88)
+            $0.height.equalTo(56)
         }
         
         actionButton.snp.makeConstraints {

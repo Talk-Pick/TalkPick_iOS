@@ -56,8 +56,8 @@ class CalendarCollectionViewCell: UICollectionViewCell {
         if dayView.superview == nil {
             contentView.addSubview(dayView)
             dayView.snp.makeConstraints { make in
-                make.top.bottom.equalToSuperview().inset(10)
-                make.leading.trailing.equalToSuperview().inset(12)
+                make.top.bottom.equalToSuperview().inset(6)
+                make.leading.trailing.equalToSuperview().inset(14)
             }
             
             dayView.addSubview(dayLabel)

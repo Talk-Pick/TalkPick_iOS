@@ -86,7 +86,7 @@ class AgreeView: UIView {
     }()
     
     let nextButton: UIButton = {
-        let bt = UIButton()
+        let bt = UIButton(type: .system)
         bt.setTitle("다음으로", for: .normal)
         bt.backgroundColor = .white
         bt.setTitleColor(.gray200, for: .normal)
@@ -117,8 +117,6 @@ class AgreeView: UIView {
     }
     
     private func setupViews() {
-        navigationbarView.homeButton.isHidden = true
-        
         addSubview(navigationbarView)
         addSubview(characterImageView)
         addSubview(agreementTitleLabel)
@@ -315,7 +313,7 @@ class AgreeView: UIView {
         // 필수 3개 + 만14세 모두 체크해야 활성화
         if agree1 && agree2 && agree3 && agreeAge{
             nextButton.isEnabled = true
-            nextButton.backgroundColor = .purple100
+            nextButton.backgroundColor = .black
             nextButton.setTitleColor(.white, for: .normal)
         } else {
             nextButton.isEnabled = false

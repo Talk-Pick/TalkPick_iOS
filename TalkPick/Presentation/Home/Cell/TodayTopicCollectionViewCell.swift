@@ -32,36 +32,6 @@ class TodayTopicCollectionViewCell: UICollectionViewCell {
         return lb
     }()
     
-    private let averageTalk: UILabel = {
-        let lb = UILabel()
-        lb.text = "평균 대화 시간"
-        lb.font = .systemFont(ofSize: 10, weight: .medium)
-        lb.textColor = .gray200
-        return lb
-    }()
-    
-    private let minuteLabel: UILabel = {
-        let lb = UILabel()
-        lb.font = .systemFont(ofSize: 15, weight: .bold)
-        lb.textColor = .gray200
-        return lb
-    }()
-    
-    private let selectCount: UILabel = {
-        let lb = UILabel()
-        lb.text = "선택된 횟수"
-        lb.font = .systemFont(ofSize: 10, weight: .medium)
-        lb.textColor = .gray200
-        return lb
-    }()
-    
-    private let countLabel: UILabel = {
-        let lb = UILabel()
-        lb.font = .systemFont(ofSize: 15, weight: .bold)
-        lb.textColor = .gray200
-        return lb
-    }()
-    
     private let character: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "talkpick_distance3"))
         iv.contentMode = .scaleAspectFit
@@ -112,38 +82,10 @@ class TodayTopicCollectionViewCell: UICollectionViewCell {
             $0.height.equalTo(40)
         }
         
-        self.contentView.addSubview(averageTalk)
-        averageTalk.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(16.5)
-            $0.leading.equalToSuperview().offset(14)
-            $0.height.equalTo(14)
-        }
-        
-        self.contentView.addSubview(minuteLabel)
-        minuteLabel.snp.makeConstraints {
-            $0.top.equalTo(averageTalk.snp.bottom).offset(3)
-            $0.leading.equalToSuperview().offset(14)
-            $0.height.equalTo(14)
-        }
-        
-        self.contentView.addSubview(selectCount)
-        selectCount.snp.makeConstraints {
-            $0.top.equalTo(minuteLabel.snp.bottom).offset(3)
-            $0.leading.equalToSuperview().offset(14)
-            $0.height.equalTo(14)
-        }
-        
-        self.contentView.addSubview(countLabel)
-        countLabel.snp.makeConstraints {
-            $0.top.equalTo(selectCount.snp.bottom).offset(3)
-            $0.leading.equalToSuperview().offset(14)
-            $0.height.equalTo(14)
-        }
-        
         self.contentView.addSubview(character)
         character.snp.makeConstraints {
             $0.bottom.equalToSuperview().inset(10)
-            $0.trailing.equalToSuperview().inset(14)
+            $0.leading.equalToSuperview().offset(14)
             $0.height.width.equalTo(88)
         }
     }
@@ -151,8 +93,6 @@ class TodayTopicCollectionViewCell: UICollectionViewCell {
     func prepare(topic: Topic) {
         labelLabel.text = topic.category
         titleLabel.text = topic.title
-        minuteLabel.text = String(topic.averageTalkTime) + "분"
-        countLabel.text = String(topic.selectCount) + "개"
         
         if let style = categoryStyles[topic.category] {
             labelView.backgroundColor = style.bgColor

@@ -40,6 +40,10 @@ class SituationView: UIView {
     }
     private var history: [UIState] = []
     
+    var canGoBack: Bool {
+        return !history.isEmpty
+    }
+    
     var onRelationshipPicked: ((Bool) -> Void)?
     var onSituationSelected: ((SituationKind) -> Void)?
     

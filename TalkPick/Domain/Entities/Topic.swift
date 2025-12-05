@@ -5,13 +5,11 @@
 //  Created by jaegu park on 11/3/25.
 //
 
-import Foundation
+import UIKit
 
 struct Topic: Codable {
     let topicId: Int
     let title: String
-    let averageTalkTime: Int
-    let selectCount: Int
     let category: String
     let keywordName: String
     let keywordIconUrl: String
@@ -55,4 +53,13 @@ struct CategoryDetail: Codable {
 struct Cursor: Codable {
     let createdDate: String
     let id: Int
+}
+
+struct TopicModel {
+    let id: String
+    let tagTitle: String     // 카드 상단 #만약에, #연애 …
+    let title: String        // 카드 하단 “MBTI 야구 게임” 등
+    let color: UIColor
+    let textColor: UIColor
+    let imageName: String
 }

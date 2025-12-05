@@ -16,7 +16,7 @@ class TopicRepository {
     }
     
     func getTopicDetail(token: String, topicId: Int) -> Single<APIResponse<TopicDetail>> {
-        let url = APIConstants.topicToday.path
+        let url = APIConstants.topicDetail(topicId).path
         let params = ["topicId": topicId]
         return APIService.shared.getWithTokenAndParams(of: APIResponse<TopicDetail>.self, url: url, parameters: params, accessToken: token)
     }

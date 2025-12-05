@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import Kingfisher
 
 class TodayViewController: UIViewController {
 
@@ -63,7 +64,10 @@ extension TodayViewController {
             .subscribe(onNext: { [weak self] detail in
                 self?.todayView.labelLabel1.text = detail.category
                 self?.todayView.labelLabel2.text = detail.keywordName
-                self?.todayView.cardView.image = self?.todayView.isFront ?? true ? UIImage(named: detail.keywordImageUrl) : UIImage(named: detail.topicImageUrl)
+                let thumbNailUrl1 = URL(string: detail.keywordImageUrl)
+                let thumbNailUrl2 = URL(string: detail.topicImageUrl)
+                let url = self?.todayView.isFront ?? true ? thumbNailUrl1 : thumbNailUrl2
+                self?.todayView.cardView.kf.setImage(with: url)
             })
             .disposed(by: disposeBag)
     }
