@@ -23,7 +23,6 @@ struct Term: Codable {
 struct SignUp: Codable {
     let memberId: Int
     let nickname: String
-    let profileImgUrl: String
     let mbti: String?
 }
 
@@ -38,7 +37,5 @@ struct User: Codable {
 
 struct Profile: Codable {
     let nickname: String
-    let profileImgUrl: String
-    let gender: String
     let mbti: String?
 }

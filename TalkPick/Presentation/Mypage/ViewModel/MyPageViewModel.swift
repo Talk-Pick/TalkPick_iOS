@@ -20,6 +20,7 @@ class MyPageViewModel {
     let profile = PublishSubject<Profile>()
     let profileEdited = PublishSubject<Bool>()
     let logout = PublishSubject<Bool>()
+    let likeTopicList = BehaviorRelay<[LikedDetail]>(value: [])
     
     func getMyProfile() {
         useCase.getMyProfile()
@@ -48,6 +49,18 @@ class MyPageViewModel {
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] success in
                 self?.logout.onNext(success)
+            }, onFailure: { error in
+                print("오류:", error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func getLikedTopics(cursor: String?, size: String) {
+        useCase.getLikedTopics(cursor: cursor, size: size)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] topics in
+                print("getLikedTopics message:", topics.message)
+                self?.likeTopicList.accept(topics.data.items)
             }, onFailure: { error in
                 print("오류:", error.localizedDescription)
             })

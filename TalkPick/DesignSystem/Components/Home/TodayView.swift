@@ -12,7 +12,7 @@ class TodayView: UIView {
     
     let navigationbarView = NavigationBarView(title: "오늘의 톡픽")
     
-    private let labelView1: UIView = {
+    let labelView1: UIView = {
         let uv = UIView()
         uv.backgroundColor = .yellow50
         uv.layer.cornerRadius = 15
@@ -73,6 +73,7 @@ class TodayView: UIView {
     }()
     
     var isFront: Bool = true
+    var onFlip: ((Bool) -> Void)?
     
     init() {
         super.init(frame: .zero)
@@ -130,8 +131,8 @@ class TodayView: UIView {
         
         cardView.snp.makeConstraints {
             $0.top.equalTo(labelView1.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(450)
+            $0.leading.trailing.equalToSuperview().inset(18)
+            $0.height.equalTo(460)
         }
         
         flipButton.snp.makeConstraints {
@@ -150,21 +151,15 @@ class TodayView: UIView {
     }
     
     @objc func buttonTapped() {
-        if isFront {
-            isFront = false
-            UIView.transition(with: cardView,
-                              duration: 0.5,
-                              options: .transitionFlipFromLeft,
-                              animations: nil,
-                              completion: nil)
-            
-        } else {
-            isFront = true
-            UIView.transition(with: cardView,
-                              duration: 0.5,
-                              options: .transitionFlipFromRight,
-                              animations: nil,
-                              completion: nil)
-        }
+        isFront.toggle()
+        let options: UIView.AnimationOptions = isFront ? .transitionFlipFromRight : .transitionFlipFromLeft
+        
+        UIView.transition(with: cardView,
+                          duration: 0.5,
+                          options: options,
+                          animations: {
+            self.onFlip?(self.isFront)
+        },
+                          completion: nil)
     }
 }

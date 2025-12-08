@@ -37,6 +37,15 @@ class MypageViewController: UIViewController {
     
     private func setUI() {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+        mypageView.etcSectionView.arrowRowViews.first?.chevronButton.addTarget(self,
+                                                                               action: #selector(etc_Tapped),
+                                                                               for: .touchUpInside)
+        mypageView.etcSectionView.arrowRowViews[1].chevronButton.addTarget(self,
+                                                                           action: #selector(etc_Tapped),
+                                                                           for: .touchUpInside)
+        mypageView.collectionSectionView.moreButton.addTarget(self,
+                                                              action: #selector(more_Tapped),
+                                                              for: .touchUpInside)
     }
     
     private func setProfile() {
@@ -52,5 +61,19 @@ class MypageViewController: UIViewController {
                 self?.mypageView.editMbtiView = EditMbtiView(mbti: profile.mbti ?? "미설정")
             })
             .disposed(by: disposeBag)
+    }
+    
+    
+    @objc private func more_Tapped() {
+        let likeTopicVC = LikeTopicViewController()
+        self.navigationController?.pushViewController(likeTopicVC, animated: true)
+    }
+    
+    @objc private func etc_Tapped() {
+        let serviceView = ServiceView()
+        self.view.addSubview(serviceView)
+        serviceView.alpha = 0
+        serviceView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        UIView.animate(withDuration: 0.3) { serviceView.alpha = 1 }
     }
 }

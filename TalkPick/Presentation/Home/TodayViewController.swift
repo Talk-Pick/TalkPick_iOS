@@ -17,6 +17,9 @@ class TodayViewController: UIViewController {
     private let topicViewModel = TopicViewModel()
     private var disposeBag = DisposeBag()
     
+    private var frontURL: URL?
+    private var backURL: URL?
+    
     override func loadView() {
         self.view = todayView
     }
@@ -48,6 +51,10 @@ class TodayViewController: UIViewController {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
         todayView.navigationbarView.delegate = self
+        todayView.likeButton.addTarget(self, action: #selector(like_Tapped), for: .touchUpInside)
+        todayView.onFlip = { [weak self] _ in
+            self?.updateCardImage()
+        }
     }
 }
 
@@ -62,13 +69,25 @@ extension TodayViewController {
         topicViewModel.topicDetail
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] detail in
-                self?.todayView.labelLabel1.text = detail.category
-                self?.todayView.labelLabel2.text = detail.keywordName
-                let thumbNailUrl1 = URL(string: detail.keywordImageUrl)
-                let thumbNailUrl2 = URL(string: detail.topicImageUrl)
-                let url = self?.todayView.isFront ?? true ? thumbNailUrl1 : thumbNailUrl2
-                self?.todayView.cardView.kf.setImage(with: url)
+                guard let self = self else { return }
+                let style = categoryStyles[detail.category]
+                self.todayView.labelView1.backgroundColor = style?.bgColor
+                self.todayView.labelLabel1.textColor = style?.textColor
+                self.todayView.labelLabel1.text = detail.category
+                self.todayView.labelLabel2.text = detail.keywordName
+                self.frontURL = URL(string: detail.keywordImageUrl)
+                self.backURL  = URL(string: detail.topicImageUrl)
+                self.updateCardImage()
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func updateCardImage() {
+        let url = todayView.isFront ? frontURL : backURL
+        todayView.cardView.kf.setImage(with: url)
+    }
+    
+    @objc private func like_Tapped() {
+        topicViewModel.postTopicLike(topicId: topicId)
     }
 }

@@ -85,13 +85,21 @@ class UserUseCase {
             .catchAndReturn(false)
     }
     
-    func getLikedTopics(parameters: [String : Any]?) -> Single<[LikedTopic]> {
+    func getLikedTopics(cursor: String?, size: String) -> Single<APIResponse<LikedTopic>> {
         guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
             return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
         }
         
-        return userRepository.getLikedTopics(token: token, parameters: parameters)
-                    .map { $0.data }
+        var params: [String: Any] = [
+            "size": size
+        ]
+        
+        // cursor가 있을 때만 파라미터에 포함
+        if let cursor = cursor {
+            params["cursor"] = cursor
+        }
+        
+        return userRepository.getLikedTopics(token: token, parameters: params)
     }
     
     func logOut() -> Single<Bool> {

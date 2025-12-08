@@ -33,7 +33,7 @@ class TodayTopicCollectionViewCell: UICollectionViewCell {
     }()
     
     private let character: UIImageView = {
-        let iv = UIImageView(image: UIImage(named: "talkpick_distance3"))
+        let iv = UIImageView(image: UIImage(named: "talkpick_topic1"))
         iv.contentMode = .scaleAspectFit
         return iv
     }()

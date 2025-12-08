@@ -287,6 +287,8 @@ final class EtcSectionView: UIView {
     private let topSeparator = SeparatorView()
     private let stackView = UIStackView()
     
+    private(set) var arrowRowViews: [ArrowRowView] = []
+    
     init(rows: [EtcRow]) {
         super.init(frame: .zero)
         backgroundColor = .white
@@ -325,6 +327,8 @@ final class EtcSectionView: UIView {
             case let .arrowRow(icon, title):
                 let r = ArrowRowView(icon: icon, title: title)
                 stackView.addArrangedSubview(r)
+                
+                arrowRowViews.append(r)
             }
         }
     }
@@ -338,7 +342,7 @@ final class ArrowRowView: UIView {
     
     private let leftIcon = UIImageView()
     private let titleLabel = UILabel()
-    private let chevron = UIImageView()
+    let chevronButton = UIButton(type: .custom)
     
     init(icon: String, title: String) {
         super.init(frame: .zero)
@@ -349,11 +353,11 @@ final class ArrowRowView: UIView {
         titleLabel.font = .systemFont(ofSize: 16, weight: .medium)
         titleLabel.textColor = .gray200
         
-        chevron.image = UIImage(named: "talkpick_more")
+        chevronButton.setImage(UIImage(named: "talkpick_more"), for: .normal)
         
         addSubview(leftIcon)
         addSubview(titleLabel)
-        addSubview(chevron)
+        addSubview(chevronButton)
         
         self.snp.makeConstraints {
             $0.height.equalTo(24)
@@ -365,7 +369,7 @@ final class ArrowRowView: UIView {
             $0.width.height.equalTo(24)
         }
         
-        chevron.snp.makeConstraints {
+        chevronButton.snp.makeConstraints {
             $0.trailing.equalToSuperview()
             $0.centerY.equalToSuperview()
             $0.height.width.equalTo(24)

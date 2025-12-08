@@ -40,9 +40,9 @@ class UserRepository {
         return APIService.shared.patchWithToken(of: APIResponse<Profile>.self, url: url, parameters: parameters, accessToken: token)
     }
     
-    func getLikedTopics(token: String, parameters: [String: Any]?) -> Single<APIResponse<[LikedTopic]>> {
-        let url = APIConstants.myProfile.path
-        return APIService.shared.getWithTokenAndParams(of: APIResponse<[LikedTopic]>.self, url: url, parameters: parameters, accessToken: token)
+    func getLikedTopics(token: String, parameters: [String: Any]?) -> Single<APIResponse<LikedTopic>> {
+        let url = APIConstants.likedTopics.path
+        return APIService.shared.getWithTokenAndParams(of: APIResponse<LikedTopic>.self, url: url, parameters: parameters, accessToken: token)
     }
     
     func logOut(token: String) -> Single<Response> {

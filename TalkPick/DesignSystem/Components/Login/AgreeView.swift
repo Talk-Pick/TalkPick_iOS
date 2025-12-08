@@ -14,7 +14,7 @@ class AgreeView: UIView {
     
     private let characterImageView: UIImageView = {
         let iv = UIImageView()
-        iv.image = UIImage(named: "talkpick_distance3")
+        iv.image = UIImage(named: "talkpick_agree")
         iv.contentMode = .scaleAspectFit
         return iv
     }()

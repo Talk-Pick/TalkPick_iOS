@@ -12,8 +12,8 @@ class MypageView: UIView {
     
     private let titleLabel = UILabel()
     private let infoSectionView: SectionView
-    private let collectionSectionView: CollectionSectionView
-    private let etcSectionView: EtcSectionView
+    let collectionSectionView: CollectionSectionView
+    let etcSectionView: EtcSectionView
     private let withdrawButton = UIButton(type: .system)
     
     var editMbtiView = EditMbtiView(mbti: "")
