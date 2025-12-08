@@ -18,7 +18,6 @@ class MyPageViewModel {
     }
     
     let profile = PublishSubject<Profile>()
-    let profileEdited = PublishSubject<Bool>()
     let logout = PublishSubject<Bool>()
     let likeTopicList = BehaviorRelay<[LikedDetail]>(value: [])
     
@@ -37,7 +36,7 @@ class MyPageViewModel {
         useCase.editMyProfile(mbti: mbti)
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] success in
-                self?.profileEdited.onNext(success)
+                self?.getMyProfile()
             }, onFailure: { error in
                 print("오류:", error.localizedDescription)
             })

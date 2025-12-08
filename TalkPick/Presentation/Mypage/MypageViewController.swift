@@ -35,6 +35,10 @@ class MypageViewController: UIViewController {
         }
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     private func setUI() {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         mypageView.etcSectionView.arrowRowViews.first?.chevronButton.addTarget(self,
@@ -57,8 +61,11 @@ class MypageViewController: UIViewController {
         viewModel.profile
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] profile in
-                self?.mypageView.updateProfile(profile.nickname, profile.mbti ?? "미설정")
-                self?.mypageView.editMbtiView = EditMbtiView(mbti: profile.mbti ?? "미설정")
+                guard let self = self else { return }
+                self.mypageView.updateProfile(profile.nickname, profile.mbti ?? "미설정")
+                let editView = EditMbtiView(mbti: profile.mbti ?? "미설정",
+                                            viewModel: self.viewModel)
+                self.mypageView.editMbtiView = editView
             })
             .disposed(by: disposeBag)
     }

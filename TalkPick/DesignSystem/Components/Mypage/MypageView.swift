@@ -16,7 +16,7 @@ class MypageView: UIView {
     let etcSectionView: EtcSectionView
     private let withdrawButton = UIButton(type: .system)
     
-    var editMbtiView = EditMbtiView(mbti: "")
+    var editMbtiView: EditMbtiView?
     
     override init(frame: CGRect) {
         // 1) 내 정보 섹션
@@ -111,14 +111,21 @@ class MypageView: UIView {
     }
     
     @objc func edit_Tapped() {
-        addSubview(editMbtiView)
-        editMbtiView.alpha = 0
-        editMbtiView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        guard let editMbtiView = editMbtiView else {
+            print("editMbtiView 가 아직 주입되지 않았습니다.")
+            return
         }
         
+        if editMbtiView.superview == nil {
+            addSubview(editMbtiView)
+            editMbtiView.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+        }
+        
+        editMbtiView.alpha = 0
         UIView.animate(withDuration: 0.3) {
-            self.editMbtiView.alpha = 1
+            editMbtiView.alpha = 1
         }
     }
 }
