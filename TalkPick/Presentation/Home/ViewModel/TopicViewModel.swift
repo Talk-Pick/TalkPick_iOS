@@ -15,7 +15,6 @@ class TopicViewModel {
     
     let todayTopics = BehaviorRelay<[Topic]>(value: [])
     let topicDetail = PublishSubject<TopicDetail>()
-    let topicLiked = PublishSubject<Bool>()
     
     init(useCase: TopicUseCase = TopicUseCase()) {
         self.useCase = useCase
@@ -46,7 +45,6 @@ class TopicViewModel {
     func postTopicLike(topicId: Int) {
         useCase.postTopicLike(topicId: topicId)
             .subscribe(onSuccess: { [weak self] success in
-                self?.topicLiked.onNext(success)
                 print("좋아요 성공")
             }, onFailure: { error in
                 print("오류:", error.localizedDescription)

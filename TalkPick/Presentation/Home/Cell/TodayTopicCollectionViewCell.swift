@@ -62,7 +62,7 @@ class TodayTopicCollectionViewCell: UICollectionViewCell {
         
         self.contentView.addSubview(labelView)
         labelView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(10)
+            $0.top.equalToSuperview().offset(12)
             $0.leading.equalToSuperview().offset(14)
             $0.height.equalTo(23)
         }
@@ -84,7 +84,7 @@ class TodayTopicCollectionViewCell: UICollectionViewCell {
         
         self.contentView.addSubview(character)
         character.snp.makeConstraints {
-            $0.bottom.equalToSuperview().inset(10)
+            $0.bottom.equalToSuperview().inset(12)
             $0.leading.equalToSuperview().offset(14)
             $0.height.width.equalTo(88)
         }

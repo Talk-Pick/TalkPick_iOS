@@ -68,11 +68,11 @@ class TopicView: UIView {
         
         for (offset, item) in items.enumerated() {
             let card = TopicButton(
-                color: item.color,
-                labelTitle: item.tagTitle,
-                textColor: item.textColor,
-                image: UIImage(named: item.imageName),
-                title: item.title
+                color: item.keywordColor,
+                labelTitle: item.keyword,
+                textColor: item.categoryColor,
+                image: item.imageName,
+                title: item.category
             )
             
             // 전체 topics 배열에서의 인덱스

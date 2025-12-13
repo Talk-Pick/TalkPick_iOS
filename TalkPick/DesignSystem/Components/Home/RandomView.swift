@@ -7,17 +7,20 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 class RandomView: UIView {
     
-    let navigationbarView = RandomNavigationBarView(title: "뒤로 가기")
+    private let randomViewModel = RandomViewModel()
+    private let randomId = UserDefaults.standard.integer(forKey: "randomId")
+    private let disposeBag = DisposeBag()
     
-    private let situationView = SituationView()
-    private let topicView = TopicView()
-    private let detailView = TopicDetailView()
-    private let finishView = FinishView()
-    
-    private var currentView: UIView?
+    private let totalSteps: Int = 11
+    private var currentStepNumber: Int = 1 {
+        didSet {
+            print("현재 단계: \(currentStepNumber)/\(totalSteps)")
+        }
+    }
     
     private var isCloseRelationship: Bool?
     private var selectedSituation: SituationView.SituationKind?
@@ -26,12 +29,11 @@ class RandomView: UIView {
     private var currentStep: Step = .situation
     private var history: [Step] = []
     
-    private let topicData: [[TopicModel]] = [
-        [TopicModel(id: "", tagTitle: "#만약에", title: "MBTI 야구 게임", color: .pink50, textColor: .pink100, imageName: "talkpick_topic1"), TopicModel(id: "", tagTitle: "가족", title: "MBTI 야구 게임", color: .purple50, textColor: .purple100, imageName: "talkpick_topic2"), TopicModel(id: "", tagTitle: "그룹 첫 모임", title: "MBTI 야구 게임", color: .yellow50, textColor: .yellow100, imageName: "talkpick_topic3"), TopicModel(id: "", tagTitle: "친구", title: "MBTI 야구 게임", color: .orange50, textColor: .orange100, imageName: "talkpick_topic4")],
-        [TopicModel(id: "", tagTitle: "#만약에", title: "MBTI 야구 게임", color: .pink50, textColor: .pink100, imageName: "talkpick_topic1"), TopicModel(id: "", tagTitle: "가족", title: "MBTI 야구 게임", color: .purple50, textColor: .purple100, imageName: "talkpick_topic2"), TopicModel(id: "", tagTitle: "그룹 첫 모임", title: "MBTI 야구 게임", color: .yellow50, textColor: .yellow100, imageName: "talkpick_topic3"), TopicModel(id: "", tagTitle: "친구", title: "MBTI 야구 게임", color: .orange50, textColor: .orange100, imageName: "talkpick_topic4")],
-        [TopicModel(id: "", tagTitle: "#만약에", title: "MBTI 야구 게임", color: .pink50, textColor: .pink100, imageName: "talkpick_topic1"), TopicModel(id: "", tagTitle: "가족", title: "MBTI 야구 게임", color: .purple50, textColor: .purple100, imageName: "talkpick_topic2"), TopicModel(id: "", tagTitle: "그룹 첫 모임", title: "MBTI 야구 게임", color: .yellow50, textColor: .yellow100, imageName: "talkpick_topic3"), TopicModel(id: "", tagTitle: "친구", title: "MBTI 야구 게임", color: .orange50, textColor: .orange100, imageName: "talkpick_topic4")],
-        [TopicModel(id: "", tagTitle: "#만약에", title: "MBTI 야구 게임", color: .pink50, textColor: .pink100, imageName: "talkpick_topic1"), TopicModel(id: "", tagTitle: "가족", title: "MBTI 야구 게임", color: .purple50, textColor: .purple100, imageName: "talkpick_topic2"), TopicModel(id: "", tagTitle: "그룹 첫 모임", title: "MBTI 야구 게임", color: .yellow50, textColor: .yellow100, imageName: "talkpick_topic3"), TopicModel(id: "", tagTitle: "친구", title: "MBTI 야구 게임", color: .orange50, textColor: .orange100, imageName: "talkpick_topic4")]
-    ]
+    private var relationshipText: String?
+    private var situationText: String?
+    
+    private var topicData: [[TopicModel]] = Array(repeating: [], count: 4)
+
     
     var onExitRequested: (() -> Void)?
     
@@ -42,6 +44,12 @@ class RandomView: UIView {
         case finish                     // 마지막 별점
     }
     
+    let navigationbarView = RandomNavigationBarView(title: "뒤로 가기")
+    private let situationView = SituationView()
+    private let topicView = TopicView()
+    private let detailView = TopicDetailView()
+    private let finishView = FinishView()
+    private var currentView: UIView?
     private let smallLogo: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "talkpick_smallLogo"))
         iv.contentMode = .scaleAspectFit
@@ -81,7 +89,12 @@ class RandomView: UIView {
     }
     
     private func show(step: Step, pushHistory: Bool = true) {
-        if pushHistory { history.append(currentStep) }
+        if pushHistory {
+            history.append(currentStep)
+            increaseStep()
+        } else {
+            decreaseStep()
+        }
         currentStep = step
 
         switch step {
@@ -126,15 +139,48 @@ class RandomView: UIView {
     private func bindViews() {
         // 1) 가까운 사이 / 처음 본 사이 선택
         situationView.onRelationshipPicked = { [weak self] isClose in
-            self?.isCloseRelationship = isClose
-            // SituationView 안에서 이미 state를 pickSituation으로 넘기고 있으니
-            // 여기서는 따로 화면 교체 안해도 됨
+            guard let self = self else { return }
+            self.isCloseRelationship = isClose
+            self.relationshipText = isClose ? "CLOSE" : "STRANGER"
         }
 
         // 2) 소개팅/과팅, 그룹 첫 모임 등 상황 선택 완료
         situationView.onSituationSelected = { [weak self] kind in
-            self?.selectedSituation = kind
-            self?.show(step: .topicSelect(step: 0))   // 첫 번째 주제 선택 화면으로
+            guard let self = self else { return }
+            self.selectedSituation = kind
+            self.situationText = kind.koreanTitle
+            self.show(step: .topicSelect(step: 0))
+            guard let relationship = self.relationshipText,
+                  let situation = self.situationText else { return }
+            
+            print("\(relationship) \(situation) \(randomId) \(currentStepNumber)")
+            
+            self.randomViewModel.getRandomTopics(
+                id: self.randomId,
+                order: self.currentStepNumber,
+                categoryGroup: relationship,
+                category: situation
+            )
+            
+            self.randomViewModel.randomTopics
+                .observe(on: MainScheduler.instance)
+                .subscribe(onNext: { [weak self] details in
+                    guard let self = self else { return }
+                    let topics = self.mapToTopicModels(details)
+                    self.topicData[0] = topics
+                    self.topicView.configure(stepIndex: 0, topics: topics)
+                })
+                .disposed(by: self.disposeBag)
+        }
+        
+        situationView.onForwardStep = { [weak self] in
+            guard let self = self else { return }
+            self.increaseStep()
+        }
+
+        situationView.onBackwardStep = { [weak self] in
+            guard let self = self else { return }
+            self.decreaseStep()
         }
     }
 
@@ -183,6 +229,28 @@ class RandomView: UIView {
             } else {
                 onExitRequested?()
             }
+        }
+    }
+    
+    func increaseStep() {
+        currentStepNumber = min(totalSteps, currentStepNumber + 1)
+    }
+    
+    func decreaseStep() {
+        currentStepNumber = max(1, currentStepNumber - 1)
+    }
+    
+    private func mapToTopicModels(_ details: [RandomTopicDetail]) -> [TopicModel] {
+        return details.map { detail in
+            let style = categoryStyles[detail.category]
+            return TopicModel(
+                id: String(detail.topicId),
+                keyword: detail.keywordName,
+                category: detail.category,
+                keywordColor: .purple50,
+                categoryColor: .purple100,
+                imageName: detail.keywordIconUrl
+            )
         }
     }
 }

@@ -22,6 +22,13 @@ enum APIConstants {
     case topicToday
     case topicCategory
     
+    case randomTotalRecord(Int)
+    case randomRate(Int)
+    case randomQuit(Int)
+    case randomEnd(Int)
+    case randomComment(Int)
+    case randomStart
+    case randomTopics(Int)
 }
 
 extension APIConstants {
@@ -59,6 +66,21 @@ extension APIConstants {
             return APIConstants.makeEndPoint("/topic/today-topics")
         case .topicCategory:
             return APIConstants.makeEndPoint("/topic/categories")
+            
+        case .randomTotalRecord(let id):
+            return APIConstants.makeEndPoint("/random/\(id)/total-record")
+        case .randomRate(let id):
+            return APIConstants.makeEndPoint("/random/\(id)/rate")
+        case .randomQuit(let id):
+            return APIConstants.makeEndPoint("/random/\(id)/quit")
+        case .randomEnd(let id):
+            return APIConstants.makeEndPoint("/random/\(id)/end")
+        case .randomComment(let id):
+            return APIConstants.makeEndPoint("/random/\(id)/comment")
+        case .randomStart:
+            return APIConstants.makeEndPoint("/random/start")
+        case .randomTopics(let id):
+            return APIConstants.makeEndPoint("/random/\(id)/topics")
         }
     }
 }

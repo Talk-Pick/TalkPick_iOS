@@ -55,35 +55,8 @@ class AgreeView: UIView {
     }()
     
     lazy var row1 = makeAgreementRow(title: "서비스 이용약관 동의", type: "필수")
-    lazy var row2 = makeAgreementRow(title: "전자금융거래 이용약관 동의", type: "필수")
-    lazy var row3 = makeAgreementRow(title: "개인정보 수집 및 이용 동의", type: "필수")
-    lazy var row4 = makeAgreementRow(title: "커뮤니티 이용규칙 확인", type: "선택")
-    
-    private let ageCheckContainer: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(white: 0.97, alpha: 1.0)
-        view.layer.cornerRadius = 10
-        return view
-    }()
-    
-    private let ageCheckIcon: UIImageView = {
-        let iv = UIImageView()
-        iv.image = UIImage(named: "talkpick_noncheck")
-        return iv
-    }()
-    
-    private let ageCheckLabel: UILabel = {
-        let label = UILabel()
-        let text = "만 14세 이상이며 본인 명의로 가입을 진행하겠습니다"
-        let attr = NSMutableAttributedString(string: text)
-        let range1 = (text as NSString).range(of: "만 14세 이상")
-        let range2 = (text as NSString).range(of: "본인 명의로 가입")
-        attr.addAttribute(.foregroundColor, value: UIColor.purple100, range: range1)
-        attr.addAttribute(.foregroundColor, value: UIColor.purple100, range: range2)
-        label.attributedText = attr
-        label.font = .systemFont(ofSize: 14, weight: .heavy)
-        return label
-    }()
+    lazy var row2 = makeAgreementRow(title: "개인정보 수집 및 이용 동의", type: "필수")
+    lazy var row3 = makeAgreementRow(title: "만 14세 이상입니다", type: "필수")
     
     let nextButton: UIButton = {
         let bt = UIButton(type: .system)
@@ -102,8 +75,8 @@ class AgreeView: UIView {
     private var agree1 = false
     private var agree2 = false
     private var agree3 = false
-    private var agreeOptional = false
-    private var agreeAge = false
+    
+    private let loginViewModel = LoginViewModel()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -122,18 +95,15 @@ class AgreeView: UIView {
         addSubview(agreementTitleLabel)
         addSubview(agreementSubLabel)
         addSubview(allAgreeContainer)
-        addSubview(ageCheckContainer)
         addSubview(nextButton)
         
-        let rows = [row1, row2, row3, row4]
+        let rows = [row1, row2, row3]
         rows.forEach { addSubview($0) }
         
         row1.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapRow1)))
         row2.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapRow2)))
         row3.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapRow3)))
-        row4.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapRow4)))
         allAgreeContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapAllAgree)))
-        ageCheckContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapAgeCheck)))
     }
     
     private func setupConstraints() {
@@ -143,7 +113,7 @@ class AgreeView: UIView {
         }
         
         characterImageView.snp.makeConstraints {
-            $0.top.equalTo(navigationbarView.snp.bottom).offset(20)
+            $0.top.equalTo(navigationbarView.snp.bottom).offset(40)
             $0.leading.equalToSuperview().offset(20)
             $0.width.height.equalTo(40)
         }
@@ -196,32 +166,6 @@ class AgreeView: UIView {
             $0.leading.trailing.equalTo(row1)
             $0.height.equalTo(39)
         }
-        row4.snp.makeConstraints {
-            $0.top.equalTo(row3.snp.bottom)
-            $0.leading.trailing.equalTo(row1)
-            $0.height.equalTo(39)
-        }
-        
-        ageCheckContainer.addSubview(ageCheckIcon)
-        ageCheckContainer.addSubview(ageCheckLabel)
-        
-        ageCheckContainer.snp.makeConstraints {
-            $0.top.equalTo(row4.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(55)
-        }
-        
-        ageCheckIcon.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(10)
-            $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(18)
-        }
-        
-        ageCheckLabel.snp.makeConstraints {
-            $0.leading.equalTo(ageCheckIcon.snp.trailing).offset(10)
-            $0.trailing.equalToSuperview().offset(-8)
-            $0.centerY.equalToSuperview()
-        }
         
         nextButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(24)
@@ -232,7 +176,7 @@ class AgreeView: UIView {
     
     private func makeAgreementRow(title: String, type: String) -> UIView {
         let container = UIView()
-        container.isUserInteractionEnabled = true   // 터치 가능하도록 추가
+        container.isUserInteractionEnabled = true
         
         let checkIcon = UIImageView()
         checkIcon.image = UIImage(named: "talkpick_noncheck")
@@ -254,7 +198,7 @@ class AgreeView: UIView {
         titleLabel.font = .boldSystemFont(ofSize: 14)
         
         let arrowIcon = UIImageView()
-        arrowIcon.image = UIImage(named: "talkpick_more")
+        arrowIcon.image = UIImage(named: "talkpick_down")
         
         container.addSubview(checkIcon)
         container.addSubview(badgeView)
@@ -287,7 +231,8 @@ class AgreeView: UIView {
         arrowIcon.snp.makeConstraints {
             $0.trailing.equalToSuperview().offset(-12)
             $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(18)
+            $0.width.equalTo(18)
+            $0.height.equalTo(8)
         }
         
         container.snp.makeConstraints {
@@ -299,19 +244,17 @@ class AgreeView: UIView {
     
     private func updateUI() {
         updateCheckIcon(allAgreeCheck, isOn: allAgree)
-        updateCheckIcon(ageCheckIcon, isOn: agreeAge)
 
         updateCheckIcon(checkIcon(in: row1)!, isOn: agree1)
         updateCheckIcon(checkIcon(in: row2)!, isOn: agree2)
         updateCheckIcon(checkIcon(in: row3)!, isOn: agree3)
-        updateCheckIcon(checkIcon(in: row4)!, isOn: agreeOptional)
 
         // 전체동의 상태 갱신
-        allAgree = agree1 && agree2 && agree3 && agreeOptional && agreeAge
+        allAgree = agree1 && agree2 && agree3
         updateCheckIcon(allAgreeCheck, isOn: allAgree)
 
         // 필수 3개 + 만14세 모두 체크해야 활성화
-        if agree1 && agree2 && agree3 && agreeAge{
+        if agree1 && agree2 && agree3 {
             nextButton.isEnabled = true
             nextButton.backgroundColor = .black
             nextButton.setTitleColor(.white, for: .normal)
@@ -330,8 +273,6 @@ class AgreeView: UIView {
         agree1 = newState
         agree2 = newState
         agree3 = newState
-        agreeOptional = newState
-        agreeAge = newState
         updateUI()
     }
 
@@ -347,16 +288,6 @@ class AgreeView: UIView {
 
     @objc private func didTapRow3() {
         agree3.toggle()
-        updateUI()
-    }
-
-    @objc private func didTapRow4() {
-        agreeOptional.toggle()
-        updateUI()
-    }
-
-    @objc private func didTapAgeCheck() {
-        agreeAge.toggle()
         updateUI()
     }
 

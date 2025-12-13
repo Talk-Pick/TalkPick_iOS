@@ -45,7 +45,7 @@ class LikeTopicView: UIView {
         }
         
         likeTopicTableView.snp.makeConstraints {
-            $0.top.equalTo(navigationbarView.snp.bottom)
+            $0.top.equalTo(navigationbarView.snp.bottom).offset(10)
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }

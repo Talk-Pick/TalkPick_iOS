@@ -10,6 +10,7 @@ import UIKit
 class RandomViewController: UIViewController {
     
     private let randomView = RandomView()
+    private let randomViewModel = RandomViewModel()
     
     override func loadView() {
         self.view = randomView
@@ -18,6 +19,7 @@ class RandomViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
+        startAPI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -36,6 +38,10 @@ class RandomViewController: UIViewController {
         randomView.onExitRequested = { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
+    }
+    
+    private func startAPI() {
+        randomViewModel.postRandomStart()
     }
     
     @objc private func homeButton() {

@@ -30,7 +30,7 @@ class UserUseCase {
             .catchAndReturn(false)
     }
     
-    func kakaoLogin(idToken: String) -> Single<User> {
+    func kakaoLogin(idToken: String) -> Single<Token> {
         let params: [String: Any] = [
             "idToken": idToken
         ]
@@ -39,7 +39,7 @@ class UserUseCase {
             .map { $0.data }
     }
     
-    func appleLogin(idToken: String) -> Single<APIResponse<User>> {
+    func appleLogin(idToken: String) -> Single<APIResponse<Token>> {
         let params: [String: Any] = [
             "idToken": idToken
         ]

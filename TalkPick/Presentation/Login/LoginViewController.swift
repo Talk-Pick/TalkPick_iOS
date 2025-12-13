@@ -39,7 +39,7 @@ class LoginViewController: UIViewController {
             .subscribe(onNext: { [weak self] profile in
                 guard let self = self else { return }
                 if let mbti = profile.mbti, !mbti.isEmpty {
-                    let mainTabVC = MainTabViewController()
+                    let mainTabVC = AgreeViewController()
                     self.navigationController?.pushViewController(mainTabVC, animated: true)
                 } else {
                     let agreeVC = AgreeViewController()

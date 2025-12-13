@@ -52,11 +52,31 @@ struct Cursor: Codable {
     let id: Int
 }
 
+struct RandomId: Codable {
+    let randomId: Int
+}
+
+struct RandomTopic: Codable {
+    let order: Int
+    let randomTopicDetails: [RandomTopicDetail]
+}
+
+struct RandomTopicDetail: Codable {
+    let topicId: Int
+    let title: String
+    let detail: String
+    let categoryGroup: String
+    let category: String
+    let keywordName: String
+    let keywordImageUrl: String
+    let keywordIconUrl: String
+}
+
 struct TopicModel {
     let id: String
-    let tagTitle: String
-    let title: String
-    let color: UIColor
-    let textColor: UIColor
+    let keyword: String
+    let category: String
+    let keywordColor: UIColor
+    let categoryColor: UIColor
     let imageName: String
 }

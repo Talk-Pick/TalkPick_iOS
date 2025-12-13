@@ -168,10 +168,10 @@ class TopicDetailView: UIView {
         let stepTitles = ["첫 번째 주제", "두 번째 주제", "세 번째 주제", "네 번째 주제"]
         stepLabel.text = stepTitles.indices.contains(stepIndex) ? stepTitles[stepIndex] : ""
 
-        labelLabel1.text = topic.tagTitle
+        labelLabel1.text = topic.category
         cardView.image = UIImage(named: topic.imageName)
         
-        print("Detail topic: id=\(topic.id), title=\(topic.tagTitle)")
+        print("Detail topic: id=\(topic.id), title=\(topic.category)")
     }
 
     @objc private func toggleLike() {

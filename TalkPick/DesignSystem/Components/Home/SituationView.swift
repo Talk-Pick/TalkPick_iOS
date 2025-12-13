@@ -47,6 +47,8 @@ class SituationView: UIView {
     
     var onRelationshipPicked: ((Bool) -> Void)?
     var onSituationSelected: ((SituationKind) -> Void)?
+    var onForwardStep: (() -> Void)?
+    var onBackwardStep: (() -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -170,6 +172,9 @@ class SituationView: UIView {
             cardStack.removeArrangedSubview($0)
             $0.removeFromSuperview()
         }
+        if state == .pickSituation && prev == .pickRelationship {
+            onBackwardStep?()
+        }
         state = prev
     }
     
@@ -183,6 +188,7 @@ class SituationView: UIView {
         onRelationshipPicked?(true)
         setupCardStack(isClose: true)
         goForward(to: .pickSituation)
+        onForwardStep?()
     }
     
     @objc private func tapFirstMet() {
@@ -190,6 +196,7 @@ class SituationView: UIView {
         onRelationshipPicked?(false)
         setupCardStack(isClose: false)
         goForward(to: .pickSituation)
+        onForwardStep?()
     }
     
     private func apply(_ state: UIState, animated: Bool) {
@@ -222,5 +229,20 @@ class SituationView: UIView {
             self.cardStack.alpha = show ? 1 : 0
         }
         animated ? UIView.animate(withDuration: 0.25, animations: change) : change()
+    }
+}
+
+extension SituationView.SituationKind {
+    var koreanTitle: String {
+        switch self {
+        case .dating:        return "소개팅/과팅"
+        case .firstGroup:    return "그룹 첫 모임"
+        case .firstRoommate: return "룸메 첫 만남"
+        case .icebreak:      return "기타/아이스브레이킹"
+        case .family:        return "가족"
+        case .friend:        return "친구"
+        case .lover:         return "연인"
+        case .coworker:      return "동료"
+        }
     }
 }

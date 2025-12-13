@@ -2,7 +2,7 @@ import UIKit
 import SnapKit
 
 class OnboardingViewController: UIViewController {
-    private let images = ["talkpick_launch", "talkpick_launch", "talkpick_launch", "talkpick_launch"]
+    private let images = ["talkpick_onboarding1", "talkpick_onboarding2", "talkpick_onboarding3", "talkpick_onboarding4"]
     private var currentIndex = 0
     
     private let currentImageView = UIImageView()
@@ -29,15 +29,15 @@ class OnboardingViewController: UIViewController {
         currentImageView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.centerY.equalToSuperview()
-            $0.width.equalToSuperview().multipliedBy(0.8)
-            $0.height.equalToSuperview().multipliedBy(0.9)
+            $0.width.equalToSuperview().multipliedBy(1)
+            $0.height.equalToSuperview().multipliedBy(1)
         }
         
         nextImageView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.centerY.equalToSuperview()
-            $0.width.equalToSuperview().multipliedBy(0.8)
-            $0.height.equalToSuperview().multipliedBy(0.9)
+            $0.width.equalToSuperview().multipliedBy(1)
+            $0.height.equalToSuperview().multipliedBy(1)
         }
     }
     

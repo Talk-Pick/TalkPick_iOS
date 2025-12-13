@@ -154,7 +154,7 @@ class LoginView: UIView {
         let label = UILabel()
         label.text = title
         label.textColor = titleColor
-        label.font = .systemFont(ofSize: 15, weight: .semibold)
+        label.font = .systemFont(ofSize: 16, weight: .bold)
         label.isUserInteractionEnabled = false
         
         let container = UIView()
