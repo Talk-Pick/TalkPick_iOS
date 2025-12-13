@@ -46,7 +46,7 @@ class CompleteView: UIView {
     
     private func setupConstraints() {
         finishImageView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(200)
+            $0.top.equalToSuperview().offset(224)
             $0.leading.trailing.equalToSuperview().inset(52)
             $0.height.equalTo(173)
         }
