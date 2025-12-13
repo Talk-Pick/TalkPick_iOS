@@ -1,9 +1,3 @@
-//
-//  APIService.swift
-//  TalkPick
-//
-//  Created by jaegu park on 11/3/25.
-//
 
 import Alamofire
 import RxSwift

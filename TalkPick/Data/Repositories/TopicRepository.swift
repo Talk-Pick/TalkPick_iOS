@@ -1,9 +1,3 @@
-//
-//  TopicRepository.swift
-//  TalkPick
-//
-//  Created by jaegu park on 11/10/25.
-//
 
 import RxSwift
 

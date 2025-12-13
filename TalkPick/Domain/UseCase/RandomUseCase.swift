@@ -1,9 +1,3 @@
-//
-//  RandomUseCase.swift
-//  TalkPick
-//
-//  Created by jaegu park on 12/9/25.
-//
 
 import RxSwift
 import Foundation
@@ -15,12 +9,44 @@ class RandomUseCase {
         self.randomRepository = randomRepository
     }
     
+    func postRandomTotalRecord(id: Int, totalRecords: [TotalRecord]) -> Single<Bool> {
+        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+            return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
+        }
+        
+        let params = ["totalRecords": totalRecords]
+        
+        return randomRepository.postRandomTotalRecord(token: token, id: id, parameters: params)
+            .map { _ in true }
+            .catchAndReturn(false)
+    }
+    
     func postRandomRate(id: Int, rating: Int) -> Single<Bool> {
         guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
             return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
         }
         
         return randomRepository.postRandomRate(token: token, id: id, rating: rating)
+            .map { _ in true }
+            .catchAndReturn(false)
+    }
+    
+    func postRandomQuit(id: Int) -> Single<Bool> {
+        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+            return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
+        }
+        
+        return randomRepository.postRandomQuit(token: token, id: id)
+            .map { _ in true }
+            .catchAndReturn(false)
+    }
+    
+    func postRandomEnd(id: Int) -> Single<Bool> {
+        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+            return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
+        }
+        
+        return randomRepository.postRandomEnd(token: token, id: id)
             .map { _ in true }
             .catchAndReturn(false)
     }

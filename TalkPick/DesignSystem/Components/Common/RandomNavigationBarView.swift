@@ -1,9 +1,3 @@
-//
-//  RandomNavigationBarView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 12/5/25.
-//
 
 import UIKit
 import SnapKit

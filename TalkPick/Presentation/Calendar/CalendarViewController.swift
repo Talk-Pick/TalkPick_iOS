@@ -1,9 +1,3 @@
-//
-//  CalendarViewController.swift
-//  TalkPick
-//
-//  Created by jaegu park on 11/13/25.
-//
 
 import UIKit
 import SnapKit

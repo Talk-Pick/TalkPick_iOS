@@ -1,9 +1,3 @@
-//
-//  ServiceView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 12/7/25.
-//
 
 import UIKit
 import SnapKit

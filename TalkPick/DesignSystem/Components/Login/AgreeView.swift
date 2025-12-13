@@ -1,9 +1,3 @@
-//
-//  AgreeView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 12/1/25.
-//
 
 import UIKit
 import SnapKit
@@ -106,9 +100,9 @@ class AgreeView: UIView {
     }
     
     private func setupViews() {
-        addSubview(navigationbarView) // 맨 위 고정
+        addSubview(navigationbarView)
         addSubview(scrollView)
-        addSubview(nextButton) // 맨 아래 고정
+        addSubview(nextButton)
         
         scrollView.addSubview(contentView)
         
@@ -219,7 +213,6 @@ class AgreeView: UIView {
         // detailHeight 저장
         detailHeights[rowId] = detailHeight
         
-        // 헤더 뷰 (체크박스, 뱃지, 타이틀, 화살표)
         let headerView = UIView()
         headerView.tag = 200
         headerView.isUserInteractionEnabled = true
@@ -420,7 +413,7 @@ class AgreeView: UIView {
                 detailContainer.snp.updateConstraints {
                     $0.height.equalTo(0)
                 }
-                arrowIcon.transform = .identity // 원래대로
+                arrowIcon.transform = .identity
             }
             self.layoutIfNeeded()
         }, completion: { _ in

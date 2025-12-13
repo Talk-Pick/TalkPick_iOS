@@ -1,9 +1,3 @@
-//
-//  TodayTopicCollectionViewCell.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/4/25.
-//
 
 import UIKit
 import SnapKit

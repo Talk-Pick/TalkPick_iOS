@@ -1,9 +1,3 @@
-//
-//  RandomViewModel.swift
-//  TalkPick
-//
-//  Created by jaegu park on 12/9/25.
-//
 
 import RxSwift
 import RxCocoa
@@ -25,6 +19,28 @@ class RandomViewModel {
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { success in
                 print("평점 매기기 성공")
+            }, onFailure: { error in
+                print("오류:", error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func postRandomQuit(id: Int) {
+        useCase.postRandomQuit(id: id)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { success in
+                print("그만두기 성공")
+            }, onFailure: { error in
+                print("오류:", error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func postRandomEnd(id: Int) {
+        useCase.postRandomEnd(id: id)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { success in
+                print("종료 성공")
             }, onFailure: { error in
                 print("오류:", error.localizedDescription)
             })

@@ -1,9 +1,3 @@
-//
-//  AuthInterceptor.swift
-//  TalkPick
-//
-//  Created by jaegu park on 11/26/25.
-//
 
 import Alamofire
 import Foundation

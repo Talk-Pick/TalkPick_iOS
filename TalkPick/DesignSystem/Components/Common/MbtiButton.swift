@@ -1,9 +1,3 @@
-//
-//  MbtiButton.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/14/25.
-//
 
 import UIKit
 import SnapKit

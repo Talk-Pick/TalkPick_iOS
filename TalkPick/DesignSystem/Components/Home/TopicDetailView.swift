@@ -1,12 +1,7 @@
-//
-//  TopicDetailView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 12/5/25.
-//
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 class TopicDetailView: UIView {
     var onNext: (() -> Void)?
@@ -21,7 +16,6 @@ class TopicDetailView: UIView {
     
     let labelLabel1: UILabel = {
         let lb = UILabel()
-        lb.text = "그룹 첫 모임"
         lb.font = .systemFont(ofSize: 12, weight: .semibold)
         lb.textColor = .yellow100
         return lb
@@ -36,14 +30,13 @@ class TopicDetailView: UIView {
     
     let stepLabel: UILabel = {
         let lb = UILabel()
-        lb.text = "첫 번째"
         lb.font = .systemFont(ofSize: 12, weight: .semibold)
         lb.textColor = .pink100
         return lb
     }()
     
     let cardView: UIImageView = {
-        let iv = UIImageView(image: UIImage(named: "talkpick_bluecard"))
+        let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
         return iv
     }()
@@ -95,6 +88,9 @@ class TopicDetailView: UIView {
 
     var isFront: Bool = true
     private var isLiked = false
+    
+    private var frontURL: URL?
+    private var backURL: URL?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -164,14 +160,49 @@ class TopicDetailView: UIView {
         }
     }
 
-    func configure(stepIndex: Int, topic: TopicModel) {
-        let stepTitles = ["첫 번째 주제", "두 번째 주제", "세 번째 주제", "네 번째 주제"]
+    func configure(stepIndex: Int) {
+        let stepTitles = ["첫 번째", "두 번째", "세 번째", "네 번째"]
         stepLabel.text = stepTitles.indices.contains(stepIndex) ? stepTitles[stepIndex] : ""
-
-        labelLabel1.text = topic.category
-        cardView.image = UIImage(named: topic.imageName)
+    }
+    
+    func updateDetail(category: String, categoryBgColor: UIColor, categoryTextColor: UIColor, frontImageUrl: String, backImageUrl: String) {
+        // 카테고리 업데이트
+        labelLabel1.text = category
+        labelView1.backgroundColor = categoryBgColor
+        labelLabel1.textColor = categoryTextColor
         
-        print("Detail topic: id=\(topic.id), title=\(topic.category)")
+        // 이미지 URL 저장
+        frontURL = URL(string: frontImageUrl)
+        backURL = URL(string: backImageUrl)
+        
+        // 앞뒷면 이미지 프리페칭
+        prefetchImages()
+        
+        // 현재 상태에 맞는 이미지 로드
+        updateCardImage()
+    }
+    
+    private func prefetchImages() {
+        let urls = [frontURL, backURL].compactMap { $0 }
+        ImagePrefetcher(urls: urls).start()
+    }
+    
+    private func updateCardImage() {
+        let url = isFront ? frontURL : backURL
+        
+        let processor = DownsamplingImageProcessor(size: cardView.bounds.size)
+        
+        cardView.kf.setImage(
+            with: url,
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale),
+                .transition(.none),
+                .cacheOriginalImage,
+                .diskCacheExpiration(.days(7)),
+                .memoryCacheExpiration(.days(1))
+            ]
+        )
     }
 
     @objc private func toggleLike() {
@@ -189,7 +220,9 @@ class TopicDetailView: UIView {
             UIView.transition(with: cardView,
                               duration: 0.5,
                               options: .transitionFlipFromLeft,
-                              animations: nil,
+                              animations: { [weak self] in
+                                  self?.updateCardImage()
+                              },
                               completion: nil)
             
         } else {
@@ -197,7 +230,9 @@ class TopicDetailView: UIView {
             UIView.transition(with: cardView,
                               duration: 0.5,
                               options: .transitionFlipFromRight,
-                              animations: nil,
+                              animations: { [weak self] in
+                                  self?.updateCardImage()
+                              },
                               completion: nil)
         }
     }

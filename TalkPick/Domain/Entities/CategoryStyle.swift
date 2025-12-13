@@ -1,9 +1,3 @@
-//
-//  CategoryStyle.swift
-//  TalkPick
-//
-//  Created by jaegu park on 11/11/25.
-//
 
 import UIKit
 

@@ -1,9 +1,3 @@
-//
-//  QuitView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/14/25.
-//
 
 import UIKit
 import SnapKit
@@ -11,6 +5,8 @@ import SnapKit
 class QuitView: UIView {
     private var num: Int = 1
     private weak var targetViewController: UIViewController?
+    private let randomId = UserDefaults.standard.integer(forKey: "randomId")
+    private let randomViewModel = RandomViewModel()
     
     private let contentView: UIView = {
         let uv = UIView()
@@ -123,11 +119,12 @@ class QuitView: UIView {
     }
     
     @objc private func dismissView() {
-       UIView.animate(withDuration: 0.3, animations: {
-          self.alpha = 0
-       }) { _ in
-          self.removeFromSuperview()
-       }
+        randomViewModel.postRandomQuit(id: randomId)
+        UIView.animate(withDuration: 0.3, animations: {
+            self.alpha = 0
+        }) { _ in
+            self.removeFromSuperview()
+        }
     }
     
     func setBackButtonTarget(target: UIViewController, num: Int) {

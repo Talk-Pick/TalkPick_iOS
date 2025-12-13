@@ -1,9 +1,3 @@
-//
-//  Topic.swift
-//  TalkPick
-//
-//  Created by jaegu park on 11/3/25.
-//
 
 import UIKit
 
@@ -70,6 +64,13 @@ struct RandomTopicDetail: Codable {
     let keywordName: String
     let keywordImageUrl: String
     let keywordIconUrl: String
+}
+
+struct TotalRecord: Decodable {
+    let topicId: Int
+    let order: Int
+    let startAt: Date
+    let endAt: Date
 }
 
 struct TopicModel {

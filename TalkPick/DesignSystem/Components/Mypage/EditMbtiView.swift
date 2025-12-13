@@ -1,9 +1,3 @@
-//
-//  EditMbtiView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/31/25.
-//
 
 import UIKit
 import SnapKit

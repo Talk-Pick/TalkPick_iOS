@@ -1,9 +1,3 @@
-//
-//  TopicViewModel.swift
-//  TalkPick
-//
-//  Created by jaegu park on 11/4/25.
-//
 
 import RxSwift
 import RxCocoa
@@ -44,7 +38,7 @@ class TopicViewModel {
     
     func postTopicLike(topicId: Int) {
         useCase.postTopicLike(topicId: topicId)
-            .subscribe(onSuccess: { [weak self] success in
+            .subscribe(onSuccess: { success in
                 print("좋아요 성공")
             }, onFailure: { error in
                 print("오류:", error.localizedDescription)

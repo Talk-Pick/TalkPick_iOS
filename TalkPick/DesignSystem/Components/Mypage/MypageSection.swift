@@ -1,9 +1,3 @@
-//
-//  MypageSection.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/29/25.
-//
 
 import UIKit
 import SnapKit

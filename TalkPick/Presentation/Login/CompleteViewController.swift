@@ -1,9 +1,3 @@
-//
-//  CompleteViewController.swift
-//  TalkPick
-//
-//  Created by jaegu park on 12/3/25.
-//
 
 import UIKit
 

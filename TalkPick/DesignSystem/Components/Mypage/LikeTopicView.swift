@@ -1,11 +1,3 @@
-//
-//  LikeTopicView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 12/8/25.
-//
-
-import Foundation
 
 import UIKit
 import SnapKit

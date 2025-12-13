@@ -1,9 +1,3 @@
-//
-//  RefreshTokenManager+.swift
-//  TalkPick
-//
-//  Created by jaegu park on 11/9/25.
-//
 
 import Foundation
 

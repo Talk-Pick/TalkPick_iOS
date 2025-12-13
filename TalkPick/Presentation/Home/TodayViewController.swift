@@ -1,9 +1,3 @@
-//
-//  TodayViewController.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/4/25.
-//
 
 import UIKit
 import RxSwift
@@ -70,21 +64,40 @@ extension TodayViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] detail in
                 guard let self = self else { return }
-                let style = categoryStyles[detail.category]
-                self.todayView.labelView1.backgroundColor = style?.bgColor
-                self.todayView.labelLabel1.textColor = style?.textColor
                 self.todayView.labelLabel1.text = detail.category
                 self.todayView.labelLabel2.text = detail.keywordName
                 self.frontURL = URL(string: detail.keywordImageUrl)
                 self.backURL  = URL(string: detail.topicImageUrl)
+                
+                // 두 이미지 모두 미리 프리페칭
+                self.prefetchImages()
                 self.updateCardImage()
             })
             .disposed(by: disposeBag)
     }
     
+    private func prefetchImages() {
+        let urls = [frontURL, backURL].compactMap { $0 }
+        ImagePrefetcher(urls: urls).start()
+    }
+    
     private func updateCardImage() {
         let url = todayView.isFront ? frontURL : backURL
-        todayView.cardView.kf.setImage(with: url)
+        
+        // 다운샘플링 프로세서 (이미지를 뷰 크기에 맞게 축소)
+        let processor = DownsamplingImageProcessor(size: todayView.cardView.bounds.size)
+        
+        todayView.cardView.kf.setImage(
+            with: url,
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale),
+                .transition(.none), // 애니메이션 제거로 즉시 표시
+                .cacheOriginalImage, // 원본 이미지도 캐시
+                .diskCacheExpiration(.days(7)), // 디스크 캐시 7일
+                .memoryCacheExpiration(.days(1)) // 메모리 캐시 1일
+            ]
+        )
     }
     
     @objc private func like_Tapped() {

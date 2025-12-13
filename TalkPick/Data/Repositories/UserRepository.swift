@@ -1,9 +1,3 @@
-//
-//  UserRepository.swift
-//  TalkPick
-//
-//  Created by jaegu park on 11/8/25.
-//
 
 import RxSwift
 

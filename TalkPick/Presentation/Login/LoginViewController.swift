@@ -1,9 +1,3 @@
-//
-//  LoginViewController.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/2/25.
-//
 
 import KakaoSDKUser
 import AuthenticationServices

@@ -1,14 +1,10 @@
-//
-//  FinishView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 12/5/25.
-//
 
 import UIKit
 import SnapKit
 
 class FinishView: UIView {
+    private let randomId = UserDefaults.standard.integer(forKey: "randomId")
+    private let randomViewModel = RandomViewModel()
     
     private let titleLabel: UILabel = {
         let lb = UILabel()
@@ -56,23 +52,21 @@ class FinishView: UIView {
         let button = UIButton(type: .system)
         button.setTitle("한줄평 남기기", for: .normal)
         button.setTitleColor(.gray200, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         button.layer.cornerRadius = 12
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.gray200.cgColor
         button.backgroundColor = .clear
+        button.isEnabled = false
         return button
     }()
     
     private(set) var rating: Int = 0 {
         didSet {
             updateStars()
-            onRatingChanged?(rating)
+            updateSubmitButton()
         }
     }
-    
-    var onRatingChanged: ((Int) -> Void)?
-    var onSubmit: (() -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -139,7 +133,6 @@ class FinishView: UIView {
     }
     
     private func setupStars() {
-        // 5개의 별 버튼 생성
         for i in 1...5 {
             let button = UIButton(type: .custom)
             button.tag = i
@@ -165,12 +158,27 @@ class FinishView: UIView {
     }
     
     @objc private func submitTapped() {
-        onSubmit?()
+        randomViewModel.postRandomRate(id: randomId, rating: rating)
     }
     
     private func updateStars() {
         for button in starButtons {
             button.isSelected = button.tag <= rating
+        }
+    }
+    
+    private func updateSubmitButton() {
+        if rating > 0 {
+            submitButton.isEnabled = true
+            submitButton.backgroundColor = .black
+            submitButton.setTitleColor(.white, for: .normal)
+            submitButton.layer.borderWidth = 0
+        } else {
+            submitButton.isEnabled = false
+            submitButton.backgroundColor = .clear
+            submitButton.setTitleColor(.gray200, for: .normal)
+            submitButton.layer.borderWidth = 1
+            submitButton.layer.borderColor = UIColor.gray200.cgColor
         }
     }
     

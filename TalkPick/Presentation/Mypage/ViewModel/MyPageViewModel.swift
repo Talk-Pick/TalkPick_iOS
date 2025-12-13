@@ -1,9 +1,3 @@
-//
-//  MyPageViewModel.swift
-//  TalkPick
-//
-//  Created by jaegu park on 11/14/25.
-//
 
 import RxSwift
 import RxCocoa

@@ -1,9 +1,3 @@
-//
-//  RandomView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/8/25.
-//
 
 import UIKit
 import SnapKit
@@ -12,6 +6,7 @@ import RxSwift
 class RandomView: UIView {
     
     private let randomViewModel = RandomViewModel()
+    private let topicViewModel = TopicViewModel()
     private let randomId = UserDefaults.standard.integer(forKey: "randomId")
     private let disposeBag = DisposeBag()
     
@@ -126,7 +121,7 @@ class RandomView: UIView {
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(smallLogo.snp.top)
         }
-        layoutIfNeeded()  // 레이아웃 먼저 확정
+        layoutIfNeeded()
         
         UIView.animate(withDuration: 0.25, animations: {
             newView.alpha = 1
@@ -150,27 +145,6 @@ class RandomView: UIView {
             self.selectedSituation = kind
             self.situationText = kind.koreanTitle
             self.show(step: .topicSelect(step: 0))
-            guard let relationship = self.relationshipText,
-                  let situation = self.situationText else { return }
-            
-            print("\(relationship) \(situation) \(randomId) \(currentStepNumber)")
-            
-            self.randomViewModel.getRandomTopics(
-                id: self.randomId,
-                order: self.currentStepNumber,
-                categoryGroup: relationship,
-                category: situation
-            )
-            
-            self.randomViewModel.randomTopics
-                .observe(on: MainScheduler.instance)
-                .subscribe(onNext: { [weak self] details in
-                    guard let self = self else { return }
-                    let topics = self.mapToTopicModels(details)
-                    self.topicData[0] = topics
-                    self.topicView.configure(stepIndex: 0, topics: topics)
-                })
-                .disposed(by: self.disposeBag)
         }
         
         situationView.onForwardStep = { [weak self] in
@@ -185,6 +159,9 @@ class RandomView: UIView {
     }
 
     private func configureTopicView(for stepIndex: Int) {
+        // 데이터가 없으면 API 호출
+        fetchTopicsIfNeeded(for: stepIndex)
+        
         topicView.configure(stepIndex: stepIndex,
                             topics: topicData[stepIndex])
 
@@ -202,7 +179,12 @@ class RandomView: UIView {
     private func configureDetailView(for stepIndex: Int) {
         guard selectedTopics.indices.contains(stepIndex) else { return }
         let topic = selectedTopics[stepIndex]
-        detailView.configure(stepIndex: stepIndex, topic: topic)
+        detailView.configure(stepIndex: stepIndex)
+        
+        // topicId로 상세 정보 가져오기
+        if let topicId = Int(topic.id) {
+            fetchTopicDetail(topicId: topicId)
+        }
 
         detailView.onNext = { [weak self] in
             guard let self else { return }
@@ -240,6 +222,33 @@ class RandomView: UIView {
         currentStepNumber = max(1, currentStepNumber - 1)
     }
     
+    private func fetchTopicsIfNeeded(for stepIndex: Int) {
+        // 이미 데이터가 있으면 API 호출하지 않음
+        guard topicData[stepIndex].isEmpty else { return }
+        
+        guard let relationship = relationshipText,
+              let situation = situationText else { return }
+        
+        print("\(relationship) \(situation) \(randomId) \(currentStepNumber)")
+        
+        randomViewModel.getRandomTopics(
+            id: randomId,
+            order: currentStepNumber,
+            categoryGroup: relationship,
+            category: situation
+        )
+        
+        randomViewModel.randomTopics
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] details in
+                guard let self = self else { return }
+                let topics = self.mapToTopicModels(details)
+                self.topicData[stepIndex] = topics
+                self.topicView.configure(stepIndex: stepIndex, topics: topics)
+            })
+            .disposed(by: disposeBag)
+    }
+    
     private func mapToTopicModels(_ details: [RandomTopicDetail]) -> [TopicModel] {
         return details.map { detail in
             let style = categoryStyles[detail.category]
@@ -247,10 +256,30 @@ class RandomView: UIView {
                 id: String(detail.topicId),
                 keyword: detail.keywordName,
                 category: detail.category,
-                keywordColor: .purple50,
-                categoryColor: .purple100,
+                keywordColor: style?.bgColor ?? .purple50,
+                categoryColor: style?.textColor ?? .purple100,
                 imageName: detail.keywordIconUrl
             )
         }
+    }
+    
+    private func fetchTopicDetail(topicId: Int) {
+        topicViewModel.getTopicDetail(topicId: topicId)
+        
+        topicViewModel.topicDetail
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] detail in
+                guard let self = self else { return }
+                let style = categoryStyles[detail.category]
+                
+                self.detailView.updateDetail(
+                    category: detail.category,
+                    categoryBgColor: style?.bgColor ?? .yellow50,
+                    categoryTextColor: style?.textColor ?? .yellow100,
+                    frontImageUrl: detail.keywordImageUrl,
+                    backImageUrl: detail.topicImageUrl
+                )
+            })
+            .disposed(by: disposeBag)
     }
 }

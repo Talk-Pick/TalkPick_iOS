@@ -1,9 +1,3 @@
-//
-//  SituationView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 11/4/25.
-//
 
 import UIKit
 import SnapKit

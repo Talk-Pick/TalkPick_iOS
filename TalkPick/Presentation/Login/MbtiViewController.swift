@@ -1,9 +1,3 @@
-//
-//  MbtiViewController.swift
-//  TalkPick
-//
-//  Created by jaegu park on 12/1/25.
-//
 
 import UIKit
 

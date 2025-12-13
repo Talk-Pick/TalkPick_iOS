@@ -1,9 +1,3 @@
-//
-//  TodayView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/4/25.
-//
 
 import UIKit
 import SnapKit
@@ -21,7 +15,6 @@ class TodayView: UIView {
     
     let labelLabel1: UILabel = {
         let lb = UILabel()
-        lb.text = "그룹 첫 모임"
         lb.font = .systemFont(ofSize: 12, weight: .semibold)
         lb.textColor = .yellow100
         return lb
@@ -36,14 +29,13 @@ class TodayView: UIView {
     
     let labelLabel2: UILabel = {
         let lb = UILabel()
-        lb.text = "첫 번째"
         lb.font = .systemFont(ofSize: 12, weight: .semibold)
         lb.textColor = .pink100
         return lb
     }()
     
     let cardView: UIImageView = {
-        let iv = UIImageView(image: UIImage(named: "talkpick_bluecard"))
+        let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
         return iv
     }()

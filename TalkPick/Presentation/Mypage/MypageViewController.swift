@@ -1,9 +1,3 @@
-//
-//  MypageViewController.swift
-//  TalkPick
-//
-//  Created by jaegu park on 11/14/25.
-//
 
 import UIKit
 import SnapKit

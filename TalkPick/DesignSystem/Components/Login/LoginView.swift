@@ -1,9 +1,3 @@
-//
-//  Loginswift
-//  TalkPick
-//
-//  Created by jaegu park on 10/3/25.
-//
 
 import UIKit
 import SnapKit
