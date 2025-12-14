@@ -20,7 +20,7 @@ class RandomViewModel {
             .subscribe(onSuccess: { success in
                 print("평점 매기기 성공")
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "평점 남기기에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
@@ -31,7 +31,7 @@ class RandomViewModel {
             .subscribe(onSuccess: { success in
                 print("그만두기 성공")
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "랜덤 대화 나가기에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
@@ -42,7 +42,7 @@ class RandomViewModel {
             .subscribe(onSuccess: { success in
                 print("종료 성공")
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "랜덤 대화 종료에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
@@ -53,7 +53,7 @@ class RandomViewModel {
             .subscribe(onSuccess: { success in
                 print("평가 성공")
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "한줄평 남기기에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
@@ -66,7 +66,7 @@ class RandomViewModel {
                 UserDefaults.standard.set(randomId, forKey: "randomId")
                 print("랜덤 시작 성공")
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "랜덤 대화 시작하기에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
@@ -78,7 +78,7 @@ class RandomViewModel {
                 self?.randomTopics.accept(topics.data[0].randomTopicDetails)
                 print("토픽 불러오기 성공")
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "랜덤 대화 토픽 불러오기에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }

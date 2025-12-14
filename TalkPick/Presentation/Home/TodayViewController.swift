@@ -83,8 +83,6 @@ extension TodayViewController {
     
     private func updateCardImage() {
         let url = todayView.isFront ? frontURL : backURL
-        
-        // 다운샘플링 프로세서 (이미지를 뷰 크기에 맞게 축소)
         let processor = DownsamplingImageProcessor(size: todayView.cardView.bounds.size)
         
         todayView.cardView.kf.setImage(

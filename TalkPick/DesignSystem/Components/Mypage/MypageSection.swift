@@ -73,7 +73,7 @@ final class SectionView: UIView {
         stackView.alignment = .fill
         stackView.distribution = .fill
         
-        actionButton.setImage(UIImage(named: "talkpick_more"), for: .normal)
+        actionButton.setImage(UIImage(named: "talkpick_more")?.withRenderingMode(.alwaysOriginal), for: .normal)
         actionButton.setTitle("변경하기", for: .normal)
         actionButton.titleLabel?.font = .systemFont(ofSize: 12, weight: .medium)
         actionButton.setTitleColor(.gray200, for: .normal)
@@ -217,7 +217,7 @@ final class CollectionSectionView: UIView {
         itemLabel.font = .systemFont(ofSize: 16, weight: .medium)
         itemLabel.textColor = .gray200
         
-        moreButton.setImage(UIImage(named: "talkpick_more"), for: .normal)
+        moreButton.setImage(UIImage(named: "talkpick_more")?.withRenderingMode(.alwaysOriginal), for: .normal)
         moreButton.setTitle(moreText, for: .normal)
         moreButton.setTitleColor(.gray200, for: .normal)
         moreButton.titleLabel?.font = .systemFont(ofSize: 12, weight: .medium)
@@ -347,7 +347,7 @@ final class ArrowRowView: UIView {
         titleLabel.font = .systemFont(ofSize: 16, weight: .medium)
         titleLabel.textColor = .gray200
         
-        chevronButton.setImage(UIImage(named: "talkpick_more"), for: .normal)
+        chevronButton.setImage(UIImage(named: "talkpick_more")?.withRenderingMode(.alwaysOriginal), for: .normal)
         
         addSubview(leftIcon)
         addSubview(titleLabel)

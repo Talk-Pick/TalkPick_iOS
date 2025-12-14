@@ -34,13 +34,13 @@ class CalendarView: UIView {
     
     private let leftButton: UIButton = {
         let bb = UIButton()
-        bb.setImage(UIImage(named: "talkpick_left"), for: .normal)
+        bb.setImage(UIImage(named: "talkpick_left")?.withRenderingMode(.alwaysOriginal), for: .normal)
         return bb
     }()
     
     private let rightButton: UIButton = {
         let bb = UIButton()
-        bb.setImage(UIImage(named: "talkpick_right"), for: .normal)
+        bb.setImage(UIImage(named: "talkpick_right")?.withRenderingMode(.alwaysOriginal), for: .normal)
         return bb
     }()
     

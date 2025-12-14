@@ -10,7 +10,7 @@ final class NavigationBarView: UIView {
     
     let backButton: UIButton = {
         let bb = UIButton()
-        bb.setImage(UIImage(named: "talkpick_back"), for: .normal)
+        bb.setImage(UIImage(named: "talkpick_back")?.withRenderingMode(.alwaysOriginal), for: .normal)
         return bb
     }()
     private var titleLabel: UILabel = {

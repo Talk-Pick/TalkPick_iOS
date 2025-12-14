@@ -136,8 +136,8 @@ class FinishView: UIView {
         for i in 1...5 {
             let button = UIButton(type: .custom)
             button.tag = i
-            button.setImage(UIImage(named: "talkpick_starOff"), for: .normal)
-            button.setImage(UIImage(named: "talkpick_starOn"), for: .selected)
+            button.setImage(UIImage(named: "talkpick_starOff")?.withRenderingMode(.alwaysOriginal), for: .normal)
+            button.setImage(UIImage(named: "talkpick_starOn")?.withRenderingMode(.alwaysOriginal), for: .selected)
             button.addTarget(self,
                              action: #selector(starTapped(_:)),
                              for: .touchUpInside)

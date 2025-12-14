@@ -9,6 +9,8 @@ class LoginViewController: UIViewController {
     private let myPageViewModel = MyPageViewModel()
     private let loginView = LoginView()
     private let disposeBag = DisposeBag()
+
+    private var userNickname: String = ""
     
     override func loadView() {
         self.view = loginView
@@ -36,7 +38,7 @@ class LoginViewController: UIViewController {
                     let mainTabVC = MainTabViewController()
                     self.navigationController?.pushViewController(mainTabVC, animated: true)
                 } else {
-                    let agreeVC = AgreeViewController()
+                    let agreeVC = AgreeViewController(nickname: self.userNickname)
                     self.navigationController?.pushViewController(agreeVC, animated: true)
                 }
             })
@@ -63,33 +65,86 @@ class LoginViewController: UIViewController {
         let nonce = CryptoHelper.sha256(randomNonce)
         if (UserApi.isKakaoTalkLoginAvailable()) {
             //카톡 설치되어있으면 -> 카톡으로 로그인
-            UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
+            UserApi.shared.loginWithKakaoAccount(nonce: nonce) { [weak self] (oauthToken, error) in
+                guard let self = self else { return }
+                
                 if let error = error {
-                    print(error)
+                    print("카카오 로그인 에러: \(error)")
+                    return
                 }
-                else {
-                    guard let idToken = oauthToken?.idToken else { return }
+                
+                guard let idToken = oauthToken?.idToken else {
+                    print("idToken이 없습니다. (OpenID Connect 설정/동의항목 확인 필요)")
+                    return
+                }
+                
+                // 먼저 카카오 사용자 정보 가져오기
+                UserApi.shared.me { [weak self] (user, error) in
+                    guard let self = self else { return }
+                    
+                    if let error = error {
+                        print("카카오 사용자 정보 가져오기 오류: \(error)")
+                        return
+                    }
+                    
+                    let nickname = user?.kakaoAccount?.profile?.nickname ?? ""
+                    self.userNickname = nickname
+                    print("카카오 닉네임 저장 (카톡): \(nickname)")
+                    
                     self.loginViewModel.kakaoLogin(idToken: idToken)
                         .observe(on: MainScheduler.instance)
-                        .subscribe(onSuccess: { success in
-                            self.myPageViewModel.getMyProfile()
-                        })
+                        .subscribe(
+                            onSuccess: { [weak self] _ in
+                                guard let self = self else { return }
+                                self.myPageViewModel.getMyProfile()
+                            },
+                            onFailure: { error in
+                                print("서버 로그인 실패: \(error)")
+                            }
+                        )
                         .disposed(by: self.disposeBag)
                 }
             }
         }
         else {
             // 카톡 없으면 -> 계정으로 로그인
-            UserApi.shared.loginWithKakaoAccount(nonce: nonce) { (oauthToken, error) in
+            UserApi.shared.loginWithKakaoAccount(nonce: nonce) { [weak self] (oauthToken, error) in
+                guard let self = self else { return }
+                
                 if let error = error {
-                    print("에러는 \(error)")
-                } else {
-                    guard let idToken = oauthToken?.idToken else { return }
+                    print("카카오 로그인 에러: \(error)")
+                    return
+                }
+                
+                guard let idToken = oauthToken?.idToken else {
+                    print("idToken이 없습니다. (OpenID Connect 설정/동의항목 확인 필요)")
+                    return
+                }
+                
+                // 먼저 카카오 사용자 정보 가져오기
+                UserApi.shared.me { [weak self] (user, error) in
+                    guard let self = self else { return }
+                    
+                    if let error = error {
+                        print("카카오 사용자 정보 가져오기 오류: \(error)")
+                        return
+                    }
+                    
+                    let nickname = user?.kakaoAccount?.profile?.nickname ?? ""
+                    self.userNickname = nickname
+                    print("카카오 닉네임 저장 (계정): \(nickname)")
+                    
                     self.loginViewModel.kakaoLogin(idToken: idToken)
                         .observe(on: MainScheduler.instance)
-                        .subscribe(onSuccess: { success in
-                            self.myPageViewModel.getMyProfile()
-                        })
+                        .subscribe(
+                            onSuccess: { [weak self] _ in
+                                guard let self = self else { return }
+                                self.myPageViewModel.getMyProfile()
+                            },
+                            onFailure: { error in
+                                print("서버 로그인 실패: \(error)")
+                            }
+                        )
                         .disposed(by: self.disposeBag)
                 }
             }
@@ -105,7 +160,6 @@ extension LoginViewController: ASAuthorizationControllerPresentationContextProvi
 }
 
 extension LoginViewController: ASAuthorizationControllerDelegate {
-    // 로그인 실패 시
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: any Error) {
         print("로그인 실패", error.localizedDescription)
     }
@@ -124,10 +178,14 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
             
             print("Apple ID 로그인에 성공하였습니다.: \(idTokenString)")
             
-            // 여기에 로그인 성공 후 수행할 작업을 추가하세요.
+            let appleNickname = "\(nickName.familyName ?? "")\(nickName.givenName ?? "")"
+            self.userNickname = appleNickname
+            print("애플 닉네임 저장: \(appleNickname)")
+            
             self.loginViewModel.appleLogin(idToken: idTokenString)
                 .observe(on: MainScheduler.instance)
-                .subscribe(onSuccess: { response in
+                .subscribe(onSuccess: { [weak self] response in
+                    guard let self = self else { return }
                     self.myPageViewModel.getMyProfile()
                 })
                 .disposed(by: self.disposeBag)

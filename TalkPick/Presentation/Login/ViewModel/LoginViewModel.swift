@@ -19,7 +19,7 @@ class LoginViewModel {
             .subscribe(onSuccess: { [weak self] success in
                 self?.termAgreed.onNext(success)
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "약관 동의에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
@@ -48,8 +48,9 @@ class LoginViewModel {
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] success in
                 self?.signUp.onNext(success)
+                print("회원가입에 성공했습니다.")
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "회원가입에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }

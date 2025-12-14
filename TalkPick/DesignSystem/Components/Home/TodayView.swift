@@ -42,7 +42,7 @@ class TodayView: UIView {
     
     private let flipButton: UIButton = {
         let fb = UIButton(type: .custom)
-        fb.setImage(UIImage(named: "talkpick_flip"), for: .normal)
+        fb.setImage(UIImage(named: "talkpick_flip")?.withRenderingMode(.alwaysOriginal), for: .normal)
         fb.setTitle("카드 뒤집기 ", for: .normal)
         fb.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
         fb.setTitleColor(.gray100, for: .normal)
@@ -57,7 +57,7 @@ class TodayView: UIView {
         cb.layer.borderWidth = 1
         cb.layer.borderColor = UIColor.gray200.cgColor
         cb.backgroundColor = .white
-        cb.setImage(UIImage(named: "talkpick_like")?.withRenderingMode(.alwaysOriginal), for: .normal)
+        cb.setImage(UIImage(named: "talkpick_like3")?.withRenderingMode(.alwaysOriginal), for: .normal)
         cb.setTitleColor(.gray200, for: .normal)
         cb.setTitle(" 좋아요", for: .normal)
         cb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)

@@ -10,7 +10,7 @@ final class RandomNavigationBarView: UIView {
     
     let backButton: UIButton = {
         let bb = UIButton()
-        bb.setImage(UIImage(named: "talkpick_back"), for: .normal)
+        bb.setImage(UIImage(named: "talkpick_back")?.withRenderingMode(.alwaysOriginal), for: .normal)
         return bb
     }()
     private var titleLabel: UILabel = {
@@ -21,7 +21,7 @@ final class RandomNavigationBarView: UIView {
     }()
     let homeButton: UIButton = {
         let hb = UIButton()
-        hb.setImage(UIImage(named: "talkpick_home"), for: .normal)
+        hb.setImage(UIImage(named: "talkpick_home")?.withRenderingMode(.alwaysOriginal), for: .normal)
         return hb
     }()
     

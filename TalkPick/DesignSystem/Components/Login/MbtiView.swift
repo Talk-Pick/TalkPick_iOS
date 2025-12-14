@@ -4,6 +4,8 @@ import SnapKit
 
 class MbtiView: UIView {
     
+    var onMbtiSelected: ((String) -> Void)?
+    
     private let mbtiImageView: UIImageView = {
         let iv = UIImageView()
         iv.image = UIImage(named: "talkpick_mbtiLogo")
@@ -186,7 +188,7 @@ class MbtiView: UIView {
     @objc private func startTapped() {
         guard let mbti = currentMBTI else { return }
         print("선택한 MBTI:", mbti)
-        // navigationController?.pushViewController(NextVC(mbti: mbti), animated: true)
+        onMbtiSelected?(mbti)
     }
     
     // (선택) 외부에서 초기 MBTI를 설정하고 싶을 때 호출

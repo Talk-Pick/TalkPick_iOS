@@ -20,7 +20,7 @@ class TopicViewModel {
             .subscribe(onSuccess: { [weak self] topics in
                 self?.todayTopics.accept(topics)
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "오늘의 토픽 불러오기에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
@@ -31,7 +31,7 @@ class TopicViewModel {
             .subscribe(onSuccess: { [weak self] detail in
                 self?.topicDetail.onNext(detail)
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "토픽 상세 불러오기에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
@@ -41,7 +41,7 @@ class TopicViewModel {
             .subscribe(onSuccess: { success in
                 print("좋아요 성공")
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "좋아요에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
