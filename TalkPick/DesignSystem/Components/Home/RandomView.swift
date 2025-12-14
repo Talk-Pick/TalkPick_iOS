@@ -28,7 +28,7 @@ class RandomView: UIView {
     private var situationText: String?
     
     private var topicData: [[TopicModel]] = Array(repeating: [], count: 4)
-
+    private var topicRecords: [TotalRecord] = []
     
     var onExitRequested: (() -> Void)?
     
@@ -174,11 +174,31 @@ class RandomView: UIView {
 
         topicView.onTopicSelected = { [weak self] topic in
             guard let self else { return }
+            
+            // 선택한 토픽 저장
             if self.selectedTopics.count > stepIndex {
                 self.selectedTopics[stepIndex] = topic
             } else {
                 self.selectedTopics.append(topic)
             }
+            
+            // TopicRecord 생성 및 저장 (토픽 선택 시간 기록)
+            guard let topicId = Int(topic.id) else { return }
+            let record = TotalRecord(
+                topicId: topicId,
+                order: stepIndex + 1, // 1-based index (1, 2, 3, 4)
+                startAt: Date().toISO8601String(),
+                endAt: nil
+            )
+            
+            if self.topicRecords.count > stepIndex {
+                self.topicRecords[stepIndex] = record
+            } else {
+                self.topicRecords.append(record)
+            }
+            
+            print("토픽 선택 기록: step \(stepIndex + 1), topicId: \(topicId), time: \(Date())")
+            
             self.show(step: .topicDetail(step: stepIndex))
         }
     }
@@ -195,9 +215,19 @@ class RandomView: UIView {
 
         detailView.onNext = { [weak self] in
             guard let self else { return }
+            
+            // endAt 업데이트 (다음으로 넘어간 시간 기록)
+            if self.topicRecords.indices.contains(stepIndex) {
+                self.topicRecords[stepIndex].endAt = Date().toISO8601String()
+                print("다음 버튼 클릭 기록: step \(stepIndex + 1), time: \(Date().toISO8601String())")
+            }
+            
             if stepIndex < 3 {
+                // 다음 토픽 선택 화면으로
                 self.show(step: .topicSelect(step: stepIndex + 1))
             } else {
+                // 마지막 단계 - API 호출 후 완료 화면으로
+                self.submitTopicRecords()
                 self.show(step: .finish)
             }
         }
@@ -235,8 +265,6 @@ class RandomView: UIView {
         
         guard let relationship = relationshipText,
               let situation = situationText else { return }
-        
-        print("\(relationship) \(situation) \(randomId) \(currentStepNumber)")
         
         randomViewModel.getRandomTopics(
             id: randomId,
@@ -288,5 +316,18 @@ class RandomView: UIView {
                 )
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func submitTopicRecords() {
+        guard topicRecords.count == 4 else {
+            print("경고: TopicRecord가 4개가 아닙니다. 현재: \(topicRecords.count)개")
+            return
+        }
+        
+        print("=== TopicRecords 제출 ===")
+        print("\(topicRecords)")
+        
+        // API 호출
+        randomViewModel.postRandomTotalRecord(id: randomId, totalRecords: topicRecords)
     }
 }

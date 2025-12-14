@@ -119,7 +119,7 @@ class QuitView: UIView {
     }
     
     @objc private func dismissView() {
-//        randomViewModel.postRandomQuit(id: randomId)
+        randomViewModel.postRandomQuit(id: randomId)
         UIView.animate(withDuration: 0.3, animations: {
             self.alpha = 0
         }) { _ in

@@ -14,6 +14,17 @@ class RandomViewModel {
         self.useCase = useCase
     }
     
+    func postRandomTotalRecord(id: Int, totalRecords: [TotalRecord]) {
+        useCase.postRandomTotalRecord(id: id, totalRecords: totalRecords)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { success in
+                print("기록하기 성공")
+            }, onFailure: { error in
+                AlertController(message: "약관 동의에 실패했습니다.\n다시 시도해주세요.").show()
+            })
+            .disposed(by: disposeBag)
+    }
+    
     func postRandomRate(id: Int, rating: Int) {
         useCase.postRandomRate(id: id, rating: rating)
             .observe(on: MainScheduler.instance)

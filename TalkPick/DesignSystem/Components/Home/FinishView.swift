@@ -160,7 +160,7 @@ class FinishView: UIView {
     }
     
     @objc private func submitTapped() {
-//        randomViewModel.postRandomRate(id: randomId, rating: rating)
+        randomViewModel.postRandomRate(id: randomId, rating: rating)
         showCommentView()
     }
     
@@ -172,7 +172,7 @@ class FinishView: UIView {
             guard let self = self else { return }
             print("한줄평: \(comment)")
             
-//            self.randomViewModel.postRandomComment(id: self.randomId, oneLine: comment)
+            self.randomViewModel.postRandomComment(id: self.randomId, oneLine: comment)
             self.onFinished?()
         }
         

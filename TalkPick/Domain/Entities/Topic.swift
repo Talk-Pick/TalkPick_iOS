@@ -66,11 +66,11 @@ struct RandomTopicDetail: Codable {
     let keywordIconUrl: String
 }
 
-struct TotalRecord: Decodable {
+struct TotalRecord: Codable {
     let topicId: Int
     let order: Int
-    let startAt: Date
-    let endAt: Date
+    let startAt: String  // ISO8601 형식: "2025-12-14T16:44:37.554Z"
+    var endAt: String?   // ISO8601 형식: "2025-12-14T16:44:37.554Z"
 }
 
 struct TopicModel {
