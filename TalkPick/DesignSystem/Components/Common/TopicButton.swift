@@ -1,12 +1,7 @@
-//
-//  TopicButton.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/14/25.
-//
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class TopicButton: UIControl {
     
@@ -24,7 +19,7 @@ final class TopicButton: UIControl {
         }
     }
     
-    init(color: UIColor, labelTitle: String, textColor: UIColor, image: UIImage?, title: String) {
+    init(color: UIColor, labelTitle: String, textColor: UIColor, image: String, title: String) {
         super.init(frame: .zero)
         setupView(color: color, labelTitle: labelTitle, textColor: textColor, image: image, title: title)
         isAccessibilityElement = true
@@ -37,7 +32,7 @@ final class TopicButton: UIControl {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupView(color: UIColor, labelTitle: String, textColor: UIColor, image: UIImage?, title: String) {
+    private func setupView(color: UIColor, labelTitle: String, textColor: UIColor, image: String, title: String) {
         backgroundColor = .gray50
         layer.cornerRadius = 20
         layer.shadowColor = UIColor.black.cgColor
@@ -54,7 +49,8 @@ final class TopicButton: UIControl {
         labelLabel.textColor = textColor
         labelLabel.isUserInteractionEnabled = false
         
-        imageView.image = image
+        let url = URL(string: image)
+        imageView.kf.setImage(with: url)
         imageView.contentMode = .scaleAspectFit
         imageView.isUserInteractionEnabled = false
         

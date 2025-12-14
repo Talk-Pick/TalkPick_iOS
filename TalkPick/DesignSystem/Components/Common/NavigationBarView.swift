@@ -1,9 +1,3 @@
-//
-//  NavigationBarView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/5/25.
-//
 
 import UIKit
 import SnapKit
@@ -16,7 +10,7 @@ final class NavigationBarView: UIView {
     
     let backButton: UIButton = {
         let bb = UIButton()
-        bb.setImage(UIImage(named: "talkpick_back"), for: .normal)
+        bb.setImage(UIImage(named: "talkpick_back")?.withRenderingMode(.alwaysOriginal), for: .normal)
         return bb
     }()
     private var titleLabel: UILabel = {
@@ -24,11 +18,6 @@ final class NavigationBarView: UIView {
         lb.textColor = .black
         lb.font = .systemFont(ofSize: 17, weight: .bold)
         return lb
-    }()
-    let homeButton: UIButton = {
-        let hb = UIButton()
-        hb.setImage(UIImage(named: "talkpick_home"), for: .normal)
-        return hb
     }()
     
     weak var delegate: NavigationBarViewDelegate?
@@ -58,13 +47,6 @@ final class NavigationBarView: UIView {
             $0.centerY.equalTo(backButton)
             $0.leading.equalTo(backButton.snp.trailing).offset(3)
             $0.height.equalTo(19)
-        }
-        
-        addSubview(homeButton)
-        homeButton.snp.makeConstraints {
-            $0.centerY.equalTo(backButton)
-            $0.trailing.equalToSuperview().inset(20)
-            $0.width.height.equalTo(32)
         }
         
         backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)

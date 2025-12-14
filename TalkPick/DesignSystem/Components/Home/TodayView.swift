@@ -1,9 +1,3 @@
-//
-//  TodayView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/4/25.
-//
 
 import UIKit
 import SnapKit
@@ -11,18 +5,16 @@ import SnapKit
 class TodayView: UIView {
     
     let navigationbarView = NavigationBarView(title: "오늘의 톡픽")
-    private var topicViewModel = TopicViewModel()
     
-    private let labelView1: UIView = {
+    let labelView1: UIView = {
         let uv = UIView()
         uv.backgroundColor = .yellow50
         uv.layer.cornerRadius = 15
         return uv
     }()
     
-    private let labelLabel1: UILabel = {
+    let labelLabel1: UILabel = {
         let lb = UILabel()
-        lb.text = "그룹 첫 모임"
         lb.font = .systemFont(ofSize: 12, weight: .semibold)
         lb.textColor = .yellow100
         return lb
@@ -35,74 +27,49 @@ class TodayView: UIView {
         return uv
     }()
     
-    private let labelLabel2: UILabel = {
+    let labelLabel2: UILabel = {
         let lb = UILabel()
-        lb.text = "첫 번째"
         lb.font = .systemFont(ofSize: 12, weight: .semibold)
         lb.textColor = .pink100
         return lb
     }()
     
-    private let cardView: UIImageView = {
-        let iv = UIImageView(image: UIImage(named: "talkpick_bluecard"))
+    let cardView: UIImageView = {
+        let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
         return iv
     }()
     
     private let flipButton: UIButton = {
         let fb = UIButton(type: .custom)
-        fb.setImage(UIImage(named: "talkpick_flip"), for: .normal)
+        fb.setImage(UIImage(named: "talkpick_flip")?.withRenderingMode(.alwaysOriginal), for: .normal)
         fb.setTitle("카드 뒤집기 ", for: .normal)
         fb.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
-        fb.setTitleColor(.gray200, for: .normal)
+        fb.setTitleColor(.gray100, for: .normal)
         fb.semanticContentAttribute = .forceRightToLeft
         return fb
     }()
     
-    private let cancelButton: UIButton = {
+    let likeButton: UIButton = {
         let cb = UIButton(type: .custom)
         cb.clipsToBounds = true
         cb.layer.cornerRadius = 12
         cb.layer.borderWidth = 1
         cb.layer.borderColor = UIColor.gray200.cgColor
         cb.backgroundColor = .white
-        cb.setImage(UIImage(named: "talkpick_like")?.withRenderingMode(.alwaysOriginal), for: .normal)
+        cb.setImage(UIImage(named: "talkpick_like3")?.withRenderingMode(.alwaysOriginal), for: .normal)
         cb.setTitleColor(.gray200, for: .normal)
         cb.setTitle(" 좋아요", for: .normal)
         cb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
         return cb
     }()
     
-    private let nextButton: UIButton = {
-        let nb = UIButton(type: .system)
-        nb.clipsToBounds = true
-        nb.layer.cornerRadius = 12
-        nb.backgroundColor = .black
-        nb.setTitleColor(.white, for: .normal)
-        nb.setTitle("다음으로", for: .normal)
-        nb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
-        return nb
-    }()
+    var isFront: Bool = true
+    var onFlip: ((Bool) -> Void)?
     
-    private lazy var buttonStackView: UIStackView = {
-        let sv = UIStackView()
-        sv.addArrangedSubview(cancelButton)
-        sv.addArrangedSubview(nextButton)
-        sv.axis = .horizontal
-        sv.spacing = 17
-        sv.distribution = .fillEqually
-        return sv
-    }()
-    
-    private var isFront: Bool = true
-    
-    init(viewModel: TopicViewModel) {
+    init() {
         super.init(frame: .zero)
         backgroundColor = .white
-        self.topicViewModel = viewModel
-//        labelLabel1.text = Label1
-//        labelLabel2.text = Label2
-//        cardView.image = isFront ? UIImage(named: cardImage1) : UIImage(named: cardImage2)
         setupViews()
         setupConstraints()
     }
@@ -121,12 +88,7 @@ class TodayView: UIView {
         
         addSubview(cardView)
         addSubview(flipButton)
-        addSubview(buttonStackView)
-        
-        let selectTopicItem = topicViewModel.selectTopicItem
-        labelLabel1.text = selectTopicItem?.category
-        labelLabel2.text = selectTopicItem?.keywordName
-        cardView.image = isFront ? UIImage(named: selectTopicItem?.keywordIconUrl ?? "talkpick_bluecard") : UIImage(named: selectTopicItem?.keywordIconUrl ?? "talkpick_bluecard")
+        addSubview(likeButton)
     }
     
     private func setupConstraints() {
@@ -160,20 +122,20 @@ class TodayView: UIView {
         }
         
         cardView.snp.makeConstraints {
-            $0.top.equalTo(labelView1.snp.bottom).offset(20)
-            $0.leading.trailing.equalToSuperview().inset(28)
-            $0.height.equalTo(442)
+            $0.top.equalTo(labelView1.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(18)
+            $0.height.equalTo(460)
         }
         
         flipButton.snp.makeConstraints {
-            $0.top.equalTo(cardView.snp.bottom).offset(10)
+            $0.top.equalTo(cardView.snp.bottom).offset(6)
             $0.centerX.equalToSuperview()
             $0.height.equalTo(22)
             $0.width.equalTo(90)
         }
         flipButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         
-        buttonStackView.snp.makeConstraints {
+        likeButton.snp.makeConstraints {
             $0.top.equalTo(flipButton.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.height.equalTo(51)
@@ -181,21 +143,15 @@ class TodayView: UIView {
     }
     
     @objc func buttonTapped() {
-        if isFront {
-            isFront = false
-            UIView.transition(with: cardView,
-                              duration: 0.5,
-                              options: .transitionFlipFromLeft,
-                              animations: nil,
-                              completion: nil)
-            
-        } else {
-            isFront = true
-            UIView.transition(with: cardView,
-                              duration: 0.5,
-                              options: .transitionFlipFromRight,
-                              animations: nil,
-                              completion: nil)
-        }
+        isFront.toggle()
+        let options: UIView.AnimationOptions = isFront ? .transitionFlipFromRight : .transitionFlipFromLeft
+        
+        UIView.transition(with: cardView,
+                          duration: 0.5,
+                          options: options,
+                          animations: {
+            self.onFlip?(self.isFront)
+        },
+                          completion: nil)
     }
 }

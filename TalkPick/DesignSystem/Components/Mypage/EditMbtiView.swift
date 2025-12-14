@@ -1,14 +1,10 @@
-//
-//  EditMbtiView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/31/25.
-//
 
 import UIKit
 import SnapKit
 
 class EditMbtiView: UIView {
+    
+    private let viewModel: MyPageViewModel
     
     private let contentView: UIView = {
         let uv = UIView()
@@ -92,7 +88,8 @@ class EditMbtiView: UIView {
         return sv
     }()
     
-    init(mbti: String) {
+    init(mbti: String, viewModel: MyPageViewModel) {
+        self.viewModel = viewModel
         super.init(frame: .zero)
         backgroundColor = UIColor(white: 0, alpha: 0.2)
         currentMBTITF.text = mbti
@@ -133,7 +130,7 @@ class EditMbtiView: UIView {
             $0.leading.equalToSuperview().offset(34)
             $0.height.equalTo(33)
         }
-
+        
         currentMBTITF.snp.makeConstraints {
             $0.top.equalTo(currentMBTI.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(34)
@@ -145,7 +142,7 @@ class EditMbtiView: UIView {
             $0.leading.equalToSuperview().offset(34)
             $0.height.equalTo(33)
         }
-
+        
         modifyMBTITF.snp.makeConstraints {
             $0.top.equalTo(modifyMBTI.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(34)
@@ -159,7 +156,7 @@ class EditMbtiView: UIView {
         }
         
         cancelButton.addTarget(self, action: #selector(dismissView), for: .touchUpInside)
-        modifyButton.addTarget(self, action: #selector(dismissView), for: .touchUpInside)
+        modifyButton.addTarget(self, action: #selector(edit_Tapped), for: .touchUpInside)
         modifyMBTITF.addTarget(self, action: #selector(mbtiEditingChanged), for: .editingChanged)
         modifyButton.isEnabled = false
     }
@@ -172,12 +169,22 @@ class EditMbtiView: UIView {
         updateModifyButtonState(with: modifyMBTITF.text)
     }
     
+    @objc private func edit_Tapped() {
+        guard let newMbti = modifyMBTITF.text, newMbti.count == 4 else { return }
+        viewModel.editMyProfile(mbti: newMbti)
+        UIView.animate(withDuration: 0.3, animations: {
+            self.alpha = 0
+        }) { _ in
+            self.removeFromSuperview() // 애니메이션 후 뷰에서 제거
+        }
+    }
+    
     @objc private func dismissView() {
-       UIView.animate(withDuration: 0.3, animations: {
-          self.alpha = 0
-       }) { _ in
-          self.removeFromSuperview() // 애니메이션 후 뷰에서 제거
-       }
+        UIView.animate(withDuration: 0.3, animations: {
+            self.alpha = 0
+        }) { _ in
+            self.removeFromSuperview() // 애니메이션 후 뷰에서 제거
+        }
     }
 }
 

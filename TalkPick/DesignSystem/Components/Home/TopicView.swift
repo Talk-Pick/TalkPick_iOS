@@ -1,14 +1,12 @@
-//
-//  TopicView.swift
-//  TalkPick
-//
-//  Created by jaegu park on 10/14/25.
-//
 
 import UIKit
 import SnapKit
 
 class TopicView: UIView {
+    
+    var onTopicSelected: ((TopicModel) -> Void)?
+
+    private var topics: [TopicModel] = []
     
     private let titleLabel: UILabel = {
         let lb = UILabel()
@@ -53,35 +51,65 @@ class TopicView: UIView {
             $0.top.equalTo(titleLabel.snp.bottom).offset(56)
             $0.leading.trailing.equalToSuperview().inset(24)
         }
-        
-        let row1 = makeRow([
-            (.pink50, "#만약에", .pink100, "talkpick_distance1", "#만약에"),
-            (.yellow50, "#연애", .yellow100, "talkpick_distance2", "MBTI 야구 게임")
-        ])
-        let row2 = makeRow([
-            (.purple50, "#스포츠", .purple100, "talkpick_distance3", "MBTI 야구 게임"),
-            (.orange50, "가족", .orange100, "talkpick_distance4", "MBTI 야구 게임")
-        ])
-        
-        [row1, row2].forEach { cardStack.addArrangedSubview($0) }
     }
     
-    private func makeRow(_ items: [(UIColor, String, UIColor, String, String)]) -> UIStackView {
+    private func makeRow(_ items: [TopicModel], startIndex: Int) -> UIStackView {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.spacing = 13
         stack.distribution = .fillEqually
         stack.alignment = .center
         
-        for (color, labelTitle, textColor, image, title) in items {
-            let card = TopicButton(color: color, labelTitle: labelTitle, textColor: textColor, image: UIImage(named: image), title: title)
+        for (offset, item) in items.enumerated() {
+            let card = TopicButton(
+                color: item.keywordColor,
+                labelTitle: item.keyword,
+                textColor: item.categoryColor,
+                image: item.imageName,
+                title: item.category
+            )
+            
+            // 전체 topics 배열에서의 인덱스
+            card.tag = startIndex + offset
+            card.addTarget(self, action: #selector(tapTopic(_:)), for: .touchUpInside)
+            
             card.snp.makeConstraints {
                 $0.width.equalTo(164)
                 $0.height.equalTo(209)
             }
+            
             stack.addArrangedSubview(card)
         }
         
         return stack
+    }
+    
+    func configure(stepIndex: Int, topics: [TopicModel]) {
+        let titles = ["첫 번째 주제", "두 번째 주제", "세 번째 주제", "네 번째 주제"]
+        titleLabel.text = titles.indices.contains(stepIndex) ? titles[stepIndex] : ""
+        self.topics = topics
+        rebuildStack()
+    }
+    
+    private func rebuildStack() {
+        cardStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        // topics 배열을 2개씩 잘라서 row 만들기
+        let rows = stride(from: 0, to: topics.count, by: 2).map {
+            Array(topics[$0..<min($0+2, topics.count)])
+        }
+        
+        var globalIndex = 0
+        for rowTopics in rows {
+            let rowStack = makeRow(rowTopics, startIndex: globalIndex)
+            globalIndex += rowTopics.count
+            cardStack.addArrangedSubview(rowStack)
+        }
+    }
+    
+    @objc private func tapTopic(_ sender: UIControl) {
+        let index = sender.tag
+        guard topics.indices.contains(index) else { return }
+        onTopicSelected?(topics[index])
     }
 }

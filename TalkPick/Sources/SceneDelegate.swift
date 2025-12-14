@@ -9,7 +9,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         
-        window?.rootViewController = UINavigationController(rootViewController: LoginViewController())
+        let hasShown = UserDefaults.standard.bool(forKey: AppStorageKey.hasShownOnboarding)
+        if hasShown {
+            window?.rootViewController = UINavigationController(rootViewController: LoginViewController())
+        } else {
+            window?.rootViewController = UINavigationController(rootViewController: OnboardingViewController())
+        }
         window?.makeKeyAndVisible()
     }
     
