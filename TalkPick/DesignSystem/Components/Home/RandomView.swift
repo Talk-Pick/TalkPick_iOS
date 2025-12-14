@@ -156,6 +156,13 @@ class RandomView: UIView {
             guard let self = self else { return }
             self.decreaseStep()
         }
+        
+        // FinishView 콜백 설정
+        finishView.onFinished = { [weak self] in
+            guard let self = self else { return }
+            // 한줄평 작성 완료 후 화면 종료
+            self.onExitRequested?()
+        }
     }
 
     private func configureTopicView(for stepIndex: Int) {

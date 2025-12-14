@@ -21,7 +21,7 @@ class MyPageViewModel {
             .subscribe(onSuccess: { [weak self] profile in
                 self?.profile.onNext(profile)
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "프로필 불러오기에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
@@ -32,7 +32,7 @@ class MyPageViewModel {
             .subscribe(onSuccess: { [weak self] success in
                 self?.getMyProfile()
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "프로필 수정에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
@@ -43,7 +43,7 @@ class MyPageViewModel {
             .subscribe(onSuccess: { [weak self] success in
                 self?.logout.onNext(success)
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "로그아웃에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
@@ -55,7 +55,7 @@ class MyPageViewModel {
                 print("getLikedTopics message:", topics.message)
                 self?.likeTopicList.accept(topics.data.items)
             }, onFailure: { error in
-                print("오류:", error.localizedDescription)
+                AlertController(message: "좋아요한 토픽 불러오기에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }

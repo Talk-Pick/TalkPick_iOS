@@ -5,7 +5,7 @@ class AgreeViewController: UIViewController {
     
     private let agreeView = AgreeView()
     private let loginViewModel = LoginViewModel()
-    private let nickname: String
+    private let nickname: String?
     
     init(nickname: String) {
         self.nickname = nickname
@@ -36,7 +36,7 @@ class AgreeViewController: UIViewController {
     
     @objc private func mbti_Tapped() {
         loginViewModel.postTerm(agreeTermIdList: [1, 2, 3], disagreeTermIdList: [])
-        let mbtiVC = MbtiViewController(nickname: nickname)
+        let mbtiVC = MbtiViewController(nickname: nickname ?? "TalkPick")
         self.navigationController?.pushViewController(mbtiVC, animated: true)
     }
 }

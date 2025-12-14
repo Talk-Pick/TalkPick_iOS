@@ -7,7 +7,7 @@ class MbtiViewController: UIViewController {
     private let mbtiView = MbtiView()
     private let loginViewModel = LoginViewModel()
     private let disposeBag = DisposeBag()
-    private let nickname: String?
+    private var nickname: String?
     
     init(nickname: String) {
         self.nickname = nickname
@@ -36,7 +36,8 @@ class MbtiViewController: UIViewController {
         mbtiView.onMbtiSelected = { [weak self] mbti in
             guard let self = self else { return }
             print(mbti)
-            loginViewModel.signUp(nickname: nickname ?? "TalkPick", mbti: mbti)
+            print(nickname)
+            loginViewModel.signUp(nickname: nickname ?? "톡픽", mbti: mbti)
         }
     }
     

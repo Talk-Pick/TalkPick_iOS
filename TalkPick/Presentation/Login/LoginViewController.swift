@@ -10,7 +10,7 @@ class LoginViewController: UIViewController {
     private let loginView = LoginView()
     private let disposeBag = DisposeBag()
 
-    private var userNickname: String = ""
+    private var userNickname: String?
     
     override func loadView() {
         self.view = loginView
@@ -38,7 +38,7 @@ class LoginViewController: UIViewController {
                     let mainTabVC = MainTabViewController()
                     self.navigationController?.pushViewController(mainTabVC, animated: true)
                 } else {
-                    let agreeVC = AgreeViewController(nickname: self.userNickname)
+                    let agreeVC = AgreeViewController(nickname: self.userNickname ?? "톡픽")
                     self.navigationController?.pushViewController(agreeVC, animated: true)
                 }
             })
@@ -88,8 +88,9 @@ class LoginViewController: UIViewController {
                     }
                     
                     let nickname = user?.kakaoAccount?.profile?.nickname ?? ""
-                    self.userNickname = nickname
-                    print("카카오 닉네임 저장 (카톡): \(nickname)")
+                    // 닉네임이 비어있으면 기본값 "톡픽" 사용
+                    self.userNickname = nickname.isEmpty ? "톡픽" : nickname
+                    print("카카오 닉네임 저장 (카톡): \(self.userNickname ?? "톡픽")")
                     
                     self.loginViewModel.kakaoLogin(idToken: idToken)
                         .observe(on: MainScheduler.instance)
@@ -131,8 +132,9 @@ class LoginViewController: UIViewController {
                     }
                     
                     let nickname = user?.kakaoAccount?.profile?.nickname ?? ""
-                    self.userNickname = nickname
-                    print("카카오 닉네임 저장 (계정): \(nickname)")
+                    // 닉네임이 비어있으면 기본값 "톡픽" 사용
+                    self.userNickname = nickname.isEmpty ? "톡픽" : nickname
+                    print("카카오 닉네임 저장 (계정): \(self.userNickname ?? "톡픽")")
                     
                     self.loginViewModel.kakaoLogin(idToken: idToken)
                         .observe(on: MainScheduler.instance)
@@ -179,8 +181,9 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
             print("Apple ID 로그인에 성공하였습니다.: \(idTokenString)")
             
             let appleNickname = "\(nickName.familyName ?? "")\(nickName.givenName ?? "")"
-            self.userNickname = appleNickname
-            print("애플 닉네임 저장: \(appleNickname)")
+            // 닉네임이 비어있으면 기본값 "톡픽" 사용
+            self.userNickname = appleNickname.isEmpty ? "톡픽" : appleNickname
+            print("애플 닉네임 저장: \(self.userNickname ?? "톡픽")")
             
             self.loginViewModel.appleLogin(idToken: idTokenString)
                 .observe(on: MainScheduler.instance)

@@ -6,6 +6,8 @@ class FinishView: UIView {
     private let randomId = UserDefaults.standard.integer(forKey: "randomId")
     private let randomViewModel = RandomViewModel()
     
+    var onFinished: (() -> Void)?
+    
     private let titleLabel: UILabel = {
         let lb = UILabel()
         lb.text = "랜덤 대화 코스가 종료되었습니다!"
@@ -158,7 +160,35 @@ class FinishView: UIView {
     }
     
     @objc private func submitTapped() {
-        randomViewModel.postRandomRate(id: randomId, rating: rating)
+//        randomViewModel.postRandomRate(id: randomId, rating: rating)
+        showCommentView()
+    }
+    
+    private func showCommentView() {
+        let commentView = CommentView()
+        
+        // 한줄평 제출 콜백
+        commentView.onCommentSubmitted = { [weak self] comment in
+            guard let self = self else { return }
+            print("한줄평: \(comment)")
+            
+//            self.randomViewModel.postRandomComment(id: self.randomId, oneLine: comment)
+            self.onFinished?()
+        }
+        
+        commentView.onCancelled = {
+            print("한줄평 작성 취소")
+        }
+        
+        addSubview(commentView)
+        commentView.alpha = 0
+        commentView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        
+        UIView.animate(withDuration: 0.3) {
+            commentView.alpha = 1
+        } completion: { _ in
+            commentView.show()
+        }
     }
     
     private func updateStars() {
