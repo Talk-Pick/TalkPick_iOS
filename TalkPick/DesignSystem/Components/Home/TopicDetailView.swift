@@ -198,9 +198,7 @@ class TopicDetailView: UIView {
                 .processor(processor),
                 .scaleFactor(UIScreen.main.scale),
                 .transition(.none),
-                .cacheOriginalImage,
-                .diskCacheExpiration(.days(7)),
-                .memoryCacheExpiration(.days(1))
+                .cacheOriginalImage
             ]
         )
     }

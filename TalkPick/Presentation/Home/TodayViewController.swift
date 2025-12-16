@@ -91,9 +91,7 @@ extension TodayViewController {
                 .processor(processor),
                 .scaleFactor(UIScreen.main.scale),
                 .transition(.none), // 애니메이션 제거로 즉시 표시
-                .cacheOriginalImage, // 원본 이미지도 캐시
-                .diskCacheExpiration(.days(7)), // 디스크 캐시 7일
-                .memoryCacheExpiration(.days(1)) // 메모리 캐시 1일
+                .cacheOriginalImage // 원본 이미지도 캐시
             ]
         )
     }
