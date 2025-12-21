@@ -39,6 +39,11 @@ class UserRepository {
         return APIService.shared.getWithTokenAndParams(of: APIResponse<LikedTopic>.self, url: url, parameters: parameters, accessToken: token)
     }
     
+    func deleteAccount(token: String) -> Single<Response> {
+        let url = APIConstants.delete.path
+        return APIService.shared.patchWithToken(of: Response.self, url: url, parameters: nil, accessToken: token)
+    }
+    
     func logOut(token: String) -> Single<Response> {
         let url = APIConstants.logOut.path
         return APIService.shared.deleteWithToken(of: Response.self, url: url, parameters: nil, accessToken: token)

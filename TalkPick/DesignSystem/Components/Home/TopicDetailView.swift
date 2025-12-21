@@ -38,6 +38,7 @@ class TopicDetailView: UIView {
     let cardView: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
+        iv.isUserInteractionEnabled = true
         return iv
     }()
     
@@ -58,7 +59,6 @@ class TopicDetailView: UIView {
         cb.layer.borderWidth = 1
         cb.layer.borderColor = UIColor.gray200.cgColor
         cb.backgroundColor = .white
-        cb.setImage(UIImage(named: "talkpick_like3")?.withRenderingMode(.alwaysOriginal), for: .normal)
         cb.setTitleColor(.gray200, for: .normal)
         cb.setTitle(" 좋아요", for: .normal)
         cb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
@@ -144,6 +144,8 @@ class TopicDetailView: UIView {
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.height.equalTo(450)
         }
+        let cardTapGesture = UITapGestureRecognizer(target: self, action: #selector(buttonTapped))
+        cardView.addGestureRecognizer(cardTapGesture)
 
         flipButton.snp.makeConstraints {
             $0.top.equalTo(cardView.snp.bottom).offset(6)
@@ -198,9 +200,7 @@ class TopicDetailView: UIView {
                 .processor(processor),
                 .scaleFactor(UIScreen.main.scale),
                 .transition(.none),
-                .cacheOriginalImage,
-                .diskCacheExpiration(.days(7)),
-                .memoryCacheExpiration(.days(1))
+                .cacheOriginalImage
             ]
         )
     }

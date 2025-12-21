@@ -17,10 +17,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="talkpick_launch" translatesAutoresizingMaskIntoConstraints="NO" id="Y3a-15-l9D">
-                                <rect key="frame" x="61.666666666666657" y="339.66666666666669" width="269.99999999999989" height="173.00000000000006"/>
+                                <rect key="frame" x="61.666666666666657" y="291" width="270" height="270"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="270" id="33r-dM-kFO"/>
-                                    <constraint firstAttribute="height" constant="173" id="Off-dT-MMc"/>
+                                    <constraint firstAttribute="height" constant="270" id="Off-dT-MMc"/>
                                 </constraints>
                             </imageView>
                         </subviews>

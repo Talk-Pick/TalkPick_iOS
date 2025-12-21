@@ -9,6 +9,7 @@ enum APIConstants {
     case signUp
     case myProfile
     case likedTopics
+    case delete
     case logOut
     
     case topicLike(Int)
@@ -49,6 +50,8 @@ extension APIConstants {
             return APIConstants.makeEndPoint("/members/me")
         case .likedTopics:
             return APIConstants.makeEndPoint("/members/liked-topics")
+        case .delete:
+            return APIConstants.makeEndPoint("/members/delete")
         case .logOut:
             return APIConstants.makeEndPoint("/members/logout")
             

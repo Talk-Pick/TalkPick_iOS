@@ -44,6 +44,7 @@ class LikeTopicTableViewCell: UITableViewCell {
     }
     
     private func setUI() {
+        self.backgroundColor = .clear
         self.contentView.layer.cornerRadius = 14
         self.contentView.layer.shadowColor = UIColor.black.cgColor
         self.contentView.layer.shadowOpacity = 0.2
