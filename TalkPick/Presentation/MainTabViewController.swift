@@ -29,17 +29,19 @@ class CustomTabBarItemView: UIView {
         let stackView = UIStackView(arrangedSubviews: [imageView, titleLabel])
         stackView.axis = .vertical
         stackView.alignment = .center
-        stackView.spacing = 3
+        stackView.spacing = 0
 
         addSubview(stackView)
 
         stackView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(8)
+            $0.top.equalToSuperview().offset(9)
             $0.centerX.equalToSuperview()
         }
-
         imageView.snp.makeConstraints {
-            $0.width.height.equalTo(40)
+            $0.width.height.equalTo(38)
+        }
+        titleLabel.snp.makeConstraints {
+            $0.height.equalTo(17)
         }
     }
 
@@ -56,7 +58,7 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
     private let items: [CustomTabBarItemView] = [
         CustomTabBarItemView(image: UIImage(named: "talkpick_tab1")?.withRenderingMode(.alwaysTemplate), title: "홈 화면"),
         CustomTabBarItemView(image: UIImage(named: "talkpick_tab2")?.withRenderingMode(.alwaysTemplate), title: "캘린더"),
-        CustomTabBarItemView(image: UIImage(named: "talkpick_tab3")?.withRenderingMode(.alwaysTemplate), title: "마이 페이지")
+        CustomTabBarItemView(image: UIImage(named: "talkpick_tab3")?.withRenderingMode(.alwaysTemplate), title: "마이페이지")
     ]
     
     override func viewDidLoad() {
@@ -87,7 +89,7 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
         view.addSubview(customTabBarView)
         customTabBarView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(80)
+            $0.height.equalTo(78)
         }
         
         let stackView = UIStackView(arrangedSubviews: items)

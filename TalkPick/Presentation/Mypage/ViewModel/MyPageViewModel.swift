@@ -12,6 +12,7 @@ class MyPageViewModel {
     }
     
     let profile = PublishSubject<Profile>()
+    let delete = PublishSubject<Bool>()
     let logout = PublishSubject<Bool>()
     let likeTopicList = BehaviorRelay<[LikedDetail]>(value: [])
     
@@ -33,6 +34,17 @@ class MyPageViewModel {
                 self?.getMyProfile()
             }, onFailure: { error in
                 AlertController(message: "프로필 수정에 실패했습니다.\n다시 시도해주세요.").show()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func deleteAccount() {
+        useCase.deleteAccount()
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] success in
+                self?.delete.onNext(success)
+            }, onFailure: { error in
+                AlertController(message: "회원 탈퇴에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }

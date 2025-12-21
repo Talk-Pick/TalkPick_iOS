@@ -29,10 +29,6 @@ class MypageViewController: UIViewController {
         }
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
     private func setUI() {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         mypageView.etcSectionView.arrowRowViews.first?.chevronButton.addTarget(self,
@@ -44,6 +40,13 @@ class MypageViewController: UIViewController {
         mypageView.collectionSectionView.moreButton.addTarget(self,
                                                               action: #selector(more_Tapped),
                                                               for: .touchUpInside)
+        mypageView.withdrawButton.addTarget(self,
+                                            action: #selector(delete_Tapped),
+                                            for: .touchUpInside)
+        
+        mypageView.logOutButton.addTarget(self,
+                                          action: #selector(logout_Tapped),
+                                          for: .touchUpInside)
     }
     
     private func setProfile() {
@@ -62,6 +65,22 @@ class MypageViewController: UIViewController {
                 self.mypageView.editMbtiView = editView
             })
             .disposed(by: disposeBag)
+        
+        viewModel.delete
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] success in
+                guard let self = self else { return }
+                self.navigateToLogin()
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.logout
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] success in
+                guard let self = self else { return }
+                self.navigateToLogin()
+            })
+            .disposed(by: disposeBag)
     }
     
     
@@ -76,5 +95,22 @@ class MypageViewController: UIViewController {
         serviceView.alpha = 0
         serviceView.snp.makeConstraints { $0.edges.equalToSuperview() }
         UIView.animate(withDuration: 0.3) { serviceView.alpha = 1 }
+    }
+    
+    @objc private func delete_Tapped() {
+        AlertController(message: "탈퇴하시겠어요?", isCancel: true) { [weak self] in
+            self?.viewModel.deleteAccount()
+        }.show()
+    }
+    
+    @objc private func logout_Tapped() {
+        AlertController(message: "로그아웃 하시겠어요?", isCancel: true) { [weak self] in
+            self?.viewModel.logOut()
+        }.show()
+    }
+    
+    private func navigateToLogin() {
+        let loginVC = UINavigationController(rootViewController: LoginViewController())
+        SceneDelegate().setRootViewController(loginVC)
     }
 }

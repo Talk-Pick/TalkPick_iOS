@@ -1,6 +1,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 class TodayView: UIView {
     
@@ -37,6 +38,7 @@ class TodayView: UIView {
     let cardView: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
+        iv.isUserInteractionEnabled = true
         return iv
     }()
     
@@ -57,7 +59,6 @@ class TodayView: UIView {
         cb.layer.borderWidth = 1
         cb.layer.borderColor = UIColor.gray200.cgColor
         cb.backgroundColor = .white
-        cb.setImage(UIImage(named: "talkpick_like3")?.withRenderingMode(.alwaysOriginal), for: .normal)
         cb.setTitleColor(.gray200, for: .normal)
         cb.setTitle(" 좋아요", for: .normal)
         cb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
@@ -65,7 +66,9 @@ class TodayView: UIView {
     }()
     
     var isFront: Bool = true
-    var onFlip: ((Bool) -> Void)?
+    
+    private var frontURL: URL?
+    private var backURL: URL?
     
     init() {
         super.init(frame: .zero)
@@ -126,6 +129,8 @@ class TodayView: UIView {
             $0.leading.trailing.equalToSuperview().inset(18)
             $0.height.equalTo(460)
         }
+        let cardTapGesture = UITapGestureRecognizer(target: self, action: #selector(buttonTapped))
+        cardView.addGestureRecognizer(cardTapGesture)
         
         flipButton.snp.makeConstraints {
             $0.top.equalTo(cardView.snp.bottom).offset(6)
@@ -142,16 +147,63 @@ class TodayView: UIView {
         }
     }
     
-    @objc func buttonTapped() {
-        isFront.toggle()
-        let options: UIView.AnimationOptions = isFront ? .transitionFlipFromRight : .transitionFlipFromLeft
+    func updateDetail(category: String, keyword: String, frontImageUrl: String, backImageUrl: String) {
+        // 카테고리 업데이트
+        labelLabel1.text = category
+        labelLabel2.text = keyword
         
-        UIView.transition(with: cardView,
-                          duration: 0.5,
-                          options: options,
-                          animations: {
-            self.onFlip?(self.isFront)
-        },
-                          completion: nil)
+        // 이미지 URL 저장
+        frontURL = URL(string: frontImageUrl)
+        backURL = URL(string: backImageUrl)
+        
+        // 앞뒷면 이미지 프리페칭
+        prefetchImages()
+        
+        // 현재 상태에 맞는 이미지 로드
+        updateCardImage()
+    }
+    
+    private func prefetchImages() {
+        let urls = [frontURL, backURL].compactMap { $0 }
+        ImagePrefetcher(urls: urls).start()
+    }
+    
+    private func updateCardImage() {
+        let url = isFront ? frontURL : backURL
+        
+        let processor = DownsamplingImageProcessor(size: cardView.bounds.size)
+        
+        cardView.kf.setImage(
+            with: url,
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale),
+                .transition(.none),
+                .cacheOriginalImage
+            ]
+        )
+    }
+    
+    @objc func buttonTapped() {
+        if isFront {
+            isFront = false
+            UIView.transition(with: cardView,
+                              duration: 0.5,
+                              options: .transitionFlipFromLeft,
+                              animations: { [weak self] in
+                                  self?.updateCardImage()
+                              },
+                              completion: nil)
+            
+        } else {
+            isFront = true
+            UIView.transition(with: cardView,
+                              duration: 0.5,
+                              options: .transitionFlipFromRight,
+                              animations: { [weak self] in
+                                  self?.updateCardImage()
+                              },
+                              completion: nil)
+        }
     }
 }

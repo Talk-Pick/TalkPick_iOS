@@ -96,6 +96,16 @@ class UserUseCase {
         return userRepository.getLikedTopics(token: token, parameters: params)
     }
     
+    func deleteAccount() -> Single<Bool> {
+        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+            return .just(false)
+        }
+        
+        return userRepository.deleteAccount(token: token)
+            .map { _ in true }
+            .catchAndReturn(false)
+    }
+    
     func logOut() -> Single<Bool> {
         guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
             return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))

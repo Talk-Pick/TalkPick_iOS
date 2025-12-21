@@ -8,7 +8,8 @@ class MypageView: UIView {
     private let infoSectionView: SectionView
     let collectionSectionView: CollectionSectionView
     let etcSectionView: EtcSectionView
-    private let withdrawButton = UIButton(type: .system)
+    let logOutButton = UIButton(type: .system)
+    let withdrawButton = UIButton(type: .system)
     
     var editMbtiView: EditMbtiView?
     
@@ -46,13 +47,15 @@ class MypageView: UIView {
     private func setupUI() {
         backgroundColor = .white
         
-        // 상단 "My Page"
-        titleLabel.text = "My Page"
+        titleLabel.text = "마이페이지"
         titleLabel.font = .systemFont(ofSize: 20, weight: .heavy)
         titleLabel.textColor = .black
         titleLabel.textAlignment = .center
         
-        // 하단 "회원탈퇴"
+        logOutButton.setTitle("로그아웃", for: .normal)
+        logOutButton.setTitleColor(.gray100, for: .normal)
+        logOutButton.titleLabel?.font = .systemFont(ofSize: 12, weight: .medium)
+        
         withdrawButton.setTitle("회원탈퇴", for: .normal)
         withdrawButton.setTitleColor(.gray100, for: .normal)
         withdrawButton.titleLabel?.font = .systemFont(ofSize: 12, weight: .medium)
@@ -61,6 +64,7 @@ class MypageView: UIView {
         addSubview(infoSectionView)
         addSubview(collectionSectionView)
         addSubview(etcSectionView)
+        addSubview(logOutButton)
         addSubview(withdrawButton)
     }
     
@@ -78,21 +82,23 @@ class MypageView: UIView {
         }
         infoSectionView.actionButton.addTarget(self, action: #selector(edit_Tapped), for: .touchUpInside)
         
-        // 컬렉션
         collectionSectionView.snp.makeConstraints {
             $0.top.equalTo(infoSectionView.snp.bottom).offset(30)
             $0.leading.trailing.equalTo(infoSectionView)
         }
         
-        // 기타
         etcSectionView.snp.makeConstraints {
             $0.top.equalTo(collectionSectionView.snp.bottom).offset(20)
             $0.leading.trailing.equalTo(infoSectionView)
         }
         
-        // 회원탈퇴
-        withdrawButton.snp.makeConstraints {
+        logOutButton.snp.makeConstraints {
             $0.top.equalTo(etcSectionView.snp.bottom).offset(10)
+            $0.trailing.equalTo(etcSectionView)
+        }
+        
+        withdrawButton.snp.makeConstraints {
+            $0.top.equalTo(logOutButton.snp.bottom).offset(4)
             $0.trailing.equalTo(etcSectionView)
             $0.bottom.lessThanOrEqualTo(safeAreaLayoutGuide.snp.bottom).inset(16)
         }
