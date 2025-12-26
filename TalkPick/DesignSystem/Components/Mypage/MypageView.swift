@@ -55,10 +55,12 @@ class MypageView: UIView {
         logOutButton.setTitle("로그아웃", for: .normal)
         logOutButton.setTitleColor(.gray100, for: .normal)
         logOutButton.titleLabel?.font = .systemFont(ofSize: 12, weight: .medium)
+        logOutButton.applyTextButtonPressEffect()
         
         withdrawButton.setTitle("회원탈퇴", for: .normal)
         withdrawButton.setTitleColor(.gray100, for: .normal)
         withdrawButton.titleLabel?.font = .systemFont(ofSize: 12, weight: .medium)
+        withdrawButton.applyTextButtonPressEffect()
         
         addSubview(titleLabel)
         addSubview(infoSectionView)

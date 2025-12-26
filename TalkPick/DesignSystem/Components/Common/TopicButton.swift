@@ -12,10 +12,24 @@ final class TopicButton: UIControl {
     
     override var isHighlighted: Bool {
         didSet {
-            UIView.animate(withDuration: 0.08) {
-                self.alpha = self.isHighlighted ? 0.85 : 1.0
-                self.transform = self.isHighlighted ? CGAffineTransform(scaleX: 0.98, y: 0.98) : .identity
+            if isHighlighted {
+                // 햅틱 피드백 추가
+                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                impactFeedback.impactOccurred()
             }
+            
+            UIView.animate(
+                withDuration: 0.15,
+                delay: 0,
+                usingSpringWithDamping: 0.6,
+                initialSpringVelocity: 0.8,
+                options: [.allowUserInteraction, .beginFromCurrentState],
+                animations: {
+                    self.alpha = self.isHighlighted ? 0.8 : 1.0
+                    self.transform = self.isHighlighted ? CGAffineTransform(scaleX: 0.94, y: 0.94) : .identity
+                    self.layer.shadowOpacity = self.isHighlighted ? 0.1 : 0.2
+                }
+            )
         }
     }
     
@@ -23,8 +37,7 @@ final class TopicButton: UIControl {
         super.init(frame: .zero)
         setupView(color: color, labelTitle: labelTitle, textColor: textColor, image: image, title: title)
         isAccessibilityElement = true
-        accessibilityLabel = labelTitle
-        accessibilityLabel = title
+        accessibilityLabel = "\(labelTitle) \(title)"
         accessibilityTraits = .button
     }
     

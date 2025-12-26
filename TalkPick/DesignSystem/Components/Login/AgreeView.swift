@@ -74,6 +74,7 @@ class AgreeView: UIView {
         bt.layer.cornerRadius = 10
         bt.isEnabled = false
         bt.titleLabel?.font = .boldSystemFont(ofSize: 18)
+        bt.applyTextButtonPressEffect()
         return bt
     }()
     

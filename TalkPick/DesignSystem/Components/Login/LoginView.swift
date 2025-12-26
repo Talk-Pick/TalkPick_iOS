@@ -27,6 +27,7 @@ class LoginView: UIView {
         qb.setTitleColor(.white, for: .normal)
         qb.setTitle("로그인", for: .normal)
         qb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+        qb.applyTextButtonPressEffect()
         return qb
     }()
     
@@ -140,6 +141,7 @@ class LoginView: UIView {
         btn.backgroundColor = background
         btn.layer.cornerRadius = 14
         btn.clipsToBounds = true
+        btn.applyTextButtonPressEffect()
         
         let icon = UIImageView(image: UIImage(named: iconName))
         icon.contentMode = .scaleAspectFit

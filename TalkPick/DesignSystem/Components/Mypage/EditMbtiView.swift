@@ -64,6 +64,7 @@ class EditMbtiView: UIView {
         cb.setTitleColor(.gray200, for: .normal)
         cb.setTitle("취소", for: .normal)
         cb.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+        cb.applyTextButtonPressEffect()
         return cb
     }()
     
@@ -75,6 +76,7 @@ class EditMbtiView: UIView {
         qb.setTitleColor(.white, for: .normal)
         qb.setTitle("변경하기", for: .normal)
         qb.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+        qb.applyTextButtonPressEffect()
         return qb
     }()
     

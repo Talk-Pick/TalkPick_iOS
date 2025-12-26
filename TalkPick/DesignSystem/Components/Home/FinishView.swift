@@ -60,6 +60,7 @@ class FinishView: UIView {
         button.layer.borderColor = UIColor.gray200.cgColor
         button.backgroundColor = .clear
         button.isEnabled = false
+        button.applyTextButtonPressEffect()
         return button
     }()
     

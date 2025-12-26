@@ -49,6 +49,7 @@ class TodayView: UIView {
         fb.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
         fb.setTitleColor(.gray100, for: .normal)
         fb.semanticContentAttribute = .forceRightToLeft
+        fb.applyTextButtonPressEffect()
         return fb
     }()
     
@@ -62,6 +63,7 @@ class TodayView: UIView {
         cb.setTitleColor(.gray200, for: .normal)
         cb.setTitle(" 좋아요", for: .normal)
         cb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+        cb.applyTextButtonPressEffect()
         return cb
     }()
     

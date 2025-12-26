@@ -96,6 +96,7 @@ class HomeView: UIView {
         sb.setTitleColor(.gray200, for: .normal)
         sb.setTitle("시작하기", for: .normal)
         sb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+        sb.applyTextButtonPressEffect()
         return sb
     }()
     
