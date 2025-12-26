@@ -40,6 +40,7 @@ class MbtiView: UIView {
         bt.layer.cornerRadius = 10
         bt.isEnabled = false
         bt.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+        bt.applyTextButtonPressEffect()
         return bt
     }()
     

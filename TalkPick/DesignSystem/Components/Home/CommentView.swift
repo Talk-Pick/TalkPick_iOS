@@ -7,17 +7,10 @@ class CommentView: UIView {
     var onCommentSubmitted: ((String) -> Void)?
     var onCancelled: (() -> Void)?
     
-    private let dimmedBackground: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
-        return view
-    }()
-    
     private let containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
         view.layer.cornerRadius = 20
-        view.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         return view
     }()
     
@@ -58,6 +51,7 @@ class CommentView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        backgroundColor = UIColor(white: 0, alpha: 0.2)
         setupUI()
         setupLayout()
         setupActions()
@@ -68,7 +62,6 @@ class CommentView: UIView {
     }
     
     private func setupUI() {
-        addSubview(dimmedBackground)
         addSubview(containerView)
         
         containerView.addSubview(titleLabel)
@@ -79,39 +72,35 @@ class CommentView: UIView {
     }
     
     private func setupLayout() {
-        dimmedBackground.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        
         containerView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(260)
+            $0.centerY.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(56)
+            $0.height.equalTo(220)
         }
         
         titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(50)
-            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.top.equalToSuperview().offset(30)
+            $0.centerX.equalToSuperview()
             $0.height.equalTo(33)
         }
         
         textField.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(5)
-            $0.leading.trailing.equalToSuperview().inset(90)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(215)
             $0.height.equalTo(42)
         }
         
         doneButton.snp.makeConstraints {
             $0.top.equalTo(textField.snp.bottom).offset(25)
-            $0.leading.trailing.equalToSuperview().inset(110)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(103)
             $0.height.equalTo(40)
         }
     }
     
     private func setupActions() {
         doneButton.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundTapped))
-        dimmedBackground.addGestureRecognizer(tapGesture)
     }
     
     @objc private func doneTapped() {
@@ -126,10 +115,6 @@ class CommentView: UIView {
         dismissWithAnimation()
     }
     
-    @objc private func backgroundTapped() {
-        textField.resignFirstResponder()
-    }
-    
     private func dismissWithAnimation() {
         textField.resignFirstResponder()
         
@@ -141,21 +126,8 @@ class CommentView: UIView {
     }
     
     func show() {
-        UIView.animate(withDuration: 0.3, delay: 0.1, options: .curveEaseOut) {
-            self.containerView.transform = .identity
-        }
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.textField.becomeFirstResponder()
-        }
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        // 초기에 아래에서 올라오는 애니메이션을 위해
-        if containerView.transform == .identity {
-            containerView.transform = CGAffineTransform(translationX: 0, y: containerView.frame.height)
         }
     }
 }

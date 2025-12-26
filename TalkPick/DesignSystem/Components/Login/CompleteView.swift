@@ -24,6 +24,7 @@ class CompleteView: UIView {
         bt.setTitleColor(.white, for: .normal)
         bt.layer.cornerRadius = 10
         bt.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+        bt.applyTextButtonPressEffect()
         return bt
     }()
     

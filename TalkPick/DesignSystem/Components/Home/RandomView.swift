@@ -78,8 +78,8 @@ class RandomView: UIView {
         smallLogo.snp.makeConstraints {
             $0.bottom.equalToSuperview().inset(25)
             $0.centerX.equalToSuperview()
-            $0.height.equalTo(33)
-            $0.width.equalTo(111)
+            $0.height.equalTo(40)
+            $0.width.equalTo(100)
         }
     }
     
