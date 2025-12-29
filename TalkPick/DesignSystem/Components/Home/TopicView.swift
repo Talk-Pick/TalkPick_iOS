@@ -85,7 +85,7 @@ class TopicView: UIView {
     }
     
     func configure(stepIndex: Int, topics: [TopicModel]) {
-        let titles = ["첫 번째 주제", "두 번째 주제", "세 번째 주제", "네 번째 주제"]
+        let titles = ["첫 번째 주제", "두 번째 주제", "세 번째 주제"]
         titleLabel.text = titles.indices.contains(stepIndex) ? titles[stepIndex] : ""
         self.topics = topics
         rebuildStack()

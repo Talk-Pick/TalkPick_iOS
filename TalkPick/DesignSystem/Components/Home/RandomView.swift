@@ -27,7 +27,7 @@ class RandomView: UIView {
     private var relationshipText: String?
     private var situationText: String?
     
-    private var topicData: [[TopicModel]] = Array(repeating: [], count: 4)
+    private var topicData: [[TopicModel]] = Array(repeating: [], count: 3)
     private var topicRecords: [TotalRecord] = []
     
     var onExitRequested: (() -> Void)?
@@ -222,7 +222,7 @@ class RandomView: UIView {
                 print("다음 버튼 클릭 기록: step \(stepIndex + 1), time: \(Date().toISO8601String())")
             }
             
-            if stepIndex < 3 {
+            if stepIndex < 2 {
                 // 다음 토픽 선택 화면으로
                 self.show(step: .topicSelect(step: stepIndex + 1))
             } else {
@@ -319,8 +319,8 @@ class RandomView: UIView {
     }
     
     private func submitTopicRecords() {
-        guard topicRecords.count == 4 else {
-            print("경고: TopicRecord가 4개가 아닙니다. 현재: \(topicRecords.count)개")
+        guard topicRecords.count == 3 else {
+            print("경고: TopicRecord가 3개가 아닙니다. 현재: \(topicRecords.count)개")
             return
         }
         

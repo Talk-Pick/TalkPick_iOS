@@ -1,0 +1,9 @@
+# Appfile - 앱 정보 설정
+# https://docs.fastlane.tools/advanced/#appfile
+
+app_identifier("io.tuist.TalkPick") # Bundle Identifier
+apple_id("pjk971113@naver.com") # Apple ID 이메일 주소를 입력하세요
+team_id("") # App Store Connect Team ID (선택사항)
+
+# 자동으로 감지되지만 명시적으로 지정할 수도 있습니다
+# itc_team_id("") # App Store Connect Team ID

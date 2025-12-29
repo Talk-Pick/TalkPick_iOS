@@ -163,7 +163,7 @@ class TopicDetailView: UIView {
     }
 
     func configure(stepIndex: Int) {
-        let stepTitles = ["첫 번째", "두 번째", "세 번째", "네 번째"]
+        let stepTitles = ["첫 번째", "두 번째", "세 번째"]
         stepLabel.text = stepTitles.indices.contains(stepIndex) ? stepTitles[stepIndex] : ""
     }
     
