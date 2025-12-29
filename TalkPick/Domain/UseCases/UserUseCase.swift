@@ -120,6 +120,7 @@ class UserUseCase {
     }
     
     private func clearUserCredentials() {
-        KeychainHelper.standard.delete(service: "access-token", account: "user")
+        AccessTokenManager.shared.clearToken()
+        RefreshTokenManager.shared.clearToken()
     }
 }

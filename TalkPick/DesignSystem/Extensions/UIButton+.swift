@@ -3,7 +3,6 @@ import UIKit
 
 extension UIButton {
     
-    /// 텍스트 버튼에 눌림 효과를 적용합니다
     func applyTextButtonPressEffect() {
         addTarget(self, action: #selector(handleTouchDown), for: [.touchDown, .touchDragInside])
         addTarget(self, action: #selector(handleTouchUp), for: [.touchUpInside, .touchUpOutside, .touchCancel, .touchDragOutside])
