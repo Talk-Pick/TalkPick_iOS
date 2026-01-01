@@ -144,7 +144,7 @@ class TodayView: UIView {
         
         likeButton.snp.makeConstraints {
             $0.top.equalTo(flipButton.snp.bottom).offset(40)
-            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.leading.trailing.equalToSuperview().inset(35)
             $0.height.equalTo(51)
         }
     }

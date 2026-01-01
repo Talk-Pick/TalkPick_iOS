@@ -18,7 +18,6 @@ class MypageViewController: UIViewController {
         super.viewDidLoad()
         
         setUI()
-        setProfile()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -27,6 +26,7 @@ class MypageViewController: UIViewController {
         if let tabBarVC = self.tabBarController as? MainTabViewController {
             tabBarVC.customTabBarView.isHidden = false
         }
+        setAPI()
     }
     
     private func setUI() {
@@ -49,7 +49,7 @@ class MypageViewController: UIViewController {
                                           for: .touchUpInside)
     }
     
-    private func setProfile() {
+    private func setAPI() {
         bindViewModel()
         viewModel.getMyProfile()
     }

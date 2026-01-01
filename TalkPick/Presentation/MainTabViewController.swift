@@ -29,16 +29,16 @@ class CustomTabBarItemView: UIView {
         let stackView = UIStackView(arrangedSubviews: [imageView, titleLabel])
         stackView.axis = .vertical
         stackView.alignment = .center
-        stackView.spacing = 0
+        stackView.spacing = 6
 
         addSubview(stackView)
 
         stackView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(9)
+            $0.top.equalToSuperview().offset(14)
             $0.centerX.equalToSuperview()
         }
         imageView.snp.makeConstraints {
-            $0.width.height.equalTo(38)
+            $0.width.height.equalTo(26)
         }
         titleLabel.snp.makeConstraints {
             $0.height.equalTo(17)
@@ -57,7 +57,7 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
     
     private let items: [CustomTabBarItemView] = [
         CustomTabBarItemView(image: UIImage(named: "talkpick_tab1")?.withRenderingMode(.alwaysTemplate), title: "홈 화면"),
-        CustomTabBarItemView(image: UIImage(named: "talkpick_tab2")?.withRenderingMode(.alwaysTemplate), title: "캘린더"),
+        CustomTabBarItemView(image: UIImage(named: "talkpick_tab2")?.withRenderingMode(.alwaysTemplate), title: "랜덤코스"),
         CustomTabBarItemView(image: UIImage(named: "talkpick_tab3")?.withRenderingMode(.alwaysTemplate), title: "마이페이지")
     ]
     
@@ -123,13 +123,13 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
     
     private func setupViewControllers() {
         let homeVC = HomeViewController()
-        let calendarVC = CalendarViewController()
+        let randomVC = CalendarViewController()
         let mypageVC = MypageViewController()
         
         let navigationHome = UINavigationController(rootViewController: homeVC)
-        let navigationCalendar = UINavigationController(rootViewController: calendarVC)
+        let navigationRandom = UINavigationController(rootViewController: randomVC)
         let navigationMypage = UINavigationController(rootViewController: mypageVC)
 
-        self.viewControllers = [navigationHome, navigationCalendar, navigationMypage]
+        self.viewControllers = [navigationHome, navigationRandom, navigationMypage]
     }
 }

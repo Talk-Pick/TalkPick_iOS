@@ -188,7 +188,6 @@ class MbtiView: UIView {
     
     @objc private func startTapped() {
         guard let mbti = currentMBTI else { return }
-        print("선택한 MBTI:", mbti)
         onMbtiSelected?(mbti)
     }
     

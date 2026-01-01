@@ -6,6 +6,7 @@ enum APIConstants {
     case term
     case kakaoLogin
     case appleLogin
+    case googleLogin
     case signUp
     case myProfile
     case likedTopics
@@ -28,7 +29,7 @@ enum APIConstants {
 
 extension APIConstants {
     
-    static let baseURL = "http://talkpick.co.kr:8080/api/v1"
+    static let baseURL = "https://talkpick.co.kr/api/v1"
     
     static func makeEndPoint(_ endpoint: String) -> String {
         baseURL + endpoint
@@ -44,6 +45,8 @@ extension APIConstants {
             return APIConstants.makeEndPoint("/members/kakao/login")
         case .appleLogin:
             return APIConstants.makeEndPoint("/members/apple/login")
+        case .googleLogin:
+            return APIConstants.makeEndPoint("/members/google/login")
         case .signUp:
             return APIConstants.makeEndPoint("/members/signup")
         case .myProfile:

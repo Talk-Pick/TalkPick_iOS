@@ -42,13 +42,14 @@ class LikeTopicViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .bind(to: likeTopicView.likeTopicTableView.rx.items(cellIdentifier: LikeTopicTableViewCell.identifier, cellType: LikeTopicTableViewCell.self)) { index, item, cell in
                 cell.prepare(likedDetail: item)
+                cell.selectionStyle = .none
             }
             .disposed(by: disposeBag)
         
         likeTopicView.likeTopicTableView.rx.modelSelected(LikedDetail.self)
             .subscribe(onNext: { [weak self] topicItem in
                 guard let self = self else { return }
-                let todayVC = TodayViewController(topicId: topicItem.id)
+                let todayVC = TodayViewController(topicId: topicItem.topicId)
                 self.navigationController?.pushViewController(todayVC, animated: true)
             })
             .disposed(by: disposeBag)
@@ -57,6 +58,6 @@ class LikeTopicViewController: UIViewController {
 
 extension LikeTopicViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100
+        return 106
     }
 }

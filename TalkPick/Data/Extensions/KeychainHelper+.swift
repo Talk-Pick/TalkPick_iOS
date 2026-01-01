@@ -11,7 +11,6 @@ class KeychainHelper {
     // Keychain에 `String`을 원본 그대로 저장
     func save(_ value: String, service: String, account: String) {
         guard let data = value.data(using: .utf8) else {
-            print("Keychain 저장 실패 - 데이터를 UTF-8로 변환할 수 없음 (\(service))")
             return
         }
 
@@ -39,8 +38,8 @@ class KeychainHelper {
         var result: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
 
+        // errSecItemNotFound는 토큰이 없는 정상적인 경우이므로 오류로 처리하지 않음
         guard status == errSecSuccess, let data = result as? Data else {
-            print("Keychain 읽기 실패 - \(service): \(status)")
             return nil
         }
 

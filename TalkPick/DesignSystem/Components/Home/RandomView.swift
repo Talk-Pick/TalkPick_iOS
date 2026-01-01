@@ -11,11 +11,7 @@ class RandomView: UIView {
     private let disposeBag = DisposeBag()
     
     private let totalSteps: Int = 11
-    private var currentStepNumber: Int = 1 {
-        didSet {
-            print("현재 단계: \(currentStepNumber)/\(totalSteps)")
-        }
-    }
+    private var currentStepNumber: Int = 1
     
     private var isCloseRelationship: Bool?
     private var selectedSituation: SituationView.SituationKind?
@@ -197,8 +193,6 @@ class RandomView: UIView {
                 self.topicRecords.append(record)
             }
             
-            print("토픽 선택 기록: step \(stepIndex + 1), topicId: \(topicId), time: \(Date())")
-            
             self.show(step: .topicDetail(step: stepIndex))
         }
     }
@@ -219,7 +213,6 @@ class RandomView: UIView {
             // endAt 업데이트 (다음으로 넘어간 시간 기록)
             if self.topicRecords.indices.contains(stepIndex) {
                 self.topicRecords[stepIndex].endAt = Date().toISO8601String()
-                print("다음 버튼 클릭 기록: step \(stepIndex + 1), time: \(Date().toISO8601String())")
             }
             
             if stepIndex < 2 {
@@ -320,12 +313,8 @@ class RandomView: UIView {
     
     private func submitTopicRecords() {
         guard topicRecords.count == 3 else {
-            print("경고: TopicRecord가 3개가 아닙니다. 현재: \(topicRecords.count)개")
             return
         }
-        
-        print("=== TopicRecords 제출 ===")
-        print("\(topicRecords)")
         
         // API 호출
         randomViewModel.postRandomTotalRecord(id: randomId, totalRecords: topicRecords)

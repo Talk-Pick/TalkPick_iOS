@@ -75,7 +75,7 @@ extension TodayViewController {
             .subscribe(onNext: { [weak self] likedTopics in
                 guard let self = self else { return }
                 // 현재 topicId가 좋아요 목록에 있는지 확인
-                self.isLiked = likedTopics.contains(where: { $0.category.id == self.topicId })
+                self.isLiked = likedTopics.contains(where: { $0.topicId == self.topicId })
                 self.updateLikeButton()
             })
             .disposed(by: disposeBag)

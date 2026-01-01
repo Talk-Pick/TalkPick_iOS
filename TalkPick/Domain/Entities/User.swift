@@ -24,9 +24,7 @@ struct User: Codable {
     let memberId: Int
     let role: String
     let accessToken: String
-    let refreshToken: String
     let accessExpiredTime: Int64
-    let refreshExpiredTime: Int64
 }
 
 struct Profile: Codable {

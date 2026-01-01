@@ -5,7 +5,7 @@ import Foundation
 class AuthInterceptor: RequestInterceptor {
     
     // 토큰 저장 및 갱신 관련 프로퍼티
-    private let lock = NSLock()
+    private let lock = NSLock() 
     private var isRefreshing = false
     private var requestsToRetry: [(RetryResult) -> Void] = []
     
@@ -47,29 +47,22 @@ class AuthInterceptor: RequestInterceptor {
         }
     }
     
-    // 리프레시 토큰을 사용하여 액세스 토큰 갱신
+    // 액세스 토큰 갱신
     private func refreshToken(completion: @escaping (Bool) -> Void) {
-        guard let refreshToken = RefreshTokenManager.shared.getToken() else {
-            print(" 리프레시 토큰 없음")
+        guard let accessToken = AccessTokenManager.shared.getToken() else {
             completion(false)
             return
         }
         
-        print(" 리프레시 토큰 요청: \(refreshToken)")
-        
         let url = APIConstants.tokenRefresh.path
         let headers: HTTPHeaders = [
             "Accept": "*/*",
-            "Content-Type": "application/json"
-        ]
-        let parameters: [String: String] = [
-            "refreshToken": refreshToken
+            "Content-Type": "application/json",
+            "Authorization": "Bearer \(accessToken)"
         ]
         
         AF.request(url,
                    method: .post,
-                   parameters: parameters,
-                   encoder: JSONParameterEncoder.default,
                    headers: headers)
         .validate(statusCode: 200..<300)
         .responseDecodable(of: Token.self) { response in
@@ -77,14 +70,10 @@ class AuthInterceptor: RequestInterceptor {
             case .success(let data):
                 let newAccessToken = data.accessToken
                 
-                print("새로운 액세스 토큰 저장 전: \(newAccessToken)")
-                
-                KeychainHelper.standard.save(newAccessToken, service: "access-token", account: "user")
-                
-                print("저장된 액세스 토큰: \(KeychainHelper.standard.read(service: "access-token", account: "user") ?? "없음")")
+                AccessTokenManager.shared.saveToken(newAccessToken)
                 
                 completion(true)
-            case .failure(let error):
+            case .failure(_):
                 completion(false)
             }
         }

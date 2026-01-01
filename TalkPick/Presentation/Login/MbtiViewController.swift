@@ -35,8 +35,6 @@ class MbtiViewController: UIViewController {
         // MbtiView의 startButton이 눌렸을 때 MBTI와 닉네임을 함께 전송
         mbtiView.onMbtiSelected = { [weak self] mbti in
             guard let self = self else { return }
-            print(mbti)
-            print(nickname)
             loginViewModel.signUp(nickname: nickname ?? "톡픽", mbti: mbti)
         }
     }
