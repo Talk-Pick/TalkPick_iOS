@@ -27,7 +27,7 @@ struct LikedTopic: Codable {
 }
 
 struct LikedDetail: Codable {
-    let id: Int
+    let topicId: Int
     let title: String
     let keyword: String
     let category: CategoryDetail

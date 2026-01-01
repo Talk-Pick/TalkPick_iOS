@@ -33,12 +33,22 @@ class UserUseCase {
             .map { $0.data }
     }
     
-    func appleLogin(idToken: String) -> Single<APIResponse<Token>> {
+    func appleLogin(idToken: String) -> Single<Token> {
         let params: [String: Any] = [
             "idToken": idToken
         ]
         
         return userRepository.postAppleLogin(idToken: idToken, parameters: params)
+            .map { $0.data }
+    }
+    
+    func googleLogin(idToken: String) -> Single<Token> {
+        let params: [String: Any] = [
+            "idToken": idToken
+        ]
+        
+        return userRepository.postGoogleLogin(idToken: idToken, parameters: params)
+            .map { $0.data }
     }
     
     func signUp(nickname: String, mbti: String) -> Single<Bool> {
@@ -57,7 +67,7 @@ class UserUseCase {
     }
     
     func getMyProfile() -> Single<Profile> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+        guard let token = AccessTokenManager.shared.getToken() ?? KeychainHelper.standard.read(service: "access-token", account: "user") else {
             return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
         }
         
@@ -121,6 +131,6 @@ class UserUseCase {
     
     private func clearUserCredentials() {
         AccessTokenManager.shared.clearToken()
-        RefreshTokenManager.shared.clearToken()
+        // 리프레시 토큰은 쿠키로 관리되므로 클라이언트에서 삭제할 필요 없음
     }
 }

@@ -8,7 +8,11 @@ platform :ios do
   # 빌드 전에 프로젝트를 생성하는 lane
   # Tuist 프로젝트의 경우 먼저 tuist generate를 실행해야 합니다
   lane :generate_project do
-    sh("tuist generate")
+    # 프로젝트 루트 디렉토리로 이동
+    project_root = File.expand_path("..", __dir__)
+    Dir.chdir(project_root) do
+      sh("tuist generate")
+    end
   end
 
   # 테스트 실행
@@ -45,7 +49,6 @@ platform :ios do
   # 빌드 및 아카이브 (App Store용)
   desc "Build and archive the app for App Store"
   lane :beta do
-    generate_project
     # 인증서 및 프로비저닝 프로파일 자동 관리
     # match를 사용하는 경우 아래 주석을 해제하세요
     # match(type: "appstore", readonly: true)
@@ -63,19 +66,9 @@ platform :ios do
   # TestFlight에 업로드
   desc "Upload to TestFlight"
   lane :beta_upload do
-    increment_build_number(
-      xcodeproj: "TalkPick.xcodeproj"
-    )
     beta
     upload_to_testflight(
       skip_waiting_for_build_processing: true
-      # App Store Connect API Key를 사용하는 경우 아래 옵션을 사용하세요
-      # api_key_path: "fastlane/AuthKey_XXXXXXXX.p8",
-      # api_key: app_store_connect_api_key(
-      #   key_id: "YOUR_KEY_ID",
-      #   issuer_id: "YOUR_ISSUER_ID",
-      #   key_filepath: "fastlane/AuthKey_XXXXXXXX.p8"
-      # )
     )
   end
 

@@ -1,10 +1,19 @@
 
 import UIKit
+import SnapKit
 
 class RandomViewController: UIViewController {
     
     private let randomView = RandomView()
     private let randomViewModel = RandomViewModel()
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
     
     override func loadView() {
         self.view = randomView
@@ -35,7 +44,7 @@ class RandomViewController: UIViewController {
     }
     
     private func startAPI() {
-        randomViewModel.postRandomStart()
+//        randomViewModel.postRandomStart()
     }
     
     @objc private func homeButton() {

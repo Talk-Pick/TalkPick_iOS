@@ -1,6 +1,7 @@
 
 import RxSwift
 import RxCocoa
+import Alamofire
 
 class LoginViewModel {
     private let disposeBag = DisposeBag()
@@ -27,20 +28,34 @@ class LoginViewModel {
     func kakaoLogin(idToken: String) -> Single<Bool> {
         return useCase.kakaoLogin(idToken: idToken)
             .do(onSuccess: { response in
-                KeychainHelper.standard.save(response.accessToken, service: "access-token", account: "user")
-                print("토큰 \(response.accessToken)")
+                AccessTokenManager.shared.saveToken(response.accessToken)
             })
             .map { _ in true }
-            .catchAndReturn(false)
+            .catch { error in
+                return .just(false)
+            }
     }
     
     func appleLogin(idToken: String) -> Single<Bool> {
         return useCase.appleLogin(idToken: idToken)
             .do(onSuccess: { response in
-                KeychainHelper.standard.save(response.data.accessToken, service: "access-token", account: "user")
+                AccessTokenManager.shared.saveToken(response.accessToken)
             })
             .map { _ in true }
-            .catchAndReturn(false)
+            .catch { error in
+                return .just(false)
+            }
+    }
+    
+    func googleLogin(idToken: String) -> Single<Bool> {
+        return useCase.googleLogin(idToken: idToken)
+            .do(onSuccess: { response in
+                AccessTokenManager.shared.saveToken(response.accessToken)
+            })
+            .map { _ in true }
+            .catch { error in
+                return .just(false)
+            }
     }
     
     func signUp(nickname: String, mbti: String) {
@@ -48,7 +63,6 @@ class LoginViewModel {
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] success in
                 self?.signUp.onNext(success)
-                print("회원가입에 성공했습니다.")
             }, onFailure: { error in
                 AlertController(message: "회원가입에 실패했습니다.\n다시 시도해주세요.").show()
             })

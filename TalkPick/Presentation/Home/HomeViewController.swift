@@ -30,10 +30,10 @@ class HomeViewController: UIViewController {
     
     private func setUI() {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
-        homeView.startButton.addTarget(self, action: #selector(situation_Tapped), for: .touchUpInside)
+        homeView.startButton.addTarget(self, action: #selector(random_Tapped), for: .touchUpInside)
     }
     
-    @objc private func situation_Tapped() {
+    @objc private func random_Tapped() {
         let randomVC = RandomViewController()
         self.navigationController?.pushViewController(randomVC, animated: true)
     }

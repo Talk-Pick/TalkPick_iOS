@@ -38,7 +38,7 @@ class CalendarView: UIView {
         return bb
     }()
     
-    private let rightButton: UIButton = {
+    let rightButton: UIButton = {
         let bb = UIButton()
         bb.setImage(UIImage(named: "talkpick_right")?.withRenderingMode(.alwaysOriginal), for: .normal)
         return bb
@@ -132,7 +132,6 @@ class CalendarView: UIView {
             $0.trailing.equalToSuperview().inset(10)
             $0.width.height.equalTo(24)
         }
-        rightButton.addTarget(self, action: #selector(goToNextMonth), for: .touchUpInside)
         
         dateStackView.snp.makeConstraints {
             $0.centerY.equalTo(leftButton)
@@ -219,7 +218,9 @@ class CalendarView: UIView {
         ? startDayOfTheWeek + numberOfDaysInMonth
         : ((startDayOfTheWeek + numberOfDaysInMonth) / 7 + 1) * 7
         let trailingDaysCount = totalGridCount - (startDayOfTheWeek + numberOfDaysInMonth)
-        let trailingDays = Array(1...trailingDaysCount)
+        let trailingDays: [Int] = (trailingDaysCount > 0)
+        ? Array(1...trailingDaysCount)
+        : []
         
         // 오늘 날짜 구성
         let todayComponents = calendar.dateComponents([.year, .month, .day], from: Date())

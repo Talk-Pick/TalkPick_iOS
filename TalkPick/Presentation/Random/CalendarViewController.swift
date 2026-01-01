@@ -39,6 +39,12 @@ extension CalendarViewController {
         calendarView.calendarBackground.snp.makeConstraints {
             calendarHeightConstraint = $0.height.equalTo(300).constraint
         }
+        calendarView.rightButton.addTarget(self, action: #selector(random_Tapped), for: .touchUpInside)
+    }
+    
+    @objc private func random_Tapped() {
+        let randomVC = RandomViewController()
+        self.navigationController?.pushViewController(randomVC, animated: true)
     }
     
     private func bindCollectionView() {

@@ -41,6 +41,7 @@ class LoginView: UIView {
         title: "Apple로 로그인",
         titleColor: .white,
         background: .black,
+        borderColor: .clear,
         iconName: "talkpick_apple"
     )
     
@@ -48,13 +49,23 @@ class LoginView: UIView {
         title: "카카오톡으로 로그인",
         titleColor: .black,
         background: UIColor(red: 0xFE/255, green: 0xE5/255, blue: 0x00/255, alpha: 1),
+        borderColor: .clear,
         iconName: "talkpick_kakao"
+    )
+    
+    lazy var googleButton = makeLoginButton(
+        title: "Google로 로그인",
+        titleColor: .gray200,
+        background: UIColor.white,
+        borderColor: .gray200,
+        iconName: "talkpick_google"
     )
     
     lazy var buttonsStack: UIStackView = {
         let st = UIStackView()
         st.addArrangedSubview(appleButton)
         st.addArrangedSubview(kakaoButton)
+        st.addArrangedSubview(googleButton)
         st.axis = .vertical
         st.spacing = 14
         return st
@@ -121,9 +132,8 @@ class LoginView: UIView {
         }
         
         buttonsStack.snp.makeConstraints {
-            $0.bottom.equalToSuperview().offset(-122)
+            $0.bottom.equalToSuperview().offset(-91)
             $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(114)
         }
         appleButton.snp.makeConstraints {
             $0.height.equalTo(51)
@@ -131,16 +141,22 @@ class LoginView: UIView {
         kakaoButton.snp.makeConstraints {
             $0.height.equalTo(51)
         }
+        googleButton.snp.makeConstraints {
+            $0.height.equalTo(51)
+        }
     }
     
     private func makeLoginButton(title: String,
                                  titleColor: UIColor,
                                  background: UIColor,
+                                 borderColor: UIColor,
                                  iconName: String) -> UIButton {
         let btn = UIButton(type: .system)
         btn.backgroundColor = background
         btn.layer.cornerRadius = 14
         btn.clipsToBounds = true
+        btn.layer.borderWidth = 1
+        btn.layer.borderColor = borderColor.cgColor
         btn.applyTextButtonPressEffect()
         
         let icon = UIImageView(image: UIImage(named: iconName))

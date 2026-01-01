@@ -16,7 +16,12 @@ class UserRepository {
     
     func postAppleLogin(idToken: String, parameters: [String: Any]?) -> Single<APIResponse<Token>> {
         let url = APIConstants.appleLogin.path
-        return APIService.shared.patch(of: APIResponse<Token>.self, url: url, parameters: parameters)
+        return APIService.shared.post(of: APIResponse<Token>.self, url: url, parameters: parameters)
+    }
+    
+    func postGoogleLogin(idToken: String, parameters: [String: Any]?) -> Single<APIResponse<Token>> {
+        let url = APIConstants.googleLogin.path
+        return APIService.shared.post(of: APIResponse<Token>.self, url: url, parameters: parameters)
     }
     
     func signUp(token: String, parameters: [String: Any]?) -> Single<SignUp> {

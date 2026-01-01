@@ -64,7 +64,6 @@ class MyPageViewModel {
         useCase.getLikedTopics(cursor: cursor, size: size)
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] topics in
-                print("getLikedTopics message:", topics.message)
                 self?.likeTopicList.accept(topics.data.items)
             }, onFailure: { error in
                 AlertController(message: "좋아요한 토픽 불러오기에 실패했습니다.\n다시 시도해주세요.").show()

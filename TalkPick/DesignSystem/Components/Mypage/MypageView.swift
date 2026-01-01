@@ -114,7 +114,6 @@ class MypageView: UIView {
     
     @objc func edit_Tapped() {
         guard let editMbtiView = editMbtiView else {
-            print("editMbtiView 가 아직 주입되지 않았습니다.")
             return
         }
         
