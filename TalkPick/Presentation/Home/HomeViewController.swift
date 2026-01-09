@@ -10,7 +10,7 @@ class HomeViewController: UIViewController {
     private let disposeBag = DisposeBag()
     
     override func loadView() {
-        self.view = homeView
+        view = homeView
     }
 
     override func viewDidLoad() {
@@ -23,19 +23,19 @@ class HomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if let tabBarVC = self.tabBarController as? MainTabViewController {
+        if let tabBarVC = tabBarController as? MainTabViewController {
             tabBarVC.customTabBarView.isHidden = false
         }
     }
     
     private func setUI() {
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-        homeView.startButton.addTarget(self, action: #selector(random_Tapped), for: .touchUpInside)
+        navigationController?.setNavigationBarHidden(true, animated: false)
+        homeView.startButton.addTarget(self, action: #selector(randomTapped), for: .touchUpInside)
     }
     
-    @objc private func random_Tapped() {
-        let randomVC = RandomViewController()
-        self.navigationController?.pushViewController(randomVC, animated: true)
+    @objc private func randomTapped() {
+        let randomVC = RandomCourseViewController()
+        navigationController?.pushViewController(randomVC, animated: true)
     }
 }
 
@@ -60,7 +60,7 @@ extension HomeViewController {
             .subscribe(onNext: { [weak self] topicItem in
                 guard let self = self else { return }
                 let todayVC = TodayViewController(topicId: topicItem.topicId)
-                self.navigationController?.pushViewController(todayVC, animated: true)
+                navigationController?.pushViewController(todayVC, animated: true)
             })
             .disposed(by: disposeBag)
     }

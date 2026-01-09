@@ -1,7 +1,6 @@
 
 import RxSwift
 import RxCocoa
-import Alamofire
 
 class LoginViewModel {
     private let disposeBag = DisposeBag()
@@ -26,35 +25,25 @@ class LoginViewModel {
     }
     
     func kakaoLogin(idToken: String) -> Single<Bool> {
-        return useCase.kakaoLogin(idToken: idToken)
-            .do(onSuccess: { response in
-                AccessTokenManager.shared.saveToken(response.accessToken)
-            })
-            .map { _ in true }
-            .catch { error in
-                return .just(false)
-            }
+        return performLogin(useCase.kakaoLogin(idToken: idToken))
     }
     
     func appleLogin(idToken: String) -> Single<Bool> {
-        return useCase.appleLogin(idToken: idToken)
-            .do(onSuccess: { response in
-                AccessTokenManager.shared.saveToken(response.accessToken)
-            })
-            .map { _ in true }
-            .catch { error in
-                return .just(false)
-            }
+        return performLogin(useCase.appleLogin(idToken: idToken))
     }
     
     func googleLogin(idToken: String) -> Single<Bool> {
-        return useCase.googleLogin(idToken: idToken)
+        return performLogin(useCase.googleLogin(idToken: idToken))
+    }
+    
+    private func performLogin(_ loginSingle: Single<Token>) -> Single<Bool> {
+        return loginSingle
             .do(onSuccess: { response in
                 AccessTokenManager.shared.saveToken(response.accessToken)
             })
             .map { _ in true }
-            .catch { error in
-                return .just(false)
+            .catch { _ in
+                .just(false)
             }
     }
     

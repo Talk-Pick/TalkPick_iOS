@@ -14,7 +14,7 @@ class LoginViewController: UIViewController {
     private var userNickname: String?
     
     override func loadView() {
-        self.view = loginView
+        view = loginView
     }
     
     override func viewDidLoad() {
@@ -24,11 +24,11 @@ class LoginViewController: UIViewController {
     }
     
     private func setUI() {
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        navigationController?.setNavigationBarHidden(true, animated: false)
         
-        loginView.appleButton.addTarget(self, action: #selector(apple_Tapped), for: .touchUpInside)
-        loginView.kakaoButton.addTarget(self, action: #selector(kakao_Tapped), for: .touchUpInside)
-        loginView.googleButton.addTarget(self, action: #selector(google_Tapped), for: .touchUpInside)
+        loginView.appleButton.addTarget(self, action: #selector(appleTapped), for: .touchUpInside)
+        loginView.kakaoButton.addTarget(self, action: #selector(kakaoTapped), for: .touchUpInside)
+        loginView.googleButton.addTarget(self, action: #selector(googleTapped), for: .touchUpInside)
     }
     
     private func setBind() {
@@ -38,16 +38,16 @@ class LoginViewController: UIViewController {
                 guard let self = self else { return }
                 if let mbti = profile.mbti, !mbti.isEmpty {
                     let mainTabVC = MainTabViewController()
-                    self.navigationController?.pushViewController(mainTabVC, animated: true)
+                    navigationController?.pushViewController(mainTabVC, animated: true)
                 } else {
-                    let agreeVC = AgreeViewController(nickname: self.userNickname ?? "톡픽")
-                    self.navigationController?.pushViewController(agreeVC, animated: true)
+                    let agreeVC = AgreeViewController(nickname: userNickname ?? "톡픽")
+                    navigationController?.pushViewController(agreeVC, animated: true)
                 }
             })
             .disposed(by: disposeBag)
     }
     
-    @objc private func apple_Tapped() {
+    @objc private func appleTapped() {
         let provider = ASAuthorizationAppleIDProvider()
         let request = provider.createRequest()
         request.nonce = CryptoHelper.sha256(CryptoHelper.randomNonceString())
@@ -59,7 +59,7 @@ class LoginViewController: UIViewController {
         controller.performRequests()
     }
     
-    @objc private func kakao_Tapped() {
+    @objc private func kakaoTapped() {
         let randomNonce = CryptoHelper.randomNonceString()
         let nonce = CryptoHelper.sha256(randomNonce)
         
@@ -70,15 +70,14 @@ class LoginViewController: UIViewController {
                 AlertController(message: "로그인 정보를 가져오는데 실패했습니다.\n다시 시도해주세요.").show()
                 return
             }
-            print("idToken: " + idToken)
             
             UserApi.shared.me { [weak self] (user, error) in
                 guard let self = self else { return }
                 
                 let nickname = user?.kakaoAccount?.profile?.nickname ?? ""
-                self.userNickname = nickname.isEmpty ? "톡픽" : nickname
+                userNickname = nickname.isEmpty ? "톡픽" : nickname
                 
-                self.loginViewModel.kakaoLogin(idToken: idToken)
+                loginViewModel.kakaoLogin(idToken: idToken)
                     .observe(on: MainScheduler.instance)
                     .subscribe(
                         onSuccess: { [weak self] success in
@@ -95,12 +94,12 @@ class LoginViewController: UIViewController {
                             AlertController(message: "로그인에 실패했습니다.\n다시 시도해주세요.").show()
                         }
                     )
-                    .disposed(by: self.disposeBag)
+                    .disposed(by: disposeBag)
             }
         }
     }
     
-    @objc private func google_Tapped() {
+    @objc private func googleTapped() {
         GIDSignIn.sharedInstance.signIn(withPresenting: self) { [weak self] result, error in
             guard let self = self else { return }
             
@@ -110,10 +109,9 @@ class LoginViewController: UIViewController {
             }
             
             let nickname = result?.user.profile?.name ?? ""
-            self.userNickname = nickname.isEmpty ? "톡픽" : nickname
-            print("idToken: " + idToken)
+            userNickname = nickname.isEmpty ? "톡픽" : nickname
             
-            self.loginViewModel.googleLogin(idToken: idToken)
+            loginViewModel.googleLogin(idToken: idToken)
                 .observe(on: MainScheduler.instance)
                 .subscribe(
                     onSuccess: { [weak self] success in
@@ -130,14 +128,14 @@ class LoginViewController: UIViewController {
                         AlertController(message: "로그인에 실패했습니다.\n다시 시도해주세요.").show()
                     }
                 )
-                .disposed(by: self.disposeBag)
+                .disposed(by: disposeBag)
         }
     }
 }
 
 extension LoginViewController: ASAuthorizationControllerPresentationContextProviding {
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return self.view.window ?? UIWindow()
+        return view.window ?? UIWindow()
     }
 }
 
@@ -159,13 +157,12 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
             
             if let nickName = appleIdCredential.fullName {
                 let appleNickname = "\(nickName.familyName ?? "")\(nickName.givenName ?? "")"
-                self.userNickname = appleNickname.isEmpty ? "톡픽" : appleNickname
+                userNickname = appleNickname.isEmpty ? "톡픽" : appleNickname
             } else {
-                self.userNickname = "톡픽"
+                userNickname = "톡픽"
             }
-            print("idToken: " + idTokenString)
             
-            self.loginViewModel.appleLogin(idToken: idTokenString)
+            loginViewModel.appleLogin(idToken: idTokenString)
                 .observe(on: MainScheduler.instance)
                 .subscribe(
                     onSuccess: { [weak self] success in
@@ -182,7 +179,7 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
                         AlertController(message: "로그인에 실패했습니다.\n다시 시도해주세요.").show()
                     }
                 )
-                .disposed(by: self.disposeBag)
+                .disposed(by: disposeBag)
             
         default: break
         }

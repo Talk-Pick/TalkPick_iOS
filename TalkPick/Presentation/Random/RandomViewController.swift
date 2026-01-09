@@ -1,63 +1,43 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
 class RandomViewController: UIViewController {
     
     private let randomView = RandomView()
-    private let randomViewModel = RandomViewModel()
-    
-    init() {
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
+    private let disposeBag = DisposeBag()
     
     override func loadView() {
-        self.view = randomView
+        view = randomView
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setUI()
-        startAPI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if let tabBarVC = self.tabBarController as? MainTabViewController {
-            tabBarVC.customTabBarView.isHidden = true
+        if let tabBarVC = tabBarController as? MainTabViewController {
+            tabBarVC.customTabBarView.isHidden = false
         }
-    }
-    
-    private func setUI() {
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-        
-        randomView.navigationbarView.delegate = self
-        randomView.navigationbarView.homeButton.addTarget(self, action: #selector(homeButton), for: .touchUpInside)
-        randomView.onExitRequested = { [weak self] in
-            self?.navigationController?.popViewController(animated: true)
-        }
-    }
-    
-    private func startAPI() {
-//        randomViewModel.postRandomStart()
-    }
-    
-    @objc private func homeButton() {
-        let quitView = QuitView(target: self, num: 2)
-        self.view.addSubview(quitView)
-        quitView.alpha = 0
-        quitView.snp.makeConstraints { $0.edges.equalToSuperview() }
-        UIView.animate(withDuration: 0.3) { quitView.alpha = 1 }
     }
 }
 
-extension RandomViewController: RandomNavigationBarViewDelegate {
-    func tapBackButton() {
-        randomView.handleBack()
+extension RandomViewController {
+    
+    private func setUI() {
+        navigationController?.setNavigationBarHidden(true, animated: false)
+        
+        randomView.rightButton.addTarget(self, action: #selector(randomTapped), for: .touchUpInside)
+    }
+    
+    @objc private func randomTapped() {
+        let randomVC = RandomCourseViewController()
+        navigationController?.pushViewController(randomVC, animated: true)
     }
 }

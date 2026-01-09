@@ -73,7 +73,7 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     private func setupCustomTabBar() {
@@ -123,13 +123,13 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
     
     private func setupViewControllers() {
         let homeVC = HomeViewController()
-        let randomVC = CalendarViewController()
+        let randomVC = RandomViewController()
         let mypageVC = MypageViewController()
         
         let navigationHome = UINavigationController(rootViewController: homeVC)
         let navigationRandom = UINavigationController(rootViewController: randomVC)
         let navigationMypage = UINavigationController(rootViewController: mypageVC)
 
-        self.viewControllers = [navigationHome, navigationRandom, navigationMypage]
+        viewControllers = [navigationHome, navigationRandom, navigationMypage]
     }
 }

@@ -13,7 +13,7 @@ class TodayViewController: UIViewController {
     private var isLiked: Bool = false
     
     override func loadView() {
-        self.view = todayView
+        view = todayView
     }
     
     init(topicId: Int) {
@@ -33,7 +33,7 @@ class TodayViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if let tabBarVC = self.tabBarController as? MainTabViewController {
+        if let tabBarVC = tabBarController as? MainTabViewController {
             tabBarVC.customTabBarView.isHidden = true
         }
         
@@ -41,10 +41,10 @@ class TodayViewController: UIViewController {
     }
     
     private func setUI() {
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        navigationController?.setNavigationBarHidden(true, animated: false)
         
         todayView.navigationbarView.delegate = self
-        todayView.likeButton.addTarget(self, action: #selector(like_Tapped), for: .touchUpInside)
+        todayView.likeButton.addTarget(self, action: #selector(likeTapped), for: .touchUpInside)
     }
 }
 
@@ -61,7 +61,7 @@ extension TodayViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] detail in
                 guard let self = self else { return }
-                self.todayView.updateDetail(
+                todayView.updateDetail(
                     category: detail.category,
                     keyword: detail.keywordName,
                     frontImageUrl: detail.keywordImageUrl,
@@ -74,9 +74,8 @@ extension TodayViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] likedTopics in
                 guard let self = self else { return }
-                // 현재 topicId가 좋아요 목록에 있는지 확인
-                self.isLiked = likedTopics.contains(where: { $0.topicId == self.topicId })
-                self.updateLikeButton()
+                isLiked = likedTopics.contains(where: { $0.topicId == self.topicId })
+                updateLikeButton()
             })
             .disposed(by: disposeBag)
     }
@@ -91,12 +90,9 @@ extension TodayViewController {
         }
     }
     
-    @objc private func like_Tapped() {
-        // 즉시 UI 업데이트 (사용자 경험 향상)
+    @objc private func likeTapped() {
         isLiked = true
         updateLikeButton()
-        
-        // 서버에 좋아요 등록
         topicViewModel.postTopicLike(topicId: topicId)
     }
 }

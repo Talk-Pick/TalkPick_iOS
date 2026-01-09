@@ -4,7 +4,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-class CalendarView: UIView {
+class RandomView: UIView {
     
     let calendar = Calendar.current
     private let dateFormatter = DateFormatter()

@@ -3,7 +3,7 @@ import UIKit
 import SnapKit
 import RxSwift
 
-class RandomView: UIView {
+class RandomCourseView: UIView {
     
     private let randomViewModel = RandomViewModel()
     private let topicViewModel = TopicViewModel()
