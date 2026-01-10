@@ -69,7 +69,7 @@ class RandomUseCase {
         return randomRepository.postRandomStart(token: token)
     }
     
-    func getRandomTopics(id: Int, order: Int, categoryGroup: String, category: String) -> Single<APIResponse<[RandomTopic]>> {
+    func getRandomTopics(id: Int, order: Int, category: String) -> Single<APIResponse<[RandomTopic]>> {
         guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
             return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
         }
@@ -77,7 +77,6 @@ class RandomUseCase {
         let params: [String: Any] = [
             "id": id,
             "order": order,
-            "categoryGroup": categoryGroup,
             "category": category
         ]
         

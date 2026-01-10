@@ -13,14 +13,12 @@ class RandomCourseView: UIView {
     private let totalSteps: Int = 11
     private var currentStepNumber: Int = 1
     
-    private var isCloseRelationship: Bool?
     private var selectedSituation: SituationView.SituationKind?
     private var selectedTopics: [TopicModel] = []
     
     private var currentStep: Step = .situation
     private var history: [Step] = []
     
-    private var relationshipText: String?
     private var situationText: String?
     
     private var topicData: [[TopicModel]] = Array(repeating: [], count: 3)
@@ -29,8 +27,8 @@ class RandomCourseView: UIView {
     var onExitRequested: (() -> Void)?
     
     enum Step {
-        case situation                  // 1,2번째 화면(현재 SituationView 안에서 상태 전환)
-        case topicSelect(step: Int)     // 3,5,7,9번째 화면
+        case situation                  // 첫 번째 화면(상황 선택)
+        case topicSelect(step: Int)     // 토픽 선택 화면
         case topicDetail(step: Int)     // 각 주제 상세 화면
         case finish                     // 마지막 별점
     }
@@ -128,29 +126,12 @@ class RandomCourseView: UIView {
     }
     
     private func bindViews() {
-        // 1) 가까운 사이 / 처음 본 사이 선택
-        situationView.onRelationshipPicked = { [weak self] isClose in
-            guard let self = self else { return }
-            self.isCloseRelationship = isClose
-            self.relationshipText = isClose ? "CLOSE" : "STRANGER"
-        }
-
-        // 2) 소개팅/과팅, 그룹 첫 모임 등 상황 선택 완료
+        // 상황 선택 완료
         situationView.onSituationSelected = { [weak self] kind in
             guard let self = self else { return }
             self.selectedSituation = kind
             self.situationText = kind.koreanTitle
             self.show(step: .topicSelect(step: 0))
-        }
-        
-        situationView.onForwardStep = { [weak self] in
-            guard let self = self else { return }
-            self.increaseStep()
-        }
-
-        situationView.onBackwardStep = { [weak self] in
-            guard let self = self else { return }
-            self.decreaseStep()
         }
         
         // FinishView 콜백 설정
@@ -229,11 +210,7 @@ class RandomCourseView: UIView {
     func handleBack() {
         switch currentStep {
         case .situation:
-            if situationView.canGoBack {
-                situationView.goBack()
-            } else {
-                onExitRequested?()
-            }
+            onExitRequested?()
             
         default:
             if let prev = history.popLast() {
@@ -256,13 +233,11 @@ class RandomCourseView: UIView {
         // 이미 데이터가 있으면 API 호출하지 않음
         guard topicData[stepIndex].isEmpty else { return }
         
-        guard let relationship = relationshipText,
-              let situation = situationText else { return }
+        guard let situation = situationText else { return }
         
         randomViewModel.getRandomTopics(
             id: randomId,
             order: currentStepNumber,
-            categoryGroup: relationship,
             category: situation
         )
         

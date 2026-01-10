@@ -70,14 +70,15 @@ class RandomViewModel {
             .subscribe(onSuccess: { success in
                 let randomId = success.data.randomId
                 UserDefaults.standard.set(randomId, forKey: "randomId")
+                print("랜덤 시작 성공")
             }, onFailure: { error in
                 AlertController(message: "랜덤 대화 시작하기에 실패했습니다.\n다시 시도해주세요.").show()
             })
             .disposed(by: disposeBag)
     }
     
-    func getRandomTopics(id: Int, order: Int, categoryGroup: String, category: String) {
-        useCase.getRandomTopics(id: id, order: order, categoryGroup: categoryGroup, category: category)
+    func getRandomTopics(id: Int, order: Int, category: String) {
+        useCase.getRandomTopics(id: id, order: order, category: category)
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] topics in
                 self?.randomTopics.accept(topics.data[0].randomTopicDetails)

@@ -22,6 +22,7 @@ class RandomCourseViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
+        startAPI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -43,7 +44,7 @@ class RandomCourseViewController: UIViewController {
     }
     
     private func startAPI() {
-//        randomViewModel.postRandomStart()
+        randomViewModel.postRandomStart()
     }
     
     @objc private func homeButton() {

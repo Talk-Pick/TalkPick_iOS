@@ -14,7 +14,6 @@ struct TopicDetail: Codable {
     let title: String
     let detail: String
     let category: String
-    let categoryGroup: String
     let keywordName: String
     let keywordImageUrl: String
     let topicImageUrl: String
@@ -38,7 +37,6 @@ struct CategoryDetail: Codable {
     let id: Int
     let title: String
     let imageUrl: String
-    let categoryGroup: String
 }
 
 struct Cursor: Codable {
@@ -59,7 +57,6 @@ struct RandomTopicDetail: Codable {
     let topicId: Int
     let title: String
     let detail: String
-    let categoryGroup: String
     let category: String
     let keywordName: String
     let keywordImageUrl: String
@@ -80,4 +77,10 @@ struct TopicModel {
     let keywordColor: UIColor
     let categoryColor: UIColor
     let imageName: String
+}
+
+struct Category: Codable {
+    let categoryId: Int
+    let title: String
+    let imageUrl: String
 }

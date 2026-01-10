@@ -161,6 +161,7 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
             } else {
                 userNickname = "톡픽"
             }
+            print("idToken: \(idTokenString)")
             
             loginViewModel.appleLogin(idToken: idTokenString)
                 .observe(on: MainScheduler.instance)
