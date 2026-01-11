@@ -28,6 +28,14 @@ class HomeViewController: UIViewController {
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if let tabBarVC = tabBarController as? MainTabViewController {
+            TutorialManager.shared.startTutorial(homeViewController: self, tabBarController: tabBarVC)
+        }
+    }
+    
     private func setUI() {
         navigationController?.setNavigationBarHidden(true, animated: false)
         homeView.startButton.addTarget(self, action: #selector(randomTapped), for: .touchUpInside)

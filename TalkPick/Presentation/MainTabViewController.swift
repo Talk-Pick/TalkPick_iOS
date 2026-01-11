@@ -55,7 +55,7 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
     
     let customTabBarView = UIView()
     
-    private let items: [CustomTabBarItemView] = [
+    let items: [CustomTabBarItemView] = [
         CustomTabBarItemView(image: UIImage(named: "talkpick_tab1")?.withRenderingMode(.alwaysTemplate), title: "홈 화면"),
         CustomTabBarItemView(image: UIImage(named: "talkpick_tab2")?.withRenderingMode(.alwaysTemplate), title: "랜덤코스"),
         CustomTabBarItemView(image: UIImage(named: "talkpick_tab3")?.withRenderingMode(.alwaysTemplate), title: "마이페이지")
