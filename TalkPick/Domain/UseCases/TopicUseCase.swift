@@ -9,13 +9,14 @@ class TopicUseCase {
         self.topicRepository = topicRepository
     }
     
-    func getTodayTopic() -> Single<[Topic]> {
+    func postTopicLike(topicId: Int) -> Single<Bool> {
         guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
             return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
         }
         
-        return topicRepository.getTodayTopic(token: token)
-            .map { $0.data }
+        return topicRepository.postTopickLike(token: token, topicId: topicId)
+            .map { _ in true }
+            .catchAndReturn(false)
     }
     
     func getTopicDetail(topicId: Int) -> Single<TopicDetail> {
@@ -27,13 +28,21 @@ class TopicUseCase {
             .map { $0.data }
     }
     
-    func postTopicLike(topicId: Int) -> Single<Bool> {
+    func getTodayTopic() -> Single<[Topic]> {
         guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
             return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
         }
         
-        return topicRepository.postTopickLike(token: token, topicId: topicId)
-            .map { _ in true }
-            .catchAndReturn(false)
+        return topicRepository.getTodayTopic(token: token)
+            .map { $0.data }
+    }
+    
+    func getCategories() -> Single<[Category]> {
+        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+            return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
+        }
+        
+        return topicRepository.getCategories(token: token)
+            .map { $0.data }
     }
 }

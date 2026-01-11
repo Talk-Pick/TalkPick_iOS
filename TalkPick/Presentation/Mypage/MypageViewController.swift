@@ -11,7 +11,7 @@ class MypageViewController: UIViewController {
     private var disposeBag = DisposeBag()
     
     override func loadView() {
-        self.view = mypageView
+        view = mypageView
     }
     
     override func viewDidLoad() {
@@ -23,29 +23,29 @@ class MypageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if let tabBarVC = self.tabBarController as? MainTabViewController {
+        if let tabBarVC = tabBarController as? MainTabViewController {
             tabBarVC.customTabBarView.isHidden = false
         }
         setAPI()
     }
     
     private func setUI() {
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        navigationController?.setNavigationBarHidden(true, animated: false)
         mypageView.etcSectionView.arrowRowViews.first?.chevronButton.addTarget(self,
-                                                                               action: #selector(etc_Tapped),
+                                                                               action: #selector(etcTapped),
                                                                                for: .touchUpInside)
         mypageView.etcSectionView.arrowRowViews[1].chevronButton.addTarget(self,
-                                                                           action: #selector(etc_Tapped),
+                                                                           action: #selector(etcTapped),
                                                                            for: .touchUpInside)
         mypageView.collectionSectionView.moreButton.addTarget(self,
-                                                              action: #selector(more_Tapped),
+                                                              action: #selector(moreTapped),
                                                               for: .touchUpInside)
         mypageView.withdrawButton.addTarget(self,
-                                            action: #selector(delete_Tapped),
+                                            action: #selector(deleteTapped),
                                             for: .touchUpInside)
         
         mypageView.logOutButton.addTarget(self,
-                                          action: #selector(logout_Tapped),
+                                          action: #selector(logoutTapped),
                                           for: .touchUpInside)
     }
     
@@ -59,51 +59,50 @@ class MypageViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] profile in
                 guard let self = self else { return }
-                self.mypageView.updateProfile(profile.nickname, profile.mbti ?? "미설정")
+                mypageView.updateProfile(profile.nickname, profile.mbti ?? "미설정")
                 let editView = EditMbtiView(mbti: profile.mbti ?? "미설정",
-                                            viewModel: self.viewModel)
-                self.mypageView.editMbtiView = editView
+                                            viewModel: viewModel)
+                mypageView.editMbtiView = editView
             })
             .disposed(by: disposeBag)
         
         viewModel.delete
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] success in
+            .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
-                self.navigateToLogin()
+                navigateToLogin()
             })
             .disposed(by: disposeBag)
         
         viewModel.logout
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] success in
+            .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
-                self.navigateToLogin()
+                navigateToLogin()
             })
             .disposed(by: disposeBag)
     }
     
-    
-    @objc private func more_Tapped() {
+    @objc private func moreTapped() {
         let likeTopicVC = LikeTopicViewController()
-        self.navigationController?.pushViewController(likeTopicVC, animated: true)
+        navigationController?.pushViewController(likeTopicVC, animated: true)
     }
     
-    @objc private func etc_Tapped() {
+    @objc private func etcTapped() {
         let serviceView = ServiceView()
-        self.view.addSubview(serviceView)
+        view.addSubview(serviceView)
         serviceView.alpha = 0
         serviceView.snp.makeConstraints { $0.edges.equalToSuperview() }
         UIView.animate(withDuration: 0.3) { serviceView.alpha = 1 }
     }
     
-    @objc private func delete_Tapped() {
+    @objc private func deleteTapped() {
         AlertController(message: "탈퇴하시겠어요?", isCancel: true) { [weak self] in
             self?.viewModel.deleteAccount()
         }.show()
     }
     
-    @objc private func logout_Tapped() {
+    @objc private func logoutTapped() {
         AlertController(message: "로그아웃 하시겠어요?", isCancel: true) { [weak self] in
             self?.viewModel.logOut()
         }.show()

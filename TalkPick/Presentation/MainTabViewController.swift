@@ -55,7 +55,7 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
     
     let customTabBarView = UIView()
     
-    private let items: [CustomTabBarItemView] = [
+    let items: [CustomTabBarItemView] = [
         CustomTabBarItemView(image: UIImage(named: "talkpick_tab1")?.withRenderingMode(.alwaysTemplate), title: "홈 화면"),
         CustomTabBarItemView(image: UIImage(named: "talkpick_tab2")?.withRenderingMode(.alwaysTemplate), title: "랜덤코스"),
         CustomTabBarItemView(image: UIImage(named: "talkpick_tab3")?.withRenderingMode(.alwaysTemplate), title: "마이페이지")
@@ -73,7 +73,7 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     private func setupCustomTabBar() {
@@ -123,13 +123,13 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
     
     private func setupViewControllers() {
         let homeVC = HomeViewController()
-        let randomVC = CalendarViewController()
+        let randomVC = RandomViewController()
         let mypageVC = MypageViewController()
         
         let navigationHome = UINavigationController(rootViewController: homeVC)
         let navigationRandom = UINavigationController(rootViewController: randomVC)
         let navigationMypage = UINavigationController(rootViewController: mypageVC)
 
-        self.viewControllers = [navigationHome, navigationRandom, navigationMypage]
+        viewControllers = [navigationHome, navigationRandom, navigationMypage]
     }
 }

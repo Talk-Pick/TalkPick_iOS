@@ -10,7 +10,7 @@ class UserUseCase {
     }
     
     func postTerm(agreeTermIdList: [Int], disagreeTermIdList: [Int]) -> Single<Bool> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+        guard let token = getAccessToken() else {
             return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
         }
         
@@ -25,34 +25,24 @@ class UserUseCase {
     }
     
     func kakaoLogin(idToken: String) -> Single<Token> {
-        let params: [String: Any] = [
-            "idToken": idToken
-        ]
-        
-        return userRepository.postKakaoLogin(idToken: idToken, parameters: params)
-            .map { $0.data }
+        return performLogin(idToken: idToken, loginMethod: userRepository.postKakaoLogin)
     }
     
     func appleLogin(idToken: String) -> Single<Token> {
-        let params: [String: Any] = [
-            "idToken": idToken
-        ]
-        
-        return userRepository.postAppleLogin(idToken: idToken, parameters: params)
-            .map { $0.data }
+        return performLogin(idToken: idToken, loginMethod: userRepository.postAppleLogin)
     }
     
     func googleLogin(idToken: String) -> Single<Token> {
-        let params: [String: Any] = [
-            "idToken": idToken
-        ]
-        
-        return userRepository.postGoogleLogin(idToken: idToken, parameters: params)
-            .map { $0.data }
+        return performLogin(idToken: idToken, loginMethod: userRepository.postGoogleLogin)
+    }
+    
+    private func performLogin(idToken: String, loginMethod: (String, [String: Any]?) -> Single<APIResponse<Token>>) -> Single<Token> {
+        let params: [String: Any] = ["idToken": idToken]
+        return loginMethod(idToken, params).map { $0.data }
     }
     
     func signUp(nickname: String, mbti: String) -> Single<Bool> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+        guard let token = getAccessToken() else {
             return .just(false)
         }
         
@@ -67,7 +57,7 @@ class UserUseCase {
     }
     
     func getMyProfile() -> Single<Profile> {
-        guard let token = AccessTokenManager.shared.getToken() ?? KeychainHelper.standard.read(service: "access-token", account: "user") else {
+        guard let token = getAccessToken(includeManager: true) else {
             return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
         }
         
@@ -76,13 +66,11 @@ class UserUseCase {
     }
     
     func editMyProfile(mbti: String) -> Single<Bool> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+        guard let token = getAccessToken() else {
             return .just(false)
         }
         
-        let params: [String: Any] = [
-            "mbti": mbti
-        ]
+        let params: [String: Any] = ["mbti": mbti]
         
         return userRepository.editMyProfile(token: token, parameters: params)
             .map { _ in true }
@@ -90,15 +78,12 @@ class UserUseCase {
     }
     
     func getLikedTopics(cursor: String?, size: String) -> Single<APIResponse<LikedTopic>> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+        guard let token = getAccessToken() else {
             return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
         }
         
-        var params: [String: Any] = [
-            "size": size
-        ]
+        var params: [String: Any] = ["size": size]
         
-        // cursor가 있을 때만 파라미터에 포함
         if let cursor = cursor {
             params["cursor"] = cursor
         }
@@ -107,7 +92,7 @@ class UserUseCase {
     }
     
     func deleteAccount() -> Single<Bool> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+        guard let token = getAccessToken() else {
             return .just(false)
         }
         
@@ -117,7 +102,7 @@ class UserUseCase {
     }
     
     func logOut() -> Single<Bool> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
+        guard let token = getAccessToken() else {
             return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
         }
         
@@ -129,8 +114,14 @@ class UserUseCase {
             .catchAndReturn(false)
     }
     
+    private func getAccessToken(includeManager: Bool = false) -> String? {
+        if includeManager {
+            return AccessTokenManager.shared.getToken() ?? KeychainHelper.standard.read(service: "access-token", account: "user")
+        }
+        return KeychainHelper.standard.read(service: "access-token", account: "user")
+    }
+    
     private func clearUserCredentials() {
         AccessTokenManager.shared.clearToken()
-        // 리프레시 토큰은 쿠키로 관리되므로 클라이언트에서 삭제할 필요 없음
     }
 }

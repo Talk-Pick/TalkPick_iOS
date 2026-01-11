@@ -29,7 +29,7 @@ class HomeView: UIView {
         return lb
     }()
     
-    private let todayLabel: UILabel = {
+    let todayLabel: UILabel = {
         let lb = UILabel()
         lb.text = "오늘의 톡픽"
         lb.font = .systemFont(ofSize: 22, weight: .heavy)
@@ -50,7 +50,7 @@ class HomeView: UIView {
         return cv
     }()
     
-    private let randomLabel: UILabel = {
+    let randomLabel: UILabel = {
         let lb = UILabel()
         lb.numberOfLines = 2
         lb.text = "오늘은 어떤 대화가 나올까?\n랜덤 코스 시작!"
@@ -59,7 +59,7 @@ class HomeView: UIView {
         return lb
     }()
     
-    private let randomView: UIView = {
+    let randomView: UIView = {
         let rv = UIView()
         rv.backgroundColor = .gray50
         return rv
