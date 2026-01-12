@@ -70,7 +70,6 @@ class RandomViewModel {
             .subscribe(onSuccess: { success in
                 let randomId = success.data.randomId
                 UserDefaults.standard.set(randomId, forKey: "randomId")
-                print("랜덤 시작 성공")
             }, onFailure: { error in
                 AlertController(message: "랜덤 대화 시작하기에 실패했습니다.\n다시 시도해주세요.").show()
             })

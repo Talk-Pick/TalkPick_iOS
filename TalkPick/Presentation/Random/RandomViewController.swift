@@ -85,7 +85,7 @@ class RandomViewController: UIViewController {
         }
         
         view.addSubview(slideImageView)
-        slideImageView.isHidden = false  // 처음에는 보이도록
+        slideImageView.isHidden = false
         slideImageView.snp.makeConstraints {
             $0.top.equalTo(currentImageView.snp.bottom).offset(-16)
             $0.centerX.equalToSuperview()
@@ -119,7 +119,7 @@ class RandomViewController: UIViewController {
             newIndex += 1
             animateTransition(to: newIndex, direction: .left)
         } else if gesture.direction == .right {
-            guard currentIndex > 0 else { return } // 첫 이미지면 멈춤
+            guard currentIndex > 0 else { return }
             newIndex -= 1
             animateTransition(to: newIndex, direction: .right)
         }
@@ -133,12 +133,10 @@ class RandomViewController: UIViewController {
         nextImageView.image = UIImage(named: images[newIndex])
         nextImageView.transform = CGAffineTransform(translationX: offset, y: 0)
         
-        // 애니메이션
         UIView.animate(withDuration: 0.35, delay: 0, options: .curveEaseInOut, animations: {
             self.currentImageView.transform = CGAffineTransform(translationX: -offset, y: 0)
             self.nextImageView.transform = .identity
         }, completion: { _ in
-            // 전환 완료 후 상태 정리
             self.currentImageView.image = self.nextImageView.image
             self.currentImageView.transform = .identity
             self.currentIndex = newIndex
@@ -148,7 +146,6 @@ class RandomViewController: UIViewController {
     }
     
     private func updateSlideImageViewVisibility() {
-        // currentIndex가 1 이상이면 slideImageView 숨김
         slideImageView.isHidden = currentIndex >= 1
     }
 }
