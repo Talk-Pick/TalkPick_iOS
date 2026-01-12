@@ -186,22 +186,59 @@ class TopicDetailView: UIView {
     
     private func prefetchImages() {
         let urls = [frontURL, backURL].compactMap { $0 }
-        ImagePrefetcher(urls: urls).start()
+        guard !urls.isEmpty else { return }
+        
+        // 실제 표시될 이미지 크기 계산 (더 정확한 다운샘플링을 위해)
+        let targetSize = calculateTargetImageSize()
+        
+        // 다운샘플링 프로세서로 프리페칭하여 메모리 사용 최적화
+        let processor = DownsamplingImageProcessor(size: targetSize)
+        let options: KingfisherOptionsInfo = [
+            .processor(processor),
+            .scaleFactor(UIScreen.main.scale),
+            .cacheOriginalImage,
+            .backgroundDecode, // 백그라운드 스레드에서 디코딩
+            .loadDiskFileSynchronously // 디스크 캐시 동기 로드로 더 빠른 응답
+        ]
+        
+        ImagePrefetcher(urls: urls, options: options).start()
+    }
+    
+    private func calculateTargetImageSize() -> CGSize {
+        // 실제 표시될 이미지 크기 계산
+        // 화면 너비에서 좌우 inset(18*2)을 뺀 값과 높이(460) 사용
+        let screenWidth = UIScreen.main.bounds.width
+        let imageWidth = screenWidth - (18 * 2)
+        let imageHeight: CGFloat = 460
+        
+        // 레티나 디스플레이를 고려한 실제 픽셀 크기
+        let scale = UIScreen.main.scale
+        return CGSize(width: imageWidth * scale, height: imageHeight * scale)
     }
     
     private func updateCardImage() {
         let url = isFront ? frontURL : backURL
+        guard let url = url else { return }
         
-        let processor = DownsamplingImageProcessor(size: cardView.bounds.size)
+        // 실제 표시될 크기로 다운샘플링하여 메모리 사용 최적화
+        let targetSize = calculateTargetImageSize()
+        let processor = DownsamplingImageProcessor(size: targetSize)
         
+        // 캐시 우선 확인 및 최적화된 옵션
         cardView.kf.setImage(
             with: url,
+            placeholder: nil,
             options: [
                 .processor(processor),
                 .scaleFactor(UIScreen.main.scale),
                 .transition(.none),
-                .cacheOriginalImage
-            ]
+                .cacheOriginalImage, // 원본 이미지도 캐시하여 나중에 다른 크기로 사용 가능
+                .fromMemoryCacheOrRefresh, // 메모리 캐시 우선 확인
+                .backgroundDecode, // 백그라운드 스레드에서 디코딩하여 UI 블로킹 방지
+                .loadDiskFileSynchronously // 디스크 캐시 동기 로드로 더 빠른 응답
+            ],
+            progressBlock: nil,
+            completionHandler: nil
         )
     }
 
@@ -215,25 +252,19 @@ class TopicDetailView: UIView {
     }
     
     @objc func buttonTapped() {
-        if isFront {
-            isFront = false
-            UIView.transition(with: cardView,
-                              duration: 0.5,
-                              options: .transitionFlipFromLeft,
-                              animations: { [weak self] in
-                                  self?.updateCardImage()
-                              },
-                              completion: nil)
-            
-        } else {
-            isFront = true
-            UIView.transition(with: cardView,
-                              duration: 0.5,
-                              options: .transitionFlipFromRight,
-                              animations: { [weak self] in
-                                  self?.updateCardImage()
-                              },
-                              completion: nil)
-        }
+        // 이미지 전환 방향 결정
+        let options: UIView.AnimationOptions = isFront ? .transitionFlipFromRight : .transitionFlipFromLeft
+        
+        // 상태 전환
+        isFront.toggle()
+        
+        // 자연스러운 카드 뒤집기 애니메이션
+        UIView.transition(with: cardView,
+                          duration: 0.6,
+                          options: [options, .curveEaseInOut],
+                          animations: { [weak self] in
+                              self?.updateCardImage()
+                          },
+                          completion: nil)
     }
 }
