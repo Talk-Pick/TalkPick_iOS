@@ -19,7 +19,7 @@ class RandomViewModel {
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { _ in
             }, onFailure: { error in
-                AlertController(message: "약관 동의에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.randomTotalRecordFailed).show()
             })
             .disposed(by: disposeBag)
     }
@@ -29,7 +29,7 @@ class RandomViewModel {
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { _ in
             }, onFailure: { error in
-                AlertController(message: "평점 남기기에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.randomRateFailed).show()
             })
             .disposed(by: disposeBag)
     }
@@ -39,7 +39,7 @@ class RandomViewModel {
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { _ in
             }, onFailure: { error in
-                AlertController(message: "랜덤 대화 나가기에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.randomQuitFailed).show()
             })
             .disposed(by: disposeBag)
     }
@@ -49,7 +49,7 @@ class RandomViewModel {
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { _ in
             }, onFailure: { error in
-                AlertController(message: "랜덤 대화 종료에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.randomEndFailed).show()
             })
             .disposed(by: disposeBag)
     }
@@ -59,7 +59,7 @@ class RandomViewModel {
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { _ in
             }, onFailure: { error in
-                AlertController(message: "한줄평 남기기에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.randomCommentFailed).show()
             })
             .disposed(by: disposeBag)
     }
@@ -71,7 +71,7 @@ class RandomViewModel {
                 let randomId = success.data.randomId
                 UserDefaults.standard.set(randomId, forKey: "randomId")
             }, onFailure: { error in
-                AlertController(message: "랜덤 대화 시작하기에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.randomStartFailed).show()
             })
             .disposed(by: disposeBag)
     }
@@ -82,7 +82,7 @@ class RandomViewModel {
             .subscribe(onSuccess: { [weak self] topics in
                 self?.randomTopics.accept(topics.data[0].randomTopicDetails)
             }, onFailure: { error in
-                AlertController(message: "랜덤 대화 토픽 불러오기에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.randomTopicLoadFailed).show()
             })
             .disposed(by: disposeBag)
     }

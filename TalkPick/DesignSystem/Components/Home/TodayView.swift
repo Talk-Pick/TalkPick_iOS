@@ -63,6 +63,7 @@ class TodayView: UIView {
         cb.setTitleColor(.gray200, for: .normal)
         cb.setTitle(" 좋아요", for: .normal)
         cb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+        cb.adjustsImageWhenDisabled = false
         cb.applyTextButtonPressEffect()
         return cb
     }()
@@ -150,18 +151,13 @@ class TodayView: UIView {
     }
     
     func updateDetail(category: String, keyword: String, frontImageUrl: String, backImageUrl: String) {
-        // 카테고리 업데이트
         labelLabel1.text = category
         labelLabel2.text = keyword
         
-        // 이미지 URL 저장
         frontURL = URL(string: frontImageUrl)
         backURL = URL(string: backImageUrl)
         
-        // 앞뒷면 이미지 프리페칭
         prefetchImages()
-        
-        // 현재 상태에 맞는 이미지 로드
         updateCardImage()
     }
     
@@ -169,43 +165,38 @@ class TodayView: UIView {
         let urls = [frontURL, backURL].compactMap { $0 }
         guard !urls.isEmpty else { return }
         
-        // 실제 표시될 이미지 크기 계산 (더 정확한 다운샘플링을 위해)
         let targetSize = calculateTargetImageSize()
-        
-        // 다운샘플링 프로세서로 프리페칭하여 메모리 사용 최적화
         let processor = DownsamplingImageProcessor(size: targetSize)
         let options: KingfisherOptionsInfo = [
             .processor(processor),
             .scaleFactor(UIScreen.main.scale),
             .cacheOriginalImage,
-            .backgroundDecode, // 백그라운드 스레드에서 디코딩
-            .loadDiskFileSynchronously // 디스크 캐시 동기 로드로 더 빠른 응답
+            .backgroundDecode,
+            .loadDiskFileSynchronously
         ]
         
         ImagePrefetcher(urls: urls, options: options).start()
     }
     
     private func calculateTargetImageSize() -> CGSize {
-        // 실제 표시될 이미지 크기 계산
-        // 화면 너비에서 좌우 inset(18*2)을 뺀 값과 높이(460) 사용
         let screenWidth = UIScreen.main.bounds.width
         let imageWidth = screenWidth - (18 * 2)
         let imageHeight: CGFloat = 460
         
-        // 레티나 디스플레이를 고려한 실제 픽셀 크기
         let scale = UIScreen.main.scale
-        return CGSize(width: imageWidth * scale, height: imageHeight * scale)
+        let minSize: CGFloat = 100
+        let calculatedWidth = max(imageWidth * scale, minSize)
+        let calculatedHeight = max(imageHeight * scale, minSize)
+        return CGSize(width: calculatedWidth, height: calculatedHeight)
     }
     
     private func updateCardImage() {
         let url = isFront ? frontURL : backURL
         guard let url = url else { return }
         
-        // 실제 표시될 크기로 다운샘플링하여 메모리 사용 최적화
         let targetSize = calculateTargetImageSize()
         let processor = DownsamplingImageProcessor(size: targetSize)
         
-        // 캐시 우선 확인 및 최적화된 옵션
         cardView.kf.setImage(
             with: url,
             placeholder: nil,
@@ -213,24 +204,29 @@ class TodayView: UIView {
                 .processor(processor),
                 .scaleFactor(UIScreen.main.scale),
                 .transition(.none),
-                .cacheOriginalImage, // 원본 이미지도 캐시하여 나중에 다른 크기로 사용 가능
-                .fromMemoryCacheOrRefresh, // 메모리 캐시 우선 확인
-                .backgroundDecode, // 백그라운드 스레드에서 디코딩하여 UI 블로킹 방지
-                .loadDiskFileSynchronously // 디스크 캐시 동기 로드로 더 빠른 응답
+                .cacheOriginalImage,
+                .fromMemoryCacheOrRefresh,
+                .backgroundDecode,
+                .loadDiskFileSynchronously
             ],
             progressBlock: nil,
-            completionHandler: nil
+            completionHandler: { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success:
+                    break
+                case .failure:
+                    break
+                }
+            }
         )
     }
     
     @objc func buttonTapped() {
-        // 이미지 전환 방향 결정
         let options: UIView.AnimationOptions = isFront ? .transitionFlipFromRight : .transitionFlipFromLeft
         
-        // 상태 전환
         isFront.toggle()
         
-        // 자연스러운 카드 뒤집기 애니메이션
         UIView.transition(with: cardView,
                           duration: 0.6,
                           options: [options, .curveEaseInOut],

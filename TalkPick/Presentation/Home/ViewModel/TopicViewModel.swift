@@ -19,7 +19,7 @@ class TopicViewModel {
         useCase.postTopicLike(topicId: topicId)
             .subscribe(onSuccess: { success in
             }, onFailure: { error in
-                AlertController(message: "좋아요에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.topicLikeFailed).show()
             })
             .disposed(by: disposeBag)
     }
@@ -30,7 +30,7 @@ class TopicViewModel {
             .subscribe(onSuccess: { [weak self] detail in
                 self?.topicDetail.onNext(detail)
             }, onFailure: { error in
-                AlertController(message: "토픽 상세 불러오기에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.topicDetailLoadFailed).show()
             })
             .disposed(by: disposeBag)
     }
@@ -41,7 +41,7 @@ class TopicViewModel {
             .subscribe(onSuccess: { [weak self] topics in
                 self?.todayTopics.accept(topics)
             }, onFailure: { error in
-                AlertController(message: "오늘의 토픽 불러오기에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.todayTopicLoadFailed).show()
             })
             .disposed(by: disposeBag)
     }
@@ -52,7 +52,7 @@ class TopicViewModel {
             .subscribe(onSuccess: { [weak self] categories in
                 self?.categories.accept(categories)
             }, onFailure: { error in
-                AlertController(message: "카테고리 불러오기에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.categoryLoadFailed).show()
             })
             .disposed(by: disposeBag)
     }

@@ -7,8 +7,12 @@ class RandomCourseView: UIView {
     
     private let randomViewModel = RandomViewModel()
     private let topicViewModel = TopicViewModel()
+    private let myPageViewModel = MyPageViewModel()
     private let randomId = UserDefaults.standard.integer(forKey: "randomId")
     private let disposeBag = DisposeBag()
+    
+    private var currentTopicId: Int?
+    private var isLiked: Bool = false
     
     private let totalSteps: Int = 11
     private var currentStepNumber: Int = 1
@@ -27,16 +31,16 @@ class RandomCourseView: UIView {
     var onExitRequested: (() -> Void)?
     
     enum Step {
-        case situation                  // 첫 번째 화면(상황 선택)
-        case topicSelect(step: Int)     // 토픽 선택 화면
-        case topicDetail(step: Int)     // 각 주제 상세 화면
-        case finish                     // 마지막 별점
+        case situation
+        case topicSelect(step: Int)
+        case topicDetail(step: Int)
+        case finish
     }
     
     let navigationbarView = RandomNavigationBarView(title: "뒤로 가기")
     private let situationView = SituationView()
     private let topicView = TopicView()
-    private let detailView = TopicDetailView()
+    let detailView = TopicDetailView()
     private let finishView = FinishView()
     private var currentView: UIView?
     private let smallLogo: UIImageView = {
@@ -126,7 +130,6 @@ class RandomCourseView: UIView {
     }
     
     private func bindViews() {
-        // 상황 선택 완료
         situationView.onSituationSelected = { [weak self] kind in
             guard let self = self else { return }
             self.selectedSituation = kind
@@ -134,16 +137,22 @@ class RandomCourseView: UIView {
             self.show(step: .topicSelect(step: 0))
         }
         
-        // FinishView 콜백 설정
         finishView.onFinished = { [weak self] in
             guard let self = self else { return }
-            // 한줄평 작성 완료 후 화면 종료
             self.onExitRequested?()
         }
+        
+        myPageViewModel.likeTopicList
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] likedTopics in
+                guard let self = self, let topicId = self.currentTopicId else { return }
+                self.isLiked = likedTopics.contains(where: { $0.topicId == topicId })
+                self.updateLikeButton()
+            })
+            .disposed(by: disposeBag)
     }
 
     private func configureTopicView(for stepIndex: Int) {
-        // 데이터가 없으면 API 호출
         fetchTopicsIfNeeded(for: stepIndex)
         
         topicView.configure(stepIndex: stepIndex,
@@ -152,18 +161,16 @@ class RandomCourseView: UIView {
         topicView.onTopicSelected = { [weak self] topic in
             guard let self else { return }
             
-            // 선택한 토픽 저장
             if self.selectedTopics.count > stepIndex {
                 self.selectedTopics[stepIndex] = topic
             } else {
                 self.selectedTopics.append(topic)
             }
             
-            // TopicRecord 생성 및 저장 (토픽 선택 시간 기록)
             guard let topicId = Int(topic.id) else { return }
             let record = TotalRecord(
                 topicId: topicId,
-                order: stepIndex + 1, // 1-based index (1, 2, 3, 4)
+                order: stepIndex + 1,
                 startAt: Date().toISO8601String(),
                 endAt: nil
             )
@@ -181,29 +188,35 @@ class RandomCourseView: UIView {
     private func configureDetailView(for stepIndex: Int) {
         guard selectedTopics.indices.contains(stepIndex) else { return }
         let topic = selectedTopics[stepIndex]
+        
         detailView.configure(stepIndex: stepIndex)
         
-        // topicId로 상세 정보 가져오기
         if let topicId = Int(topic.id) {
+            currentTopicId = topicId
             fetchTopicDetail(topicId: topicId)
+            myPageViewModel.getLikedTopics(cursor: nil, size: "10")
         }
 
         detailView.onNext = { [weak self] in
             guard let self else { return }
             
-            // endAt 업데이트 (다음으로 넘어간 시간 기록)
             if self.topicRecords.indices.contains(stepIndex) {
                 self.topicRecords[stepIndex].endAt = Date().toISO8601String()
             }
             
             if stepIndex < 2 {
-                // 다음 토픽 선택 화면으로
                 self.show(step: .topicSelect(step: stepIndex + 1))
             } else {
-                // 마지막 단계 - API 호출 후 완료 화면으로
                 self.submitTopicRecords()
                 self.show(step: .finish)
             }
+        }
+        
+        detailView.onLikeToggled = { [weak self] liked in
+            guard let self = self, let topicId = self.currentTopicId else { return }
+            self.isLiked = true
+            self.updateLikeButton()
+            self.topicViewModel.postTopicLike(topicId: topicId)
         }
     }
     
@@ -230,7 +243,6 @@ class RandomCourseView: UIView {
     }
     
     private func fetchTopicsIfNeeded(for stepIndex: Int) {
-        // 이미 데이터가 있으면 API 호출하지 않음
         guard topicData[stepIndex].isEmpty else { return }
         
         guard let situation = situationText else { return }
@@ -291,7 +303,19 @@ class RandomCourseView: UIView {
             return
         }
         
-        // API 호출
         randomViewModel.postRandomTotalRecord(id: randomId, totalRecords: topicRecords)
+    }
+    
+    private func updateLikeButton() {
+        if isLiked {
+            let image = UIImage(named: "talkpick_like2")?.withRenderingMode(.alwaysOriginal)
+            detailView.likeButton.setImage(image, for: .normal)
+            detailView.likeButton.setImage(image, for: .disabled)
+            detailView.likeButton.isEnabled = false
+        } else {
+            let image = UIImage(named: "talkpick_like3")?.withRenderingMode(.alwaysOriginal)
+            detailView.likeButton.setImage(image, for: .normal)
+            detailView.likeButton.isEnabled = true
+        }
     }
 }

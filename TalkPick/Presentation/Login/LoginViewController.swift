@@ -58,11 +58,11 @@ class LoginViewController: UIViewController {
                             self.myPageViewModel.getMyProfile()
                         }
                     } else {
-                        AlertController(message: "로그인에 실패했습니다.\n다시 시도해주세요.").show()
+                        AlertController(message: ErrorMessage.loginFailed).show()
                     }
                 },
                 onFailure: { _ in
-                    AlertController(message: "로그인에 실패했습니다.\n다시 시도해주세요.").show()
+                    AlertController(message: ErrorMessage.loginFailed).show()
                 }
             )
             .disposed(by: disposeBag)
@@ -88,7 +88,7 @@ class LoginViewController: UIViewController {
             guard let self = self else { return }
             
             guard let idToken = oauthToken?.idToken else {
-                AlertController(message: "로그인 정보를 가져오는데 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.loginInfoFailed).show()
                 return
             }
             
@@ -108,7 +108,7 @@ class LoginViewController: UIViewController {
             guard let self = self else { return }
             
             guard let idToken = result?.user.idToken?.tokenString else {
-                AlertController(message: "로그인 정보를 가져오는데 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.loginInfoFailed).show()
                 return
             }
             
@@ -128,7 +128,7 @@ extension LoginViewController: ASAuthorizationControllerPresentationContextProvi
 
 extension LoginViewController: ASAuthorizationControllerDelegate {
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: any Error) {
-        AlertController(message: "애플 로그인에 실패했습니다.\n다시 시도해주세요.").show()
+        AlertController(message: ErrorMessage.appleLoginFailed).show()
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
@@ -138,7 +138,7 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
                 let identityToken = appleIdCredential.identityToken,
                 let idTokenString = String(data: identityToken, encoding: .utf8)
             else {
-                AlertController(message: "로그인 정보를 가져오는데 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.loginInfoFailed).show()
                 return
             }
             

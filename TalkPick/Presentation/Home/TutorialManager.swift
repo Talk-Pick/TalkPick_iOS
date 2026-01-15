@@ -301,7 +301,6 @@ class TutorialManager {
     
     private enum DescriptionPosition {
         case top
-        case bottom
     }
     
     private func createTabBarHighlightView(in containerView: UIView, frame: CGRect, overlay: UIView, excludeArea: CGRect?) {
@@ -352,60 +351,6 @@ class TutorialManager {
                    endAngle: .pi,
                    clockwise: true)
         // 왼쪽 테두리 (직선, 시작점으로 돌아감)
-        path.close()
-        
-        borderLayer.path = path.cgPath
-        borderLayer.strokeColor = UIColor.purple100.cgColor  // 명시적으로 보라색 설정
-        borderLayer.fillColor = UIColor.clear.cgColor
-        borderLayer.lineWidth = lineWidth
-        borderLayer.frame = highlight.bounds
-        
-        highlight.layer.addSublayer(borderLayer)
-        
-        self.highlightView = highlight
-        
-        // 테두리 안 영역을 overlay에서 제외 (어둡게 처리되지 않도록)
-        if let excludeArea = excludeArea {
-            applyMaskToOverlay(overlay, excluding: excludeArea)
-        }
-    }
-    
-    private func createHighlightViewWithoutDescription(in overlay: UIView, frame: CGRect, excludeArea: CGRect?) {
-        let highlight = UIView()
-        highlight.backgroundColor = highlightColor
-        
-        overlay.addSubview(highlight)
-        highlight.frame = frame
-        
-        // 테두리가 탭바 위에 보이도록 zPosition 설정
-        highlight.layer.zPosition = 1000
-        
-        // 탭바 테두리: 밑쪽 모서리만 둥글게 처리
-        let borderLayer = CAShapeLayer()
-        let path = UIBezierPath()
-        let cornerRadius: CGFloat = 35 // 더 둥글게
-        let inset: CGFloat = 3 // 테두리를 안쪽으로 3pt inset
-        let lineWidth: CGFloat = 3
-        let halfLineWidth = lineWidth / 2
-        
-        // inset을 적용한 경계 계산
-        let insetRect = CGRect(
-            x: inset + halfLineWidth,
-            y: inset + halfLineWidth,
-            width: frame.width - (inset * 2) - lineWidth,
-            height: frame.height - (inset * 2) - lineWidth
-        )
-        
-        // 경로 그리기: 위쪽은 직선, 밑쪽은 둥글게
-        path.move(to: CGPoint(x: insetRect.minX, y: insetRect.minY))
-        path.addLine(to: CGPoint(x: insetRect.maxX, y: insetRect.minY))
-        path.addLine(to: CGPoint(x: insetRect.maxX, y: insetRect.maxY - cornerRadius))
-        
-        // 밑쪽 둥근 모서리 (더 둥글게)
-        path.addQuadCurve(to: CGPoint(x: insetRect.minX, y: insetRect.maxY - cornerRadius),
-                        controlPoint: CGPoint(x: insetRect.midX, y: insetRect.maxY))
-        
-        path.addLine(to: CGPoint(x: insetRect.minX, y: insetRect.minY))
         path.close()
         
         borderLayer.path = path.cgPath
@@ -498,11 +443,7 @@ class TutorialManager {
         } else {
             // 기존 로직: 중앙 정렬
             labelX = overlay.frame.midX - labelWidth / 2
-            if position == .top {
-                labelY = frame.minY - labelHeight - 16
-            } else {
-                labelY = frame.maxY + 16
-            }
+            labelY = frame.minY - labelHeight - 16
         }
         
         descriptionLabel.frame = CGRect(
