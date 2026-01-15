@@ -82,10 +82,13 @@ extension TodayViewController {
     
     private func updateLikeButton() {
         if isLiked {
-            todayView.likeButton.setImage(UIImage(named: "talkpick_like2")?.withRenderingMode(.alwaysOriginal), for: .normal)
+            let image = UIImage(named: "talkpick_like2")?.withRenderingMode(.alwaysOriginal)
+            todayView.likeButton.setImage(image, for: .normal)
+            todayView.likeButton.setImage(image, for: .disabled) // disabled 상태에도 동일한 이미지 설정
             todayView.likeButton.isEnabled = false
         } else {
-            todayView.likeButton.setImage(UIImage(named: "talkpick_like3")?.withRenderingMode(.alwaysOriginal), for: .normal)
+            let image = UIImage(named: "talkpick_like3")?.withRenderingMode(.alwaysOriginal)
+            todayView.likeButton.setImage(image, for: .normal)
             todayView.likeButton.isEnabled = true
         }
     }

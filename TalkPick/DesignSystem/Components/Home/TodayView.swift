@@ -63,6 +63,7 @@ class TodayView: UIView {
         cb.setTitleColor(.gray200, for: .normal)
         cb.setTitle(" 좋아요", for: .normal)
         cb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+        cb.adjustsImageWhenDisabled = false
         cb.applyTextButtonPressEffect()
         return cb
     }()
@@ -150,62 +151,88 @@ class TodayView: UIView {
     }
     
     func updateDetail(category: String, keyword: String, frontImageUrl: String, backImageUrl: String) {
-        // 카테고리 업데이트
         labelLabel1.text = category
         labelLabel2.text = keyword
         
-        // 이미지 URL 저장
         frontURL = URL(string: frontImageUrl)
         backURL = URL(string: backImageUrl)
         
-        // 앞뒷면 이미지 프리페칭
         prefetchImages()
-        
-        // 현재 상태에 맞는 이미지 로드
         updateCardImage()
     }
     
     private func prefetchImages() {
         let urls = [frontURL, backURL].compactMap { $0 }
-        ImagePrefetcher(urls: urls).start()
+        guard !urls.isEmpty else { return }
+        
+        let targetSize = calculateTargetImageSize()
+        let processor = DownsamplingImageProcessor(size: targetSize)
+        let options: KingfisherOptionsInfo = [
+            .processor(processor),
+            .scaleFactor(UIScreen.main.scale),
+            .cacheOriginalImage,
+            .backgroundDecode,
+            .loadDiskFileSynchronously
+        ]
+        
+        ImagePrefetcher(urls: urls, options: options).start()
+    }
+    
+    private func calculateTargetImageSize() -> CGSize {
+        let screenWidth = UIScreen.main.bounds.width
+        let imageWidth = screenWidth - (18 * 2)
+        let imageHeight: CGFloat = 460
+        
+        let scale = UIScreen.main.scale
+        let minSize: CGFloat = 100
+        let calculatedWidth = max(imageWidth * scale, minSize)
+        let calculatedHeight = max(imageHeight * scale, minSize)
+        return CGSize(width: calculatedWidth, height: calculatedHeight)
     }
     
     private func updateCardImage() {
         let url = isFront ? frontURL : backURL
+        guard let url = url else { return }
         
-        let processor = DownsamplingImageProcessor(size: cardView.bounds.size)
+        let targetSize = calculateTargetImageSize()
+        let processor = DownsamplingImageProcessor(size: targetSize)
         
         cardView.kf.setImage(
             with: url,
+            placeholder: nil,
             options: [
                 .processor(processor),
                 .scaleFactor(UIScreen.main.scale),
                 .transition(.none),
-                .cacheOriginalImage
-            ]
+                .cacheOriginalImage,
+                .fromMemoryCacheOrRefresh,
+                .backgroundDecode,
+                .loadDiskFileSynchronously
+            ],
+            progressBlock: nil,
+            completionHandler: { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success:
+                    break
+                case .failure:
+                    break
+                }
+            }
         )
     }
     
     @objc func buttonTapped() {
-        if isFront {
-            isFront = false
-            UIView.transition(with: cardView,
-                              duration: 0.5,
-                              options: .transitionFlipFromLeft,
-                              animations: { [weak self] in
-                                  self?.updateCardImage()
-                              },
-                              completion: nil)
-            
-        } else {
-            isFront = true
-            UIView.transition(with: cardView,
-                              duration: 0.5,
-                              options: .transitionFlipFromRight,
-                              animations: { [weak self] in
-                                  self?.updateCardImage()
-                              },
-                              completion: nil)
-        }
+        let options: UIView.AnimationOptions = isFront ? .transitionFlipFromRight : .transitionFlipFromLeft
+        
+        isFront.toggle()
+        
+        UIView.transition(with: cardView,
+                          duration: 0.6,
+                          options: [options, .curveEaseInOut],
+                          animations: { [weak self] in
+                              self?.updateCardImage()
+                          },
+                          completion: nil)
     }
 }

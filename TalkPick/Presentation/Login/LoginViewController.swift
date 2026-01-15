@@ -47,6 +47,27 @@ class LoginViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    private func handleLoginResult(_ loginSingle: Single<Bool>) {
+        loginSingle
+            .observe(on: MainScheduler.instance)
+            .subscribe(
+                onSuccess: { [weak self] success in
+                    guard let self = self else { return }
+                    if success {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            self.myPageViewModel.getMyProfile()
+                        }
+                    } else {
+                        AlertController(message: ErrorMessage.loginFailed).show()
+                    }
+                },
+                onFailure: { _ in
+                    AlertController(message: ErrorMessage.loginFailed).show()
+                }
+            )
+            .disposed(by: disposeBag)
+    }
+    
     @objc private func appleTapped() {
         let provider = ASAuthorizationAppleIDProvider()
         let request = provider.createRequest()
@@ -67,7 +88,7 @@ class LoginViewController: UIViewController {
             guard let self = self else { return }
             
             guard let idToken = oauthToken?.idToken else {
-                AlertController(message: "로그인 정보를 가져오는데 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.loginInfoFailed).show()
                 return
             }
             
@@ -77,24 +98,7 @@ class LoginViewController: UIViewController {
                 let nickname = user?.kakaoAccount?.profile?.nickname ?? ""
                 userNickname = nickname.isEmpty ? "톡픽" : nickname
                 
-                loginViewModel.kakaoLogin(idToken: idToken)
-                    .observe(on: MainScheduler.instance)
-                    .subscribe(
-                        onSuccess: { [weak self] success in
-                            guard let self = self else { return }
-                            if success {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    self.myPageViewModel.getMyProfile()
-                                }
-                            } else {
-                                AlertController(message: "로그인에 실패했습니다.\n다시 시도해주세요.").show()
-                            }
-                        },
-                        onFailure: { error in
-                            AlertController(message: "로그인에 실패했습니다.\n다시 시도해주세요.").show()
-                        }
-                    )
-                    .disposed(by: disposeBag)
+                handleLoginResult(loginViewModel.kakaoLogin(idToken: idToken))
             }
         }
     }
@@ -104,31 +108,14 @@ class LoginViewController: UIViewController {
             guard let self = self else { return }
             
             guard let idToken = result?.user.idToken?.tokenString else {
-                AlertController(message: "로그인 정보를 가져오는데 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.loginInfoFailed).show()
                 return
             }
             
             let nickname = result?.user.profile?.name ?? ""
             userNickname = nickname.isEmpty ? "톡픽" : nickname
             
-            loginViewModel.googleLogin(idToken: idToken)
-                .observe(on: MainScheduler.instance)
-                .subscribe(
-                    onSuccess: { [weak self] success in
-                        guard let self = self else { return }
-                        if success {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                self.myPageViewModel.getMyProfile()
-                            }
-                        } else {
-                            AlertController(message: "로그인에 실패했습니다.\n다시 시도해주세요.").show()
-                        }
-                    },
-                    onFailure: { error in
-                        AlertController(message: "로그인에 실패했습니다.\n다시 시도해주세요.").show()
-                    }
-                )
-                .disposed(by: disposeBag)
+            handleLoginResult(loginViewModel.googleLogin(idToken: idToken))
         }
     }
 }
@@ -141,7 +128,7 @@ extension LoginViewController: ASAuthorizationControllerPresentationContextProvi
 
 extension LoginViewController: ASAuthorizationControllerDelegate {
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: any Error) {
-        AlertController(message: "애플 로그인에 실패했습니다.\n다시 시도해주세요.").show()
+        AlertController(message: ErrorMessage.appleLoginFailed).show()
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
@@ -151,7 +138,7 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
                 let identityToken = appleIdCredential.identityToken,
                 let idTokenString = String(data: identityToken, encoding: .utf8)
             else {
-                AlertController(message: "로그인 정보를 가져오는데 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.loginInfoFailed).show()
                 return
             }
             
@@ -161,26 +148,8 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
             } else {
                 userNickname = "톡픽"
             }
-            print("idToken: \(idTokenString)")
             
-            loginViewModel.appleLogin(idToken: idTokenString)
-                .observe(on: MainScheduler.instance)
-                .subscribe(
-                    onSuccess: { [weak self] success in
-                        guard let self = self else { return }
-                        if success {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                self.myPageViewModel.getMyProfile()
-                            }
-                        } else {
-                            AlertController(message: "로그인에 실패했습니다.\n다시 시도해주세요.").show()
-                        }
-                    },
-                    onFailure: { error in
-                        AlertController(message: "로그인에 실패했습니다.\n다시 시도해주세요.").show()
-                    }
-                )
-                .disposed(by: disposeBag)
+            handleLoginResult(loginViewModel.appleLogin(idToken: idTokenString))
             
         default: break
         }

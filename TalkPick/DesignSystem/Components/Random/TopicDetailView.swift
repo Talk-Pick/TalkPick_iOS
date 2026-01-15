@@ -39,6 +39,7 @@ class TopicDetailView: UIView {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
         iv.isUserInteractionEnabled = true
+        iv.backgroundColor = .clear
         return iv
     }()
     
@@ -52,7 +53,7 @@ class TopicDetailView: UIView {
         return fb
     }()
 
-    private let likeButton: UIButton = {
+    let likeButton: UIButton = {
         let cb = UIButton(type: .custom)
         cb.clipsToBounds = true
         cb.layer.cornerRadius = 10
@@ -62,6 +63,7 @@ class TopicDetailView: UIView {
         cb.setTitleColor(.gray200, for: .normal)
         cb.setTitle(" 좋아요", for: .normal)
         cb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+        cb.adjustsImageWhenDisabled = false
         return cb
     }()
     
@@ -87,7 +89,6 @@ class TopicDetailView: UIView {
     }()
 
     var isFront: Bool = true
-    private var isLiked = false
     
     private var frontURL: URL?
     private var backURL: URL?
@@ -111,10 +112,11 @@ class TopicDetailView: UIView {
         addSubview(cardView)
         addSubview(flipButton)
         addSubview(buttonsStack)
+        
+        likeButton.addTarget(self, action: #selector(toggleLike), for: .touchUpInside)
     }
 
     private func setupLayout() {
-        
         labelView1.snp.makeConstraints {
             $0.top.equalToSuperview().offset(40)
             $0.leading.equalToSuperview().offset(35)
@@ -165,49 +167,95 @@ class TopicDetailView: UIView {
     func configure(stepIndex: Int) {
         let stepTitles = ["첫 번째", "두 번째", "세 번째"]
         stepLabel.text = stepTitles.indices.contains(stepIndex) ? stepTitles[stepIndex] : ""
+        
+        isFront = true
+        
+        cardView.kf.cancelDownloadTask()
+        cardView.image = nil
+        cardView.layer.contents = nil
+        cardView.alpha = 0
+        frontURL = nil
+        backURL = nil
     }
     
     func updateDetail(category: String, categoryBgColor: UIColor, categoryTextColor: UIColor, frontImageUrl: String, backImageUrl: String) {
-        // 카테고리 업데이트
         labelLabel1.text = category
         labelView1.backgroundColor = categoryBgColor
         labelLabel1.textColor = categoryTextColor
         
-        // 이미지 URL 저장
+        cardView.kf.cancelDownloadTask()
+        cardView.image = nil
+        cardView.layer.contents = nil
+        cardView.alpha = 0
+        
         frontURL = URL(string: frontImageUrl)
         backURL = URL(string: backImageUrl)
         
-        // 앞뒷면 이미지 프리페칭
-        prefetchImages()
+        isFront = true
         
-        // 현재 상태에 맞는 이미지 로드
+        prefetchImages()
         updateCardImage()
     }
     
     private func prefetchImages() {
         let urls = [frontURL, backURL].compactMap { $0 }
-        ImagePrefetcher(urls: urls).start()
+        guard !urls.isEmpty else { return }
+        
+        let targetSize = calculateTargetImageSize()
+        let processor = DownsamplingImageProcessor(size: targetSize)
+        let options: KingfisherOptionsInfo = [
+            .processor(processor),
+            .scaleFactor(UIScreen.main.scale),
+            .cacheOriginalImage,
+            .backgroundDecode,
+            .loadDiskFileSynchronously
+        ]
+        
+        ImagePrefetcher(urls: urls, options: options).start()
+    }
+    
+    private func calculateTargetImageSize() -> CGSize {
+        let screenWidth = UIScreen.main.bounds.width
+        let imageWidth = screenWidth - (18 * 2)
+        let imageHeight: CGFloat = 450
+        
+        let scale = UIScreen.main.scale
+        let minSize: CGFloat = 100
+        let calculatedWidth = max(imageWidth * scale, minSize)
+        let calculatedHeight = max(imageHeight * scale, minSize)
+        return CGSize(width: calculatedWidth, height: calculatedHeight)
     }
     
     private func updateCardImage() {
         let url = isFront ? frontURL : backURL
+        guard let url = url else { return }
         
-        let processor = DownsamplingImageProcessor(size: cardView.bounds.size)
+        let targetSize = calculateTargetImageSize()
+        let processor = DownsamplingImageProcessor(size: targetSize)
         
         cardView.kf.setImage(
             with: url,
+            placeholder: nil,
             options: [
                 .processor(processor),
                 .scaleFactor(UIScreen.main.scale),
                 .transition(.none),
-                .cacheOriginalImage
-            ]
+                .cacheOriginalImage,
+                .backgroundDecode,
+                .loadDiskFileSynchronously
+            ],
+            progressBlock: nil,
+            completionHandler: { [weak self] _ in
+                guard let self = self else { return }
+                UIView.animate(withDuration: 0.2) {
+                    self.cardView.alpha = 1.0
+                }
+            }
         )
     }
 
     @objc private func toggleLike() {
-        isLiked.toggle()
-        onLikeToggled?(isLiked)
+        onLikeToggled?(true)
     }
 
     @objc private func nextTapped() {
@@ -215,25 +263,16 @@ class TopicDetailView: UIView {
     }
     
     @objc func buttonTapped() {
-        if isFront {
-            isFront = false
-            UIView.transition(with: cardView,
-                              duration: 0.5,
-                              options: .transitionFlipFromLeft,
-                              animations: { [weak self] in
-                                  self?.updateCardImage()
-                              },
-                              completion: nil)
-            
-        } else {
-            isFront = true
-            UIView.transition(with: cardView,
-                              duration: 0.5,
-                              options: .transitionFlipFromRight,
-                              animations: { [weak self] in
-                                  self?.updateCardImage()
-                              },
-                              completion: nil)
-        }
+        let options: UIView.AnimationOptions = isFront ? .transitionFlipFromRight : .transitionFlipFromLeft
+        
+        isFront.toggle()
+        
+        UIView.transition(with: cardView,
+                          duration: 0.6,
+                          options: [options, .curveEaseInOut],
+                          animations: { [weak self] in
+                              self?.updateCardImage()
+                          },
+                          completion: nil)
     }
 }

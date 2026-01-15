@@ -19,7 +19,7 @@ class LoginViewModel {
             .subscribe(onSuccess: { [weak self] success in
                 self?.termAgreed.onNext(success)
             }, onFailure: { error in
-                AlertController(message: "약관 동의에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.termAgreementFailed).show()
             })
             .disposed(by: disposeBag)
     }
@@ -40,6 +40,7 @@ class LoginViewModel {
         return loginSingle
             .do(onSuccess: { response in
                 AccessTokenManager.shared.saveToken(response.accessToken)
+                print("토큰: \(response.accessToken)")
             })
             .map { _ in true }
             .catch { _ in
@@ -53,7 +54,7 @@ class LoginViewModel {
             .subscribe(onSuccess: { [weak self] success in
                 self?.signUp.onNext(success)
             }, onFailure: { error in
-                AlertController(message: "회원가입에 실패했습니다.\n다시 시도해주세요.").show()
+                AlertController(message: ErrorMessage.signUpFailed).show()
             })
             .disposed(by: disposeBag)
     }

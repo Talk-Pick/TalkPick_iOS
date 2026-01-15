@@ -6,6 +6,9 @@ enum TutorialStep {
     case welcome
     case todayTopic
     case randomCourse
+    case homeTabBar
+    case randomCourseTabBar
+    case myPageTabBar
     case finalTodayTopic
     
     var description: String {
@@ -16,6 +19,12 @@ enum TutorialStep {
             return "오늘의 추천 주제로 대화를 시작할 수 있어요."
         case .randomCourse:
             return "랜덤으로 주어지는 주제로 대화를 시작할 수 있어요."
+        case .homeTabBar:
+            return "홈화면 기능 설명"
+        case .randomCourseTabBar:
+            return "랜덤코스 화면 기능 설명"
+        case .myPageTabBar:
+            return "마이페이지 기능 설명"
         case .finalTodayTopic:
             return "화면을 터치하여 시작해보세요!"
         }
@@ -39,6 +48,11 @@ class TutorialManager {
     static let shared = TutorialManager()
     
     private init() {}
+    
+    /// 테스트를 위한 튜토리얼 완료 상태 초기화 함수
+    static func resetTutorial() {
+        UserDefaults.standard.set(false, forKey: AppStorageKey.hasCompletedTutorial)
+    }
     
     func startTutorial(homeViewController: HomeViewController, tabBarController: MainTabViewController) {
         self.homeViewController = homeViewController
@@ -87,6 +101,12 @@ class TutorialManager {
         case .todayTopic:
             currentStep = .randomCourse
         case .randomCourse:
+            currentStep = .homeTabBar
+        case .homeTabBar:
+            currentStep = .randomCourseTabBar
+        case .randomCourseTabBar:
+            currentStep = .myPageTabBar
+        case .myPageTabBar:
             currentStep = .finalTodayTopic
         case .finalTodayTopic:
             completeTutorial()
@@ -98,9 +118,7 @@ class TutorialManager {
     private func showCurrentStep() {
         removeCurrentOverlay()
         
-        guard let homeVC = homeViewController,
-              let tabBarVC = tabBarController,
-              let homeView = homeVC.view as? HomeView else { return }
+        guard let tabBarVC = tabBarController else { return }
         
         let overlay = createOverlayView()
         
@@ -109,20 +127,30 @@ class TutorialManager {
         overlay.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        // overlay를 탭바 위로 가져오기 (z-order 조정)
+        tabBarVC.view.bringSubviewToFront(overlay)
+        
         self.overlayView = overlay
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(overlayTapped))
         overlay.addGestureRecognizer(tapGesture)
         
         // 레이아웃이 완료될 때까지 대기
-        homeVC.view.layoutIfNeeded()
+        homeViewController?.view.layoutIfNeeded()
         tabBarVC.view.layoutIfNeeded()
         
         switch currentStep {
         case .todayTopic:
-            highlightTodayTopicSection(in: overlay, homeView: homeView)
+            if let homeVC = homeViewController, let homeView = homeVC.view as? HomeView {
+                highlightTodayTopicSection(in: overlay, homeView: homeView)
+            }
         case .randomCourse:
-            highlightRandomCourseSection(in: overlay, homeView: homeView)
+            if let homeVC = homeViewController, let homeView = homeVC.view as? HomeView {
+                highlightRandomCourseSection(in: overlay, homeView: homeView)
+            }
+        case .homeTabBar, .randomCourseTabBar, .myPageTabBar:
+            highlightTabBar(in: overlay)
         case .finalTodayTopic:
             showFinalMessage(in: overlay)
         default:
@@ -180,8 +208,64 @@ class TutorialManager {
         createHighlightView(in: overlay, frame: highlightFrame, description: currentStep.description, position: .top, isSpecialLayout: true, excludeArea: excludeArea)
     }
     
+    private func highlightTabBar(in overlay: UIView) {
+        guard let tabBarVC = tabBarController else { return }
+        
+        // 탭바 높이 78
+        let tabBarHeight: CGFloat = 78
+        let tabBarFrame = CGRect(
+            x: 0,
+            y: overlay.frame.height - tabBarHeight,
+            width: overlay.frame.width,
+            height: tabBarHeight
+        )
+        
+        // 테두리 안쪽 영역 (테두리 두께 3pt 제외)
+        let excludeArea = tabBarFrame.insetBy(dx: 3, dy: 3)
+        
+        // 탭바 테두리만 표시 (설명 레이블은 별도로 처리)
+        // highlight view를 tabBarVC.view에 직접 추가하여 overlay 마스크의 영향을 받지 않도록 함
+        createTabBarHighlightView(in: tabBarVC.view, frame: tabBarFrame, overlay: overlay, excludeArea: excludeArea)
+        
+        // 설명 레이블을 탭바 바로 위에 배치
+        let descriptionLabel = UILabel()
+        descriptionLabel.text = currentStep.description
+        descriptionLabel.font = .systemFont(ofSize: 16, weight: .bold)
+        descriptionLabel.textColor = .white
+        descriptionLabel.textAlignment = .center
+        descriptionLabel.numberOfLines = 0
+        
+        overlay.addSubview(descriptionLabel)
+        self.descriptionLabel = descriptionLabel
+        
+        // 설명 레이블 크기 계산
+        let maxWidth = overlay.frame.width - 48
+        let labelSize = currentStep.description.size(
+            withAttributes: [NSAttributedString.Key.font: descriptionLabel.font!]
+        )
+        let labelWidth = min(max(labelSize.width, 200), maxWidth)
+        let labelHeight = currentStep.description.height(
+            withConstrainedWidth: labelWidth,
+            font: descriptionLabel.font
+        )
+        
+        // 탭바 바로 위에 배치 (탭바 위로 16pt 여백)
+        let labelX = overlay.frame.midX - labelWidth / 2
+        let labelY = tabBarFrame.minY - labelHeight - 16
+        
+        descriptionLabel.frame = CGRect(
+            x: labelX,
+            y: labelY,
+            width: labelWidth,
+            height: labelHeight
+        )
+    }
+    
     private func showFinalMessage(in overlay: UIView) {
         // 보라색 테두리 없이 텍스트만 화면 가운데에 표시
+        // highlightView가 없도록 명시적으로 nil 설정
+        highlightView = nil
+        
         let descriptionLabel = UILabel()
         descriptionLabel.text = currentStep.description
         descriptionLabel.font = .systemFont(ofSize: 16, weight: .bold)
@@ -217,7 +301,72 @@ class TutorialManager {
     
     private enum DescriptionPosition {
         case top
-        case bottom
+    }
+    
+    private func createTabBarHighlightView(in containerView: UIView, frame: CGRect, overlay: UIView, excludeArea: CGRect?) {
+        let highlight = UIView()
+        highlight.backgroundColor = UIColor.clear
+        
+        // highlight view를 containerView(tabBarVC.view)에 직접 추가하여 overlay 마스크의 영향을 받지 않도록 함
+        containerView.addSubview(highlight)
+        highlight.frame = frame
+        
+        // 테두리가 탭바 위에 보이도록 zPosition 설정
+        highlight.layer.zPosition = 1000
+        
+        // 탭바 테두리: 밑쪽 모서리만 둥글게 처리
+        let borderLayer = CAShapeLayer()
+        let path = UIBezierPath()
+        let cornerRadius: CGFloat = 45 // 둥근 모서리 반경 (더 둥글게)
+        let lineWidth: CGFloat = 3
+        let halfLineWidth = lineWidth / 2
+        
+        // 테두리 경로: frame 경계에서 lineWidth/2만큼 안쪽으로 (테두리 중심선)
+        let borderRect = CGRect(
+            x: halfLineWidth,
+            y: halfLineWidth,
+            width: frame.width - lineWidth,
+            height: frame.height - lineWidth
+        )
+        
+        // 경로 그리기: 위쪽과 양옆은 직선, 양쪽 하단 모서리만 둥글게, 밑쪽 가운데는 직선
+        // 위쪽 왼쪽 모서리부터 시작
+        path.move(to: CGPoint(x: borderRect.minX, y: borderRect.minY))
+        // 위쪽 테두리 (직선)
+        path.addLine(to: CGPoint(x: borderRect.maxX, y: borderRect.minY))
+        // 오른쪽 테두리 (직선)
+        path.addLine(to: CGPoint(x: borderRect.maxX, y: borderRect.maxY - cornerRadius))
+        // 오른쪽 하단 둥근 모서리 (arc)
+        path.addArc(withCenter: CGPoint(x: borderRect.maxX - cornerRadius, y: borderRect.maxY - cornerRadius),
+                   radius: cornerRadius,
+                   startAngle: 0,
+                   endAngle: .pi / 2,
+                   clockwise: true)
+        // 밑쪽 테두리 (직선)
+        path.addLine(to: CGPoint(x: borderRect.minX + cornerRadius, y: borderRect.maxY))
+        // 왼쪽 하단 둥근 모서리 (arc)
+        path.addArc(withCenter: CGPoint(x: borderRect.minX + cornerRadius, y: borderRect.maxY - cornerRadius),
+                   radius: cornerRadius,
+                   startAngle: .pi / 2,
+                   endAngle: .pi,
+                   clockwise: true)
+        // 왼쪽 테두리 (직선, 시작점으로 돌아감)
+        path.close()
+        
+        borderLayer.path = path.cgPath
+        borderLayer.strokeColor = UIColor.purple100.cgColor  // 명시적으로 보라색 설정
+        borderLayer.fillColor = UIColor.clear.cgColor
+        borderLayer.lineWidth = lineWidth
+        borderLayer.frame = highlight.bounds
+        
+        highlight.layer.addSublayer(borderLayer)
+        
+        self.highlightView = highlight
+        
+        // 테두리 안 영역을 overlay에서 제외 (어둡게 처리되지 않도록)
+        if let excludeArea = excludeArea {
+            applyMaskToOverlay(overlay, excluding: excludeArea)
+        }
     }
     
     private func createHighlightView(in overlay: UIView, frame: CGRect, description: String, position: DescriptionPosition, isSpecialLayout: Bool = false, excludeArea: CGRect? = nil, isTabBar: Bool = false) {
@@ -294,11 +443,7 @@ class TutorialManager {
         } else {
             // 기존 로직: 중앙 정렬
             labelX = overlay.frame.midX - labelWidth / 2
-            if position == .top {
-                labelY = frame.minY - labelHeight - 16
-            } else {
-                labelY = frame.maxY + 16
-            }
+            labelY = frame.minY - labelHeight - 16
         }
         
         descriptionLabel.frame = CGRect(
@@ -324,7 +469,12 @@ class TutorialManager {
         overlayView?.layer.mask = nil // 마스크 제거
         overlayView?.removeFromSuperview()
         overlayView = nil
+        
+        // highlightView가 다른 view에 추가되어 있을 수 있으므로 명시적으로 제거
+        highlightView?.removeFromSuperview()
         highlightView = nil
+        
+        descriptionLabel?.removeFromSuperview()
         descriptionLabel = nil
     }
     

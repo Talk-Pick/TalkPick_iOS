@@ -49,7 +49,8 @@ class AuthInterceptor: RequestInterceptor {
     
     // 액세스 토큰 갱신
     private func refreshToken(completion: @escaping (Bool) -> Void) {
-        guard let accessToken = AccessTokenManager.shared.getToken() else {
+        // 쿠키에서 리프레시 토큰 추출
+        guard let refreshToken = getRefreshTokenFromCookie() else {
             completion(false)
             return
         }
@@ -57,12 +58,18 @@ class AuthInterceptor: RequestInterceptor {
         let url = APIConstants.tokenRefresh.path
         let headers: HTTPHeaders = [
             "Accept": "*/*",
-            "Content-Type": "application/json",
-            "Authorization": "Bearer \(accessToken)"
+            "Content-Type": "application/json"
+        ]
+        
+        // 리프레시 토큰을 parameter로 전달
+        let parameters: [String: Any] = [
+            "refreshToken": refreshToken
         ]
         
         AF.request(url,
                    method: .post,
+                   parameters: parameters,
+                   encoding: JSONEncoding.default,
                    headers: headers)
         .validate(statusCode: 200..<300)
         .responseDecodable(of: Token.self) { response in
@@ -77,5 +84,33 @@ class AuthInterceptor: RequestInterceptor {
                 completion(false)
             }
         }
+    }
+    
+    // 쿠키에서 리프레시 토큰 추출
+    private func getRefreshTokenFromCookie() -> String? {
+        guard let url = URL(string: APIConstants.baseURL) else {
+            return nil
+        }
+        
+        // HTTPCookieStorage에서 쿠키 가져오기
+        if let cookies = HTTPCookieStorage.shared.cookies(for: url) {
+            // refreshToken 쿠키 찾기
+            for cookie in cookies {
+                if cookie.name == "refreshToken" {
+                    return cookie.value
+                }
+            }
+        }
+        
+        // 특정 URL에 쿠키가 없으면 모든 쿠키에서 찾기 (도메인이 다른 경우 대비)
+        if let allCookies = HTTPCookieStorage.shared.cookies {
+            for cookie in allCookies {
+                if cookie.name == "refreshToken" {
+                    return cookie.value
+                }
+            }
+        }
+        
+        return nil
     }
 }
