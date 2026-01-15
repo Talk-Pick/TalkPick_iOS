@@ -13,7 +13,12 @@ final class RandomNavigationBarView: UIView {
         bb.setImage(UIImage(named: "talkpick_back")?.withRenderingMode(.alwaysOriginal), for: .normal)
         return bb
     }()
-    private var titleLabel: UILabel = {
+    let progress: UIImageView = {
+        let iv = UIImageView(image: UIImage(named: "talkpick_progress1"))
+        iv.contentMode = .scaleAspectFit
+        return iv
+    }()
+    var titleLabel: UILabel = {
         let lb = UILabel()
         lb.textColor = .black
         lb.font = .systemFont(ofSize: 17, weight: .bold)
@@ -45,6 +50,14 @@ final class RandomNavigationBarView: UIView {
             $0.leading.equalToSuperview().offset(20)
             $0.bottom.equalToSuperview()
             $0.width.height.equalTo(32)
+        }
+        
+        addSubview(progress)
+        progress.snp.makeConstraints {
+            $0.centerY.equalTo(backButton)
+            $0.leading.equalToSuperview().offset(24)
+            $0.width.equalTo(124)
+            $0.height.equalTo(20)
         }
         
         addSubview(titleLabel)
