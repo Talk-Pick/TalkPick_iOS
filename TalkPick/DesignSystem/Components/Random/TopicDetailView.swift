@@ -207,7 +207,8 @@ class TopicDetailView: UIView {
             .scaleFactor(UIScreen.main.scale),
             .cacheOriginalImage,
             .backgroundDecode,
-            .loadDiskFileSynchronously
+            .loadDiskFileSynchronously,
+            .downloadPriority(.high)
         ]
         
         ImagePrefetcher(urls: urls, options: options).start()
@@ -238,10 +239,12 @@ class TopicDetailView: UIView {
             options: [
                 .processor(processor),
                 .scaleFactor(UIScreen.main.scale),
-                .transition(.none),
+                .transition(.fade(0.2)),
                 .cacheOriginalImage,
+                .fromMemoryCacheOrRefresh,
                 .backgroundDecode,
-                .loadDiskFileSynchronously
+                .loadDiskFileSynchronously,
+                .downloadPriority(.high)
             ],
             progressBlock: nil,
             completionHandler: { [weak self] _ in
