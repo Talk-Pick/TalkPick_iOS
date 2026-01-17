@@ -14,7 +14,7 @@ class RandomCourseView: UIView {
     private var currentTopicId: Int?
     private var isLiked: Bool = false
     
-    private let totalSteps: Int = 11
+    private let totalSteps: Int = 8
     private var currentStepNumber: Int = 1
     
     private var selectedSituation: SituationView.SituationKind?
@@ -90,6 +90,11 @@ class RandomCourseView: UIView {
         }
         currentStep = step
 
+        // backButton 표시/숨김 제어
+        updateBackButtonVisibility(for: step)
+        // progress 이미지 및 표시/숨김 제어
+        updateProgressVisibility(for: step)
+
         switch step {
         case .situation:
             setCurrentView(situationView)
@@ -104,6 +109,38 @@ class RandomCourseView: UIView {
 
         case .finish:
             setCurrentView(finishView)
+        }
+    }
+    
+    private func updateBackButtonVisibility(for step: Step) {
+        switch step {
+        case .situation:
+            navigationbarView.backButton.isHidden = false
+            navigationbarView.titleLabel.isHidden = false
+        case .topicSelect, .topicDetail, .finish:
+            navigationbarView.backButton.isHidden = true
+            navigationbarView.titleLabel.isHidden = true
+        }
+    }
+    
+    private func updateProgressVisibility(for step: Step) {
+        switch step {
+        case .situation, .finish:
+            navigationbarView.progress.isHidden = true
+        case .topicSelect(let index), .topicDetail(let index):
+            navigationbarView.progress.isHidden = false
+            let imageName: String
+            switch index {
+            case 0:
+                imageName = "talkpick_progress1"
+            case 1:
+                imageName = "talkpick_progress2"
+            case 2:
+                imageName = "talkpick_progress3"
+            default:
+                imageName = "talkpick_progress1"
+            }
+            navigationbarView.progress.image = UIImage(named: imageName)
         }
     }
 
@@ -212,9 +249,10 @@ class RandomCourseView: UIView {
             }
         }
         
-        detailView.onLikeToggled = { [weak self] liked in
+        detailView.onLikeToggled = { [weak self] in
             guard let self = self, let topicId = self.currentTopicId else { return }
-            self.isLiked = true
+            // 현재 좋아요 상태를 토글
+            self.isLiked.toggle()
             self.updateLikeButton()
             self.topicViewModel.postTopicLike(topicId: topicId)
         }
@@ -310,12 +348,11 @@ class RandomCourseView: UIView {
         if isLiked {
             let image = UIImage(named: "talkpick_like2")?.withRenderingMode(.alwaysOriginal)
             detailView.likeButton.setImage(image, for: .normal)
-            detailView.likeButton.setImage(image, for: .disabled)
-            detailView.likeButton.isEnabled = false
         } else {
             let image = UIImage(named: "talkpick_like3")?.withRenderingMode(.alwaysOriginal)
             detailView.likeButton.setImage(image, for: .normal)
-            detailView.likeButton.isEnabled = true
         }
+        // 버튼은 항상 활성화 상태로 유지 (토글 가능하도록)
+        detailView.likeButton.isEnabled = true
     }
 }

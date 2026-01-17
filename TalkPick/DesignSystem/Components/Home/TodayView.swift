@@ -63,7 +63,6 @@ class TodayView: UIView {
         cb.setTitleColor(.gray200, for: .normal)
         cb.setTitle(" 좋아요", for: .normal)
         cb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
-        cb.adjustsImageWhenDisabled = false
         cb.applyTextButtonPressEffect()
         return cb
     }()
@@ -154,6 +153,10 @@ class TodayView: UIView {
         labelLabel1.text = category
         labelLabel2.text = keyword
         
+        // 이전 이미지 제거
+        cardView.image = nil
+        cardView.kf.cancelDownloadTask()
+        
         frontURL = URL(string: frontImageUrl)
         backURL = URL(string: backImageUrl)
         
@@ -172,7 +175,8 @@ class TodayView: UIView {
             .scaleFactor(UIScreen.main.scale),
             .cacheOriginalImage,
             .backgroundDecode,
-            .loadDiskFileSynchronously
+            .loadDiskFileSynchronously,
+            .downloadPriority(.high)
         ]
         
         ImagePrefetcher(urls: urls, options: options).start()
@@ -203,18 +207,22 @@ class TodayView: UIView {
             options: [
                 .processor(processor),
                 .scaleFactor(UIScreen.main.scale),
-                .transition(.none),
+                .transition(.fade(0.2)),
                 .cacheOriginalImage,
                 .fromMemoryCacheOrRefresh,
                 .backgroundDecode,
-                .loadDiskFileSynchronously
+                .loadDiskFileSynchronously,
+                .downloadPriority(.high)
             ],
             progressBlock: nil,
             completionHandler: { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .success:
-                    break
+                    // 이미지 로딩 성공 시 alpha 애니메이션
+                    UIView.animate(withDuration: 0.2) {
+                        self.cardView.alpha = 1.0
+                    }
                 case .failure:
                     break
                 }

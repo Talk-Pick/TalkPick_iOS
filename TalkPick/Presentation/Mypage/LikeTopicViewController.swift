@@ -22,6 +22,11 @@ class LikeTopicViewController: UIViewController {
         super.viewDidLoad()
         setUI()
         bindViewModel()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // 화면으로 돌아왔을 때 좋아요 목록을 다시 가져와서 업데이트
         setAPI()
     }
     
