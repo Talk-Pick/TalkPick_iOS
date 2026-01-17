@@ -50,9 +50,9 @@ class TutorialManager {
     private init() {}
     
     /// 테스트를 위한 튜토리얼 완료 상태 초기화 함수
-    static func resetTutorial() {
-        UserDefaults.standard.set(false, forKey: AppStorageKey.hasCompletedTutorial)
-    }
+//    static func resetTutorial() {
+//        UserDefaults.standard.set(false, forKey: AppStorageKey.hasCompletedTutorial)
+//    }
     
     func startTutorial(homeViewController: HomeViewController, tabBarController: MainTabViewController) {
         self.homeViewController = homeViewController

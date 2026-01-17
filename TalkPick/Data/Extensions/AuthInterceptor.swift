@@ -58,18 +58,13 @@ class AuthInterceptor: RequestInterceptor {
         let url = APIConstants.tokenRefresh.path
         let headers: HTTPHeaders = [
             "Accept": "*/*",
-            "Content-Type": "application/json"
-        ]
-        
-        // 리프레시 토큰을 parameter로 전달
-        let parameters: [String: Any] = [
-            "refreshToken": refreshToken
+            "Cookie": "refreshToken=\(refreshToken)"
         ]
         
         AF.request(url,
                    method: .post,
-                   parameters: parameters,
-                   encoding: JSONEncoding.default,
+                   parameters: nil,
+                   encoding: URLEncoding.default,
                    headers: headers)
         .validate(statusCode: 200..<300)
         .responseDecodable(of: Token.self) { response in
