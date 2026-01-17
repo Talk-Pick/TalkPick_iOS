@@ -5,7 +5,7 @@ import Kingfisher
 
 class TopicDetailView: UIView {
     var onNext: (() -> Void)?
-    var onLikeToggled: ((Bool) -> Void)?
+    var onLikeToggled: (() -> Void)?
 
     private let labelView1: UIView = {
         let uv = UIView()
@@ -63,7 +63,6 @@ class TopicDetailView: UIView {
         cb.setTitleColor(.gray200, for: .normal)
         cb.setTitle(" 좋아요", for: .normal)
         cb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
-        cb.adjustsImageWhenDisabled = false
         return cb
     }()
     
@@ -255,7 +254,7 @@ class TopicDetailView: UIView {
     }
 
     @objc private func toggleLike() {
-        onLikeToggled?(true)
+        onLikeToggled?()
     }
 
     @objc private func nextTapped() {

@@ -63,7 +63,6 @@ class TodayView: UIView {
         cb.setTitleColor(.gray200, for: .normal)
         cb.setTitle(" 좋아요", for: .normal)
         cb.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
-        cb.adjustsImageWhenDisabled = false
         cb.applyTextButtonPressEffect()
         return cb
     }()
@@ -210,8 +209,7 @@ class TodayView: UIView {
                 .loadDiskFileSynchronously
             ],
             progressBlock: nil,
-            completionHandler: { [weak self] result in
-                guard let self = self else { return }
+            completionHandler: { result in
                 switch result {
                 case .success:
                     break

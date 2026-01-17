@@ -249,9 +249,10 @@ class RandomCourseView: UIView {
             }
         }
         
-        detailView.onLikeToggled = { [weak self] liked in
+        detailView.onLikeToggled = { [weak self] in
             guard let self = self, let topicId = self.currentTopicId else { return }
-            self.isLiked = true
+            // 현재 좋아요 상태를 토글
+            self.isLiked.toggle()
             self.updateLikeButton()
             self.topicViewModel.postTopicLike(topicId: topicId)
         }
@@ -347,12 +348,11 @@ class RandomCourseView: UIView {
         if isLiked {
             let image = UIImage(named: "talkpick_like2")?.withRenderingMode(.alwaysOriginal)
             detailView.likeButton.setImage(image, for: .normal)
-            detailView.likeButton.setImage(image, for: .disabled)
-            detailView.likeButton.isEnabled = false
         } else {
             let image = UIImage(named: "talkpick_like3")?.withRenderingMode(.alwaysOriginal)
             detailView.likeButton.setImage(image, for: .normal)
-            detailView.likeButton.isEnabled = true
         }
+        // 버튼은 항상 활성화 상태로 유지 (토글 가능하도록)
+        detailView.likeButton.isEnabled = true
     }
 }

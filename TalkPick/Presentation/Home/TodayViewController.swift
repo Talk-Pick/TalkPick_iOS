@@ -84,17 +84,17 @@ extension TodayViewController {
         if isLiked {
             let image = UIImage(named: "talkpick_like2")?.withRenderingMode(.alwaysOriginal)
             todayView.likeButton.setImage(image, for: .normal)
-            todayView.likeButton.setImage(image, for: .disabled) // disabled 상태에도 동일한 이미지 설정
-            todayView.likeButton.isEnabled = false
         } else {
             let image = UIImage(named: "talkpick_like3")?.withRenderingMode(.alwaysOriginal)
             todayView.likeButton.setImage(image, for: .normal)
-            todayView.likeButton.isEnabled = true
         }
+        // 버튼은 항상 활성화 상태로 유지 (토글 가능하도록)
+        todayView.likeButton.isEnabled = true
     }
     
     @objc private func likeTapped() {
-        isLiked = true
+        // 현재 좋아요 상태를 토글
+        isLiked.toggle()
         updateLikeButton()
         topicViewModel.postTopicLike(topicId: topicId)
     }
