@@ -88,7 +88,7 @@ class LikeTopicViewController: UIViewController {
         
         mypageViewModel.error
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] error in
+            .subscribe(onNext: { error in
                 AlertController(message: error.userMessage).show()
             })
             .disposed(by: disposeBag)

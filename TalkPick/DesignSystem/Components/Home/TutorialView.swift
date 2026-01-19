@@ -127,6 +127,7 @@ class TutorialView: UIView {
         
         touchImageView.snp.makeConstraints {
             $0.top.equalTo(containerView.snp.bottom).offset(81)
+            $0.centerX.equalToSuperview()
             $0.width.equalTo(227)
             $0.height.equalTo(130)
         }

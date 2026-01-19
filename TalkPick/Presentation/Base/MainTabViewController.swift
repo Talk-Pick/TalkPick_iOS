@@ -110,12 +110,12 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
         }
         
         items[0].snp.makeConstraints {
-            $0.trailing.equalTo(items[1].snp.leading).offset(-70)
+            $0.trailing.equalTo(items[1].snp.leading).offset(-72)
             $0.leading.greaterThanOrEqualToSuperview().offset(15) // 최소 여백
         }
         
         items[2].snp.makeConstraints {
-            $0.leading.equalTo(items[1].snp.trailing).offset(70)
+            $0.leading.equalTo(items[1].snp.trailing).offset(72)
             $0.trailing.lessThanOrEqualToSuperview().offset(-15) // 최소 여백
         }
         
