@@ -67,6 +67,12 @@ class TutorialView: UIView {
         return stackView
     }()
     
+    private let touchImageView: UIImageView = {
+        let iv = UIImageView(image: UIImage(named: "talkpick_tutorial1"))
+        iv.contentMode = .scaleAspectFit
+        return iv
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = UIColor(white: 0, alpha: 0.5)
@@ -87,6 +93,8 @@ class TutorialView: UIView {
         
         buttonStackView.addArrangedSubview(skipButton)
         buttonStackView.addArrangedSubview(startButton)
+        
+        addSubview(touchImageView)
         
         skipButton.addTarget(self, action: #selector(skipButtonTapped), for: .touchUpInside)
         startButton.addTarget(self, action: #selector(startButtonTapped), for: .touchUpInside)
@@ -115,6 +123,12 @@ class TutorialView: UIView {
             $0.leading.trailing.equalToSuperview().inset(14)
             $0.bottom.equalToSuperview().offset(-34)
             $0.height.equalTo(43)
+        }
+        
+        touchImageView.snp.makeConstraints {
+            $0.top.equalTo(containerView.snp.bottom).offset(81)
+            $0.width.equalTo(227)
+            $0.height.equalTo(130)
         }
     }
     

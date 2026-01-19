@@ -1,14 +1,20 @@
 
 import UIKit
+import RxSwift
 
 class AgreeViewController: UIViewController {
     
     private let agreeView = AgreeView()
-    private let loginViewModel = LoginViewModel()
+    private let loginViewModel: LoginViewModel
     private let nickname: String?
+    private let disposeBag = DisposeBag()
     
-    init(nickname: String) {
+    init(
+        nickname: String,
+        loginViewModel: LoginViewModel = LoginViewModel()
+    ) {
         self.nickname = nickname
+        self.loginViewModel = loginViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -24,6 +30,16 @@ class AgreeViewController: UIViewController {
         super.viewDidLoad()
         
         setUI()
+        bindViewModel()
+    }
+    
+    private func bindViewModel() {
+        loginViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { error in
+                AlertController(message: error.userMessage).show()
+            })
+            .disposed(by: disposeBag)
     }
     
     private func setUI() {

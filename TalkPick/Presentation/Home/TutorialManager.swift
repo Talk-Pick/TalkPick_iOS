@@ -50,9 +50,9 @@ class TutorialManager {
     private init() {}
     
     /// 테스트를 위한 튜토리얼 완료 상태 초기화 함수
-//    static func resetTutorial() {
-//        UserDefaults.standard.set(false, forKey: AppStorageKey.hasCompletedTutorial)
-//    }
+    static func resetTutorial() {
+        UserDefaults.standard.set(false, forKey: AppStorageKey.hasCompletedTutorial)
+    }
     
     func startTutorial(homeViewController: HomeViewController, tabBarController: MainTabViewController) {
         self.homeViewController = homeViewController
@@ -174,7 +174,7 @@ class TutorialManager {
             x: 0,
             y: combinedFrame.minY - 12,
             width: overlay.frame.width,
-            height: combinedFrame.maxY - combinedFrame.minY + 12 - 20 // 밑 테두리 20pt 올림
+            height: combinedFrame.maxY - combinedFrame.minY
         )
         
         // 테두리 안쪽 영역 (테두리 두께 3pt 제외)

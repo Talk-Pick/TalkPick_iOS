@@ -6,8 +6,17 @@ import RxCocoa
 class HomeViewController: UIViewController {
     
     private let homeView = HomeView()
-    private let topicViewModel = TopicViewModel()
+    private let topicViewModel: TopicViewModel
     private let disposeBag = DisposeBag()
+    
+    init(topicViewModel: TopicViewModel = TopicViewModel()) {
+        self.topicViewModel = topicViewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = homeView
@@ -69,6 +78,13 @@ extension HomeViewController {
                 guard let self = self else { return }
                 let todayVC = TodayViewController(topicId: topicItem.topicId)
                 navigationController?.pushViewController(todayVC, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        topicViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { error in
+                AlertController(message: error.userMessage).show()
             })
             .disposed(by: disposeBag)
     }

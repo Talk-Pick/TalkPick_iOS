@@ -7,8 +7,17 @@ import RxCocoa
 class MypageViewController: UIViewController {
     
     private let mypageView = MypageView()
-    private let viewModel = MyPageViewModel()
+    private let viewModel: MyPageViewModel
     private var disposeBag = DisposeBag()
+    
+    init(viewModel: MyPageViewModel = MyPageViewModel()) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = mypageView
@@ -79,6 +88,13 @@ class MypageViewController: UIViewController {
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 navigateToLogin()
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] error in
+                AlertController(message: error.userMessage).show()
             })
             .disposed(by: disposeBag)
     }

@@ -6,12 +6,25 @@ import RxSwift
 
 class LoginViewController: UIViewController {
     
-    private let loginViewModel = LoginViewModel()
-    private let myPageViewModel = MyPageViewModel()
+    private let loginViewModel: LoginViewModel
+    private let myPageViewModel: MyPageViewModel
     private let loginView = LoginView()
     private let disposeBag = DisposeBag()
 
     private var userNickname: String?
+    
+    init(
+        loginViewModel: LoginViewModel = LoginViewModel(),
+        myPageViewModel: MyPageViewModel = MyPageViewModel()
+    ) {
+        self.loginViewModel = loginViewModel
+        self.myPageViewModel = myPageViewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = loginView
@@ -43,6 +56,20 @@ class LoginViewController: UIViewController {
                     let agreeVC = AgreeViewController(nickname: userNickname ?? "톡픽")
                     navigationController?.pushViewController(agreeVC, animated: true)
                 }
+            })
+            .disposed(by: disposeBag)
+        
+        loginViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { error in
+                AlertController(message: error.userMessage).show()
+            })
+            .disposed(by: disposeBag)
+        
+        myPageViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { error in
+                AlertController(message: error.userMessage).show()
             })
             .disposed(by: disposeBag)
     }
@@ -141,6 +168,8 @@ extension LoginViewController: ASAuthorizationControllerDelegate {
                 AlertController(message: ErrorMessage.loginInfoFailed).show()
                 return
             }
+            
+            print("idToken: \(idTokenString)")
             
             if let nickName = appleIdCredential.fullName {
                 let appleNickname = "\(nickName.familyName ?? "")\(nickName.givenName ?? "")"

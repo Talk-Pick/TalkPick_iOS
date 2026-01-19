@@ -2,13 +2,12 @@
 import Alamofire
 import RxSwift
 
-struct APIService {
-    
+struct APIService: APIServiceProtocol {
     static let shared = APIService()
 
     private func request<T: Codable>(
         of type: T.Type,
-        url: URLConvertible,
+        url: String,
         method: HTTPMethod,
         parameters: [String: Any]? = nil,
         encoding: ParameterEncoding? = nil,
@@ -37,13 +36,13 @@ struct APIService {
     }
     
     // GET 요청 (토큰 없음)
-    func get<T: Codable>(of type: T.Type, url: URLConvertible) -> Single<T> {
+    func get<T: Codable>(of type: T.Type, url: String) -> Single<T> {
         let headers: HTTPHeaders = ["Content-Type": "application/json", "Accept": "application/json"]
         return request(of: type, url: url, method: .get, headers: headers)
     }
     
     // GET 요청 (토큰 포함)
-    func getWithToken<T: Codable>(of type: T.Type, url: URLConvertible, accessToken: String) -> Single<T> {
+    func getWithToken<T: Codable>(of type: T.Type, url: String, accessToken: String) -> Single<T> {
         let headers: HTTPHeaders = [
             "Accept": "application/json",
             "Authorization": "Bearer \(accessToken)"
@@ -52,7 +51,7 @@ struct APIService {
     }
     
     // GET 요청 (토큰 & 파라미터 포함)
-    func getWithTokenAndParams<T: Codable>(of type: T.Type, url: URLConvertible, parameters: [String: Any]?, accessToken: String) -> Single<T> {
+    func getWithTokenAndParams<T: Codable>(of type: T.Type, url: String, parameters: [String: Any]?, accessToken: String) -> Single<T> {
         let headers: HTTPHeaders = [
             "Accept": "application/json",
             "Authorization": "Bearer \(accessToken)"
@@ -61,13 +60,13 @@ struct APIService {
     }
 
     // POST 요청
-    func post<T: Codable>(of type: T.Type, url: URLConvertible, parameters: [String: Any]?) -> Single<T> {
+    func post<T: Codable>(of type: T.Type, url: String, parameters: [String: Any]?) -> Single<T> {
         let headers: HTTPHeaders = ["Content-Type": "application/json", "Accept": "application/json"]
         return request(of: type, url: url, method: .post, parameters: parameters, headers: headers)
     }
     
     // POST 요청 (토큰 포함)
-    func postWithToken<T: Codable>(of type: T.Type, url: URLConvertible, parameters: [String: Any]?, accessToken: String) -> Single<T> {
+    func postWithToken<T: Codable>(of type: T.Type, url: String, parameters: [String: Any]?, accessToken: String) -> Single<T> {
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -76,7 +75,7 @@ struct APIService {
         return request(of: type, url: url, method: .post, parameters: parameters, headers: headers)
     }
     
-    func postWithTokenAndParams<T: Codable>(of type: T.Type, url: URLConvertible, parameters: [String: Any]?, accessToken: String) -> Single<T> {
+    func postWithTokenAndParams<T: Codable>(of type: T.Type, url: String, parameters: [String: Any]?, accessToken: String) -> Single<T> {
         let headers: HTTPHeaders = [
             "Accept": "application/json",
             "Authorization": "Bearer \(accessToken)"
@@ -85,7 +84,7 @@ struct APIService {
     }
     
     // DELETE 요청 (토큰 포함)
-    func deleteWithToken<T: Codable>(of type: T.Type, url: URLConvertible, parameters: [String: Any]?, accessToken: String) -> Single<T> {
+    func deleteWithToken<T: Codable>(of type: T.Type, url: String, parameters: [String: Any]?, accessToken: String) -> Single<T> {
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -95,7 +94,7 @@ struct APIService {
     }
     
     // PATCH 요청
-    func patch<T: Codable>(of type: T.Type, url: URLConvertible, parameters: [String: Any]?) -> Single<T> {
+    func patch<T: Codable>(of type: T.Type, url: String, parameters: [String: Any]?) -> Single<T> {
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Accept": "application/json"
@@ -104,7 +103,7 @@ struct APIService {
     }
 
     // PATCH 요청 (토큰 포함)
-    func patchWithToken<T: Codable>(of type: T.Type, url: URLConvertible, parameters: [String: Any]?, accessToken: String) -> Single<T> {
+    func patchWithToken<T: Codable>(of type: T.Type, url: String, parameters: [String: Any]?, accessToken: String) -> Single<T> {
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -114,7 +113,7 @@ struct APIService {
     }
     
     // PUT 요청 (토큰 포함)
-    func putWithToken<T: Codable>(of type: T.Type, url: URLConvertible, parameters: [String: Any]?, accessToken: String) -> Single<T> {
+    func putWithToken<T: Codable>(of type: T.Type, url: String, parameters: [String: Any]?, accessToken: String) -> Single<T> {
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Accept": "application/json",

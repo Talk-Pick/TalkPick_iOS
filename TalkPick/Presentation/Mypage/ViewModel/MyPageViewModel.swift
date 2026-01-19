@@ -2,12 +2,11 @@
 import RxSwift
 import RxCocoa
 
-class MyPageViewModel {
+class MyPageViewModel: BaseViewModel {
     
-    private let disposeBag = DisposeBag()
-    private let useCase: UserUseCase
+    private let useCase: UserUseCaseProtocol
     
-    init(useCase: UserUseCase = UserUseCase()) {
+    init(useCase: UserUseCaseProtocol = UserUseCase()) {
         self.useCase = useCase
     }
     
@@ -17,57 +16,67 @@ class MyPageViewModel {
     let likeTopicList = BehaviorRelay<[LikedDetail]>(value: [])
     
     func getMyProfile() {
-        useCase.getMyProfile()
-            .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] profile in
-                self?.profile.onNext(profile)
-            }, onFailure: { error in
-                AlertController(message: ErrorMessage.profileLoadFailed).show()
-            })
-            .disposed(by: disposeBag)
+        executeWithLoading {
+            self.useCase.getMyProfile()
+        }
+        .observe(on: MainScheduler.instance)
+        .subscribe(onSuccess: { [weak self] profile in
+            self?.profile.onNext(profile)
+        }, onFailure: { [weak self] error in
+            self?.handleError(error)
+        })
+        .disposed(by: disposeBag)
     }
 
     func editMyProfile(mbti: String) {
-        useCase.editMyProfile(mbti: mbti)
-            .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] success in
-                self?.getMyProfile()
-            }, onFailure: { error in
-                AlertController(message: ErrorMessage.profileEditFailed).show()
-            })
-            .disposed(by: disposeBag)
+        executeWithLoading {
+            self.useCase.editMyProfile(mbti: mbti)
+        }
+        .observe(on: MainScheduler.instance)
+        .subscribe(onSuccess: { [weak self] _ in
+            self?.getMyProfile()
+        }, onFailure: { [weak self] error in
+            self?.handleError(error)
+        })
+        .disposed(by: disposeBag)
     }
     
     func deleteAccount() {
-        useCase.deleteAccount()
-            .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] success in
-                self?.delete.onNext(success)
-            }, onFailure: { error in
-                AlertController(message: ErrorMessage.accountDeleteFailed).show()
-            })
-            .disposed(by: disposeBag)
+        executeWithLoading {
+            self.useCase.deleteAccount()
+        }
+        .observe(on: MainScheduler.instance)
+        .subscribe(onSuccess: { [weak self] success in
+            self?.delete.onNext(success)
+        }, onFailure: { [weak self] error in
+            self?.handleError(error)
+        })
+        .disposed(by: disposeBag)
     }
     
     func logOut() {
-        useCase.logOut()
-            .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] success in
-                self?.logout.onNext(success)
-            }, onFailure: { error in
-                AlertController(message: ErrorMessage.logoutFailed).show()
-            })
-            .disposed(by: disposeBag)
+        executeWithLoading {
+            self.useCase.logOut()
+        }
+        .observe(on: MainScheduler.instance)
+        .subscribe(onSuccess: { [weak self] success in
+            self?.logout.onNext(success)
+        }, onFailure: { [weak self] error in
+            self?.handleError(error)
+        })
+        .disposed(by: disposeBag)
     }
     
     func getLikedTopics(cursor: String?, size: String) {
-        useCase.getLikedTopics(cursor: cursor, size: size)
-            .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] topics in
-                self?.likeTopicList.accept(topics.data.items)
-            }, onFailure: { error in
-                AlertController(message: ErrorMessage.likedTopicLoadFailed).show()
-            })
-            .disposed(by: disposeBag)
+        executeWithLoading {
+            self.useCase.getLikedTopics(cursor: cursor, size: size)
+        }
+        .observe(on: MainScheduler.instance)
+        .subscribe(onSuccess: { [weak self] topics in
+            self?.likeTopicList.accept(topics.data.items)
+        }, onFailure: { [weak self] error in
+            self?.handleError(error)
+        })
+        .disposed(by: disposeBag)
     }
 }

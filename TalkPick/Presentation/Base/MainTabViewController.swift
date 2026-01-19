@@ -92,13 +92,31 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
             $0.height.equalTo(78)
         }
         
-        let stackView = UIStackView(arrangedSubviews: items)
-        stackView.axis = .horizontal
-        stackView.distribution = .fillEqually
+        // 각 아이템을 직접 추가하고 제약 설정
+        for item in items {
+            customTabBarView.addSubview(item)
+            item.setContentHuggingPriority(.required, for: .horizontal)
+            item.setContentCompressionResistancePriority(.required, for: .horizontal)
+            item.snp.makeConstraints {
+                $0.top.bottom.equalToSuperview()
+                $0.height.equalTo(78)
+                $0.width.equalTo(50)
+            }
+        }
         
-        customTabBarView.addSubview(stackView)
-        stackView.snp.makeConstraints {
-            $0.top.leading.trailing.bottom.equalToSuperview()
+        // 중앙 탭을 중앙에 고정
+        items[1].snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+        }
+        
+        items[0].snp.makeConstraints {
+            $0.trailing.equalTo(items[1].snp.leading).offset(-70)
+            $0.leading.greaterThanOrEqualToSuperview().offset(15) // 최소 여백
+        }
+        
+        items[2].snp.makeConstraints {
+            $0.leading.equalTo(items[1].snp.trailing).offset(70)
+            $0.trailing.lessThanOrEqualToSuperview().offset(-15) // 최소 여백
         }
         
         for (index, item) in items.enumerated() {

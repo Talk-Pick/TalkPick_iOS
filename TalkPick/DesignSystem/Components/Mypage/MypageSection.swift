@@ -415,7 +415,7 @@ final class TodayTopicView: UIView {
     private func setupUI() {
         backgroundColor = .gray10
         layer.cornerRadius = 10
-        layer.shadowColor = UIColor.black.withAlphaComponent(0.12).cgColor
+        layer.shadowColor = UIColor.black.withAlphaComponent(0.2).cgColor
         layer.shadowOpacity = 1
         layer.shadowOffset = CGSize(width: 0, height: 6)
         layer.shadowRadius = 16
@@ -427,7 +427,7 @@ final class TodayTopicView: UIView {
     private func setupLayout() {
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(20)
-            $0.centerX.equalToSuperview().inset(16)
+            $0.centerX.equalToSuperview()
         }
         
         actionButton.snp.makeConstraints {
@@ -508,19 +508,19 @@ final class NoLikeView: UIView {
         
         todayTopicView1.snp.makeConstraints {
             $0.top.equalTo(subTitleLabel.snp.bottom).offset(22)
-            $0.leading.trailing.equalToSuperview().inset(54)
+            $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(103)
         }
         
         todayTopicView2.snp.makeConstraints {
             $0.top.equalTo(todayTopicView1.snp.bottom).offset(22)
-            $0.leading.trailing.equalToSuperview().inset(54)
+            $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(125)
         }
         
         todayTopicView3.snp.makeConstraints {
             $0.top.equalTo(todayTopicView2.snp.bottom).offset(22)
-            $0.leading.trailing.equalToSuperview().inset(54)
+            $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(125)
         }
     }
