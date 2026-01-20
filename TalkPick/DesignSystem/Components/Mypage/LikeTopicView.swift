@@ -14,6 +14,8 @@ class LikeTopicView: UIView {
         return tv
     }()
     
+    let noLikeView = NoLikeView()
+    
     init() {
         super.init(frame: .zero)
         backgroundColor = .white
@@ -28,6 +30,7 @@ class LikeTopicView: UIView {
     private func setupViews() {
         addSubview(navigationbarView)
         addSubview(likeTopicTableView)
+        addSubview(noLikeView)
     }
     
     private func setupConstraints() {
@@ -39,6 +42,13 @@ class LikeTopicView: UIView {
         likeTopicTableView.snp.makeConstraints {
             $0.top.equalTo(navigationbarView.snp.bottom).offset(10)
             $0.leading.trailing.bottom.equalToSuperview()
+        }
+        
+        noLikeView.snp.makeConstraints {
+            $0.top.equalTo(navigationbarView.snp.bottom).offset(32)
+            $0.leading.trailing.equalToSuperview().inset(53)
+            $0.height.equalTo(601)
+            $0.bottom.equalToSuperview()
         }
     }
 }

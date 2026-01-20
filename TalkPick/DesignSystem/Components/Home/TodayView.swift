@@ -175,8 +175,7 @@ class TodayView: UIView {
             .scaleFactor(UIScreen.main.scale),
             .cacheOriginalImage,
             .backgroundDecode,
-            .loadDiskFileSynchronously,
-            .downloadPriority(.high)
+            .loadDiskFileSynchronously
         ]
         
         ImagePrefetcher(urls: urls, options: options).start()
@@ -211,8 +210,7 @@ class TodayView: UIView {
                 .cacheOriginalImage,
                 .fromMemoryCacheOrRefresh,
                 .backgroundDecode,
-                .loadDiskFileSynchronously,
-                .downloadPriority(.high)
+                .loadDiskFileSynchronously
             ],
             progressBlock: nil,
             completionHandler: { [weak self] result in

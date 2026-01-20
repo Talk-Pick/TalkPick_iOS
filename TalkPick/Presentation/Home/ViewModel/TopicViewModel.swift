@@ -2,58 +2,65 @@
 import RxSwift
 import RxCocoa
 
-class TopicViewModel {
+class TopicViewModel: BaseViewModel {
     
-    private let disposeBag = DisposeBag()
-    private let useCase: TopicUseCase
+    private let useCase: TopicUseCaseProtocol
 
     let topicDetail = PublishSubject<TopicDetail>()
     let todayTopics = BehaviorRelay<[Topic]>(value: [])
     let categories = BehaviorRelay<[Category]>(value: [])
     
-    init(useCase: TopicUseCase = TopicUseCase()) {
+    init(useCase: TopicUseCaseProtocol = TopicUseCase()) {
         self.useCase = useCase
     }
     
     func postTopicLike(topicId: Int) {
-        useCase.postTopicLike(topicId: topicId)
-            .subscribe(onSuccess: { success in
-            }, onFailure: { error in
-                AlertController(message: ErrorMessage.topicLikeFailed).show()
-            })
-            .disposed(by: disposeBag)
+        executeWithLoading {
+            self.useCase.postTopicLike(topicId: topicId)
+        }
+        .observe(on: MainScheduler.instance)
+        .subscribe(onSuccess: { _ in }, onFailure: { [weak self] error in
+            self?.handleError(error)
+        })
+        .disposed(by: disposeBag)
     }
     
     func getTopicDetail(topicId: Int) {
-        useCase.getTopicDetail(topicId: topicId)
-            .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] detail in
-                self?.topicDetail.onNext(detail)
-            }, onFailure: { error in
-                AlertController(message: ErrorMessage.topicDetailLoadFailed).show()
-            })
-            .disposed(by: disposeBag)
+        executeWithLoading {
+            self.useCase.getTopicDetail(topicId: topicId)
+        }
+        .observe(on: MainScheduler.instance)
+        .subscribe(onSuccess: { [weak self] detail in
+            self?.topicDetail.onNext(detail)
+        }, onFailure: { [weak self] error in
+            self?.handleError(error)
+        })
+        .disposed(by: disposeBag)
     }
     
     func getTodayTopic() {
-        useCase.getTodayTopic()
-            .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] topics in
-                self?.todayTopics.accept(topics)
-            }, onFailure: { error in
-                AlertController(message: ErrorMessage.todayTopicLoadFailed).show()
-            })
-            .disposed(by: disposeBag)
+        executeWithLoading {
+            self.useCase.getTodayTopic()
+        }
+        .observe(on: MainScheduler.instance)
+        .subscribe(onSuccess: { [weak self] topics in
+            self?.todayTopics.accept(topics)
+        }, onFailure: { [weak self] error in
+            self?.handleError(error)
+        })
+        .disposed(by: disposeBag)
     }
     
     func getCategories() {
-        useCase.getCategories()
-            .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] categories in
-                self?.categories.accept(categories)
-            }, onFailure: { error in
-                AlertController(message: ErrorMessage.categoryLoadFailed).show()
-            })
-            .disposed(by: disposeBag)
+        executeWithLoading {
+            self.useCase.getCategories()
+        }
+        .observe(on: MainScheduler.instance)
+        .subscribe(onSuccess: { [weak self] categories in
+            self?.categories.accept(categories)
+        }, onFailure: { [weak self] error in
+            self?.handleError(error)
+        })
+        .disposed(by: disposeBag)
     }
 }

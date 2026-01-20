@@ -12,7 +12,8 @@ class AuthInterceptor: RequestInterceptor {
     // 요청에 액세스 토큰 추가
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
         var request = urlRequest
-        if let accessToken = KeychainHelper.standard.read(service: "access-token", account: "user") {
+        // AccessTokenManager를 통해 토큰 가져오기 (캐싱된 토큰 사용)
+        if let accessToken = AccessTokenManager.shared.getToken() {
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
         completion(.success(request))
@@ -47,7 +48,12 @@ class AuthInterceptor: RequestInterceptor {
         }
     }
     
-    // 액세스 토큰 갱신
+    // 액세스 토큰 갱신 (외부에서도 사용 가능)
+    func refreshAccessToken(completion: @escaping (Bool) -> Void) {
+        refreshToken(completion: completion)
+    }
+    
+    // 액세스 토큰 갱신 (내부용)
     private func refreshToken(completion: @escaping (Bool) -> Void) {
         // 쿠키에서 리프레시 토큰 추출
         guard let refreshToken = getRefreshTokenFromCookie() else {

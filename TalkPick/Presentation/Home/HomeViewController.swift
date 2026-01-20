@@ -6,8 +6,17 @@ import RxCocoa
 class HomeViewController: UIViewController {
     
     private let homeView = HomeView()
-    private let topicViewModel = TopicViewModel()
+    private let topicViewModel: TopicViewModel
     private let disposeBag = DisposeBag()
+    
+    init(topicViewModel: TopicViewModel = TopicViewModel()) {
+        self.topicViewModel = topicViewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = homeView
@@ -54,9 +63,6 @@ extension HomeViewController {
     }
     
     private func bindViewModel() {
-        homeView.todayTopicCollectionView.rx.setDelegate(self)
-            .disposed(by: disposeBag)
-        
         topicViewModel.todayTopics
             .observe(on: MainScheduler.instance)
             .bind(to: homeView.todayTopicCollectionView.rx.items(cellIdentifier: TodayTopicCollectionViewCell.identifier, cellType: TodayTopicCollectionViewCell.self)) { index, item, cell in
@@ -71,12 +77,12 @@ extension HomeViewController {
                 navigationController?.pushViewController(todayVC, animated: true)
             })
             .disposed(by: disposeBag)
-    }
-}
-
-extension HomeViewController: UICollectionViewDelegateFlowLayout {
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 221, height: 178)
+        
+        topicViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { error in
+                AlertController(message: error.userMessage).show()
+            })
+            .disposed(by: disposeBag)
     }
 }

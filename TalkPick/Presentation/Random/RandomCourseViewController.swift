@@ -1,17 +1,21 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 class RandomCourseViewController: UIViewController {
     
     private let randomCourseView = RandomCourseView()
-    private let randomViewModel = RandomViewModel()
+    private let randomViewModel: RandomViewModel
+    private let disposeBag = DisposeBag()
     
-    init() {
+    init(randomViewModel: RandomViewModel = RandomViewModel()) {
+        self.randomViewModel = randomViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
+        self.randomViewModel = RandomViewModel()
         super.init(coder: coder)
     }
     
@@ -22,6 +26,7 @@ class RandomCourseViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
+        bindViewModel()
         startAPI()
     }
     
@@ -41,6 +46,15 @@ class RandomCourseViewController: UIViewController {
         randomCourseView.onExitRequested = { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
+    }
+    
+    private func bindViewModel() {
+        randomViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { error in
+                AlertController(message: error.userMessage).show()
+            })
+            .disposed(by: disposeBag)
     }
     
     private func startAPI() {

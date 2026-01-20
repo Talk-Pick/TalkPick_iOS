@@ -6,8 +6,8 @@ class TodayViewController: UIViewController {
 
     private var todayView = TodayView()
     private var topicId = Int()
-    private let topicViewModel = TopicViewModel()
-    private let myPageViewModel = MyPageViewModel()
+    private let topicViewModel: TopicViewModel
+    private let myPageViewModel: MyPageViewModel
     private var disposeBag = DisposeBag()
     
     private var isLiked: Bool = false
@@ -16,9 +16,15 @@ class TodayViewController: UIViewController {
         view = todayView
     }
     
-    init(topicId: Int) {
-        super.init(nibName: nil, bundle: nil)
+    init(
+        topicId: Int,
+        topicViewModel: TopicViewModel = TopicViewModel(),
+        myPageViewModel: MyPageViewModel = MyPageViewModel()
+    ) {
         self.topicId = topicId
+        self.topicViewModel = topicViewModel
+        self.myPageViewModel = myPageViewModel
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -76,6 +82,20 @@ extension TodayViewController {
                 guard let self = self else { return }
                 isLiked = likedTopics.contains(where: { $0.topicId == self.topicId })
                 updateLikeButton()
+            })
+            .disposed(by: disposeBag)
+        
+        topicViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { error in
+                AlertController(message: error.userMessage).show()
+            })
+            .disposed(by: disposeBag)
+        
+        myPageViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { error in
+                AlertController(message: error.userMessage).show()
             })
             .disposed(by: disposeBag)
     }

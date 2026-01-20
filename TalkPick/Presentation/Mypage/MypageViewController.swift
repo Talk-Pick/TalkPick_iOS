@@ -7,8 +7,17 @@ import RxCocoa
 class MypageViewController: UIViewController {
     
     private let mypageView = MypageView()
-    private let viewModel = MyPageViewModel()
+    private let viewModel: MyPageViewModel
     private var disposeBag = DisposeBag()
+    
+    init(viewModel: MyPageViewModel = MyPageViewModel()) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = mypageView
@@ -81,6 +90,13 @@ class MypageViewController: UIViewController {
                 navigateToLogin()
             })
             .disposed(by: disposeBag)
+        
+        viewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { error in
+                AlertController(message: error.userMessage).show()
+            })
+            .disposed(by: disposeBag)
     }
     
     @objc private func moreTapped() {
@@ -110,6 +126,6 @@ class MypageViewController: UIViewController {
     
     private func navigateToLogin() {
         let loginVC = UINavigationController(rootViewController: LoginViewController())
-        SceneDelegate().setRootViewController(loginVC)
+        SceneDelegate.setRootViewController(loginVC)
     }
 }

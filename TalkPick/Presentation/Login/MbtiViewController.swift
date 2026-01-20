@@ -5,12 +5,16 @@ import RxSwift
 class MbtiViewController: UIViewController {
     
     private let mbtiView = MbtiView()
-    private let loginViewModel = LoginViewModel()
+    private let loginViewModel: LoginViewModel
     private let disposeBag = DisposeBag()
     private var nickname: String?
     
-    init(nickname: String) {
+    init(
+        nickname: String,
+        loginViewModel: LoginViewModel = LoginViewModel()
+    ) {
         self.nickname = nickname
+        self.loginViewModel = loginViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -46,6 +50,13 @@ class MbtiViewController: UIViewController {
                 guard let self = self else { return }
                 let completeVC = CompleteViewController()
                 self.navigationController?.pushViewController(completeVC, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        loginViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { error in
+                AlertController(message: error.userMessage).show()
             })
             .disposed(by: disposeBag)
     }

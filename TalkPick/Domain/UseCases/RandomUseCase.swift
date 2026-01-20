@@ -1,85 +1,74 @@
 
 import RxSwift
-import Foundation
 
-class RandomUseCase {
-    private let randomRepository: RandomRepository
+class RandomUseCase: BaseUseCase, RandomUseCaseProtocol {
+    private let randomRepository: RandomRepositoryProtocol
     
-    init(randomRepository: RandomRepository = RandomRepository.shared) {
+    init(
+        randomRepository: RandomRepositoryProtocol = RandomRepository(),
+        tokenProvider: TokenProviderProtocol = TokenProvider.shared
+    ) {
         self.randomRepository = randomRepository
+        super.init(tokenProvider: tokenProvider)
     }
     
     func postRandomTotalRecord(id: Int, totalRecords: [TotalRecord]) -> Single<Bool> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
-            return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
-        }
-        
         let params = ["totalRecords": totalRecords]
         
-        return randomRepository.postRandomTotalRecord(token: token, id: id, parameters: params)
-            .map { _ in true }
-            .catchAndReturn(false)
+        return executeWithToken { token in
+            self.randomRepository.postRandomTotalRecord(token: token, id: id, parameters: params)
+                .map { _ in true }
+        }
+        .catchAndReturn(false)
     }
     
     func postRandomRate(id: Int, rating: Int) -> Single<Bool> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
-            return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
+        return executeWithToken { token in
+            self.randomRepository.postRandomRate(token: token, id: id, rating: rating)
+                .map { _ in true }
         }
-        
-        return randomRepository.postRandomRate(token: token, id: id, rating: rating)
-            .map { _ in true }
-            .catchAndReturn(false)
+        .catchAndReturn(false)
     }
     
     func postRandomQuit(id: Int) -> Single<Bool> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
-            return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
+        return executeWithToken { token in
+            self.randomRepository.postRandomQuit(token: token, id: id)
+                .map { _ in true }
         }
-        
-        return randomRepository.postRandomQuit(token: token, id: id)
-            .map { _ in true }
-            .catchAndReturn(false)
+        .catchAndReturn(false)
     }
     
     func postRandomEnd(id: Int) -> Single<Bool> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
-            return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
+        return executeWithToken { token in
+            self.randomRepository.postRandomEnd(token: token, id: id)
+                .map { _ in true }
         }
-        
-        return randomRepository.postRandomEnd(token: token, id: id)
-            .map { _ in true }
-            .catchAndReturn(false)
+        .catchAndReturn(false)
     }
     
     func postRandomComment(id: Int, oneLine: String) -> Single<Bool> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
-            return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
+        return executeWithToken { token in
+            self.randomRepository.postRandomComment(token: token, id: id, oneLine: oneLine)
+                .map { _ in true }
         }
-        
-        return randomRepository.postRandomComment(token: token, id: id, oneLine: oneLine)
-            .map { _ in true }
-            .catchAndReturn(false)
+        .catchAndReturn(false)
     }
     
     func postRandomStart() -> Single<APIResponse<RandomId>> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
-            return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
+        return executeWithToken { token in
+            self.randomRepository.postRandomStart(token: token)
         }
-        
-        return randomRepository.postRandomStart(token: token)
     }
     
     func getRandomTopics(id: Int, order: Int, category: String) -> Single<APIResponse<[RandomTopic]>> {
-        guard let token = KeychainHelper.standard.read(service: "access-token", account: "user") else {
-            return .error(NSError(domain: "TokenError", code: 401, userInfo: [NSLocalizedDescriptionKey: "토큰이 존재하지 않습니다."]))
-        }
-        
         let params: [String: Any] = [
             "id": id,
             "order": order,
             "category": category
         ]
         
-        return randomRepository.getRandomTopics(token: token, id: id, parameters: params)
+        return executeWithToken { token in
+            self.randomRepository.getRandomTopics(token: token, id: id, parameters: params)
+        }
     }
 }
