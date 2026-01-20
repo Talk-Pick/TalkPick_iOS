@@ -12,8 +12,8 @@ class AuthInterceptor: RequestInterceptor {
     // 요청에 액세스 토큰 추가
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
         var request = urlRequest
-        // AccessTokenManager를 통해 토큰 가져오기 (캐싱된 토큰 사용)
-        if let accessToken = AccessTokenManager.shared.getToken() {
+        // TokenProvider를 통해 토큰 가져오기 (캐싱된 토큰 사용)
+        if let accessToken = TokenProvider.shared.getAccessToken() {
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
         completion(.success(request))
@@ -78,7 +78,7 @@ class AuthInterceptor: RequestInterceptor {
             case .success(let data):
                 let newAccessToken = data.accessToken
                 
-                AccessTokenManager.shared.saveToken(newAccessToken)
+                TokenProvider.shared.saveAccessToken(newAccessToken)
                 
                 completion(true)
             case .failure(_):
