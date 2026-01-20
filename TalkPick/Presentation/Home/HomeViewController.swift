@@ -63,9 +63,6 @@ extension HomeViewController {
     }
     
     private func bindViewModel() {
-        homeView.todayTopicCollectionView.rx.setDelegate(self)
-            .disposed(by: disposeBag)
-        
         topicViewModel.todayTopics
             .observe(on: MainScheduler.instance)
             .bind(to: homeView.todayTopicCollectionView.rx.items(cellIdentifier: TodayTopicCollectionViewCell.identifier, cellType: TodayTopicCollectionViewCell.self)) { index, item, cell in
@@ -87,12 +84,5 @@ extension HomeViewController {
                 AlertController(message: error.userMessage).show()
             })
             .disposed(by: disposeBag)
-    }
-}
-
-extension HomeViewController: UICollectionViewDelegateFlowLayout {
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 221, height: 178)
     }
 }

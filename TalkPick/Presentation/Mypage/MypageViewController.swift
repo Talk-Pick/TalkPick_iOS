@@ -126,6 +126,6 @@ class MypageViewController: UIViewController {
     
     private func navigateToLogin() {
         let loginVC = UINavigationController(rootViewController: LoginViewController())
-        SceneDelegate().setRootViewController(loginVC)
+        SceneDelegate.setRootViewController(loginVC)
     }
 }

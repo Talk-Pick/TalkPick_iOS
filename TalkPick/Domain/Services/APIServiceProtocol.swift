@@ -26,12 +26,6 @@ protocol APIServiceProtocol {
     // DELETE 요청 (토큰 포함)
     func deleteWithToken<T: Codable>(of type: T.Type, url: String, parameters: [String: Any]?, accessToken: String) -> Single<T>
     
-    // PATCH 요청
-    func patch<T: Codable>(of type: T.Type, url: String, parameters: [String: Any]?) -> Single<T>
-    
     // PATCH 요청 (토큰 포함)
     func patchWithToken<T: Codable>(of type: T.Type, url: String, parameters: [String: Any]?, accessToken: String) -> Single<T>
-    
-    // PUT 요청 (토큰 포함)
-    func putWithToken<T: Codable>(of type: T.Type, url: String, parameters: [String: Any]?, accessToken: String) -> Single<T>
 }

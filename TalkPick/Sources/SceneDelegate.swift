@@ -81,7 +81,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
     }
     
-    func setRootViewController(_ viewController: UIViewController) {
+    static func setRootViewController(_ viewController: UIViewController) {
         guard let window = UIApplication.shared.connectedScenes
             .filter({ $0.activationState == .foregroundActive })
             .first(where: { $0 is UIWindowScene }) as? UIWindowScene else {
@@ -96,7 +96,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func checkAutoLogin(completion: @escaping (Bool) -> Void) {
         // 액세스 토큰이 있으면 먼저 토큰 갱신 시도 (리프레시 토큰은 쿠키로 관리)
         if AccessTokenManager.shared.getToken() != nil {
-            refreshAccessToken { [weak self] success in
+            // AuthInterceptor의 토큰 갱신 로직 사용
+            let authInterceptor = AuthInterceptor()
+            authInterceptor.refreshAccessToken { [weak self] success in
                 guard let self = self else {
                     completion(false)
                     return
@@ -116,38 +118,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
     }
     
-    /// 액세스 토큰 갱신
-    private func refreshAccessToken(completion: @escaping (Bool) -> Void) {
-        guard let accessToken = AccessTokenManager.shared.getToken() else {
-            completion(false)
-            return
-        }
-        
-        let url = APIConstants.tokenRefresh.path
-        let headers: HTTPHeaders = [
-            "Accept": "*/*",
-            "Content-Type": "application/json",
-            "Authorization": "Bearer \(accessToken)"
-        ]
-        
-        AF.request(url,
-                   method: .post,
-                   headers: headers)
-        .validate(statusCode: 200..<300)
-        .responseDecodable(of: Token.self) { response in
-            switch response.result {
-            case .success(let data):
-                AccessTokenManager.shared.saveToken(data.accessToken)
-                completion(true)
-            case .failure:
-                completion(false)
-            }
-        }
-    }
-    
     /// 프로필 확인으로 로그인 상태 검증
     private func verifyProfile(completion: @escaping (Bool) -> Void) {
-        guard let token = AccessTokenManager.shared.getToken() ?? KeychainHelper.standard.read(service: "access-token", account: "user"),
+        guard let token = AccessTokenManager.shared.getToken(),
               !token.isEmpty else {
             completion(false)
             return
@@ -170,8 +143,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     if let afError = error as? AFError,
                        let responseCode = afError.responseCode,
                        responseCode == 401 {
-                        // 토큰 만료 시 토큰 갱신 후 재시도
-                        self.refreshAccessToken { success in
+                        // 토큰 만료 시 AuthInterceptor의 토큰 갱신 로직 사용
+                        let authInterceptor = AuthInterceptor()
+                        authInterceptor.refreshAccessToken { success in
                             if success {
                                 // 토큰 갱신 성공 시 프로필 확인 재시도
                                 self.verifyProfile(completion: completion)

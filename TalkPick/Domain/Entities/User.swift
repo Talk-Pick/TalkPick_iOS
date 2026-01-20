@@ -20,13 +20,6 @@ struct SignUp: Codable {
     let mbti: String?
 }
 
-struct User: Codable {
-    let memberId: Int
-    let role: String
-    let accessToken: String
-    let accessExpiredTime: Int64
-}
-
 struct Profile: Codable {
     let nickname: String
     let mbti: String?

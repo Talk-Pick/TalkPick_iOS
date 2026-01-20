@@ -197,7 +197,7 @@ class TutorialManager {
             x: 0,
             y: combinedFrame.minY - 12,
             width: overlay.frame.width,
-            height: combinedFrame.maxY - combinedFrame.minY
+            height: combinedFrame.maxY - combinedFrame.minY - 20
         )
         
         let excludeArea = highlightFrame.insetBy(dx: 3, dy: 3)

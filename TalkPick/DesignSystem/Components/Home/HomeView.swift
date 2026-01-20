@@ -38,10 +38,38 @@ class HomeView: UIView {
     }()
     
     let todayTopicCollectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.minimumInteritemSpacing = 10
-        layout.scrollDirection = .horizontal
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 24, bottom: 0, right: 24)
+        // Compositional Layout 생성
+        let layout = UICollectionViewCompositionalLayout { sectionIndex, environment in
+            // Item 크기 설정
+            let itemSize = NSCollectionLayoutSize(
+                widthDimension: .absolute(221),
+                heightDimension: .absolute(178)
+            )
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            
+            // Group 크기 설정 (가로 스크롤)
+            let groupSize = NSCollectionLayoutSize(
+                widthDimension: .absolute(221),
+                heightDimension: .absolute(178)
+            )
+            let group = NSCollectionLayoutGroup.horizontal(
+                layoutSize: groupSize,
+                subitems: [item]
+            )
+            
+            // Section 설정
+            let section = NSCollectionLayoutSection(group: group)
+            section.orthogonalScrollingBehavior = .continuous
+            section.interGroupSpacing = 10  // Group 간 간격 설정
+            section.contentInsets = NSDirectionalEdgeInsets(
+                top: 0,
+                leading: 24,
+                bottom: 0,
+                trailing: 24
+            )
+            
+            return section
+        }
         
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.register(TodayTopicCollectionViewCell.self, forCellWithReuseIdentifier: TodayTopicCollectionViewCell.identifier)
@@ -161,7 +189,7 @@ class HomeView: UIView {
         }
         
         todayTopicCollectionView.snp.makeConstraints {
-            $0.top.equalTo(todayLabel.snp.bottom)
+            $0.top.equalTo(todayLabel.snp.bottom).offset(25)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(228)
         }
