@@ -146,6 +146,7 @@ class TodayView: UIView {
             $0.top.equalTo(flipButton.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview().inset(35)
             $0.height.equalTo(51)
+            $0.bottom.lessThanOrEqualTo(safeAreaLayoutGuide).inset(20)
         }
     }
     
