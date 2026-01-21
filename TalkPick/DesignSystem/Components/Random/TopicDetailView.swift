@@ -141,9 +141,9 @@ class TopicDetailView: UIView {
         }
 
         cardView.snp.makeConstraints {
-            $0.top.equalTo(labelView1.snp.bottom).offset(20)
-            $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(450)
+            $0.top.equalTo(labelView1.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(18)
+            $0.height.equalTo(460)
         }
         let cardTapGesture = UITapGestureRecognizer(target: self, action: #selector(buttonTapped))
         cardView.addGestureRecognizer(cardTapGesture)
