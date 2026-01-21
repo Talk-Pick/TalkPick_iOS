@@ -141,9 +141,9 @@ class TopicDetailView: UIView {
         }
 
         cardView.snp.makeConstraints {
-            $0.top.equalTo(labelView1.snp.bottom).offset(20)
-            $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(450)
+            $0.top.equalTo(labelView1.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(18)
+            $0.height.equalTo(460)
         }
         let cardTapGesture = UITapGestureRecognizer(target: self, action: #selector(buttonTapped))
         cardView.addGestureRecognizer(cardTapGesture)
@@ -263,16 +263,20 @@ class TopicDetailView: UIView {
     }
     
     @objc func buttonTapped() {
-        let options: UIView.AnimationOptions = isFront ? .transitionFlipFromRight : .transitionFlipFromLeft
+        guard cardView.layer.animationKeys() == nil else { return }
         
         isFront.toggle()
         
-        UIView.transition(with: cardView,
-                          duration: 0.6,
-                          options: [options, .curveEaseInOut],
-                          animations: { [weak self] in
-                              self?.updateCardImage()
-                          },
-                          completion: nil)
+        let options: UIView.AnimationOptions = isFront ? .transitionFlipFromRight : .transitionFlipFromLeft
+        
+        UIView.transition(
+            with: cardView,
+            duration: 0.5,
+            options: [options],
+            animations: { [weak self] in
+                self?.updateCardImage()
+            },
+            completion: nil
+        )
     }
 }

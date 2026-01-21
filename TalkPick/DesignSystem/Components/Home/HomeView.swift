@@ -165,7 +165,7 @@ class HomeView: UIView {
         
         contentView.snp.makeConstraints {
             $0.edges.equalTo(scrollView.contentLayoutGuide)
-            $0.width.equalTo(scrollView.frameLayoutGuide)
+            $0.width.equalTo(scrollView.snp.width)
             $0.bottom.equalTo(startButton.snp.bottom).offset(105)
         }
         

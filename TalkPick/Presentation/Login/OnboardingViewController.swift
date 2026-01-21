@@ -108,11 +108,23 @@ class OnboardingViewController: UIViewController {
         let loginVC = LoginViewController()
         let nav = UINavigationController(rootViewController: loginVC)
         
-        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = scene.windows.first {
-            window.rootViewController = nav
-            window.makeKeyAndVisible()
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first else {
+            return
         }
+        
+        // 부드러운 화면 전환을 위한 fade 애니메이션
+        UIView.transition(
+            with: window,
+            duration: 0.4,
+            options: [.transitionCrossDissolve, .curveEaseInOut],
+            animations: {
+                window.rootViewController = nav
+            },
+            completion: { _ in
+                window.makeKeyAndVisible()
+            }
+        )
     }
 }
 

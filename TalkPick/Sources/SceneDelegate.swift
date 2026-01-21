@@ -95,7 +95,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     /// 자동 로그인 확인
     private func checkAutoLogin(completion: @escaping (Bool) -> Void) {
         // 액세스 토큰이 있으면 먼저 토큰 갱신 시도 (리프레시 토큰은 쿠키로 관리)
-        if AccessTokenManager.shared.getToken() != nil {
+        if TokenProvider.shared.getAccessToken() != nil {
             // AuthInterceptor의 토큰 갱신 로직 사용
             let authInterceptor = AuthInterceptor()
             authInterceptor.refreshAccessToken { [weak self] success in
@@ -120,7 +120,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     /// 프로필 확인으로 로그인 상태 검증
     private func verifyProfile(completion: @escaping (Bool) -> Void) {
-        guard let token = AccessTokenManager.shared.getToken(),
+        guard let token = TokenProvider.shared.getAccessToken(),
               !token.isEmpty else {
             completion(false)
             return
@@ -151,13 +151,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                                 self.verifyProfile(completion: completion)
                             } else {
                                 // 토큰 갱신 실패 시 로그아웃 처리
-                                AccessTokenManager.shared.clearToken()
+                                TokenProvider.shared.clearAccessToken()
                                 completion(false)
                             }
                         }
                     } else {
                         // 401이 아닌 다른 에러인 경우
-                        AccessTokenManager.shared.clearToken()
+                        TokenProvider.shared.clearAccessToken()
                         completion(false)
                     }
                 }

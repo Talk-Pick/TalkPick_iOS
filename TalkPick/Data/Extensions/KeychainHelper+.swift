@@ -21,8 +21,18 @@ class KeychainHelper {
             kSecValueData as String: data // 저장할 데이터
         ]
 
-        SecItemDelete(query as CFDictionary) // 기존 값 삭제 후 저장 (중복 방지)
-        SecItemAdd(query as CFDictionary, nil)
+        // 기존 값 삭제 (없어도 에러가 아님)
+        SecItemDelete(query as CFDictionary)
+        
+        // 새 값 추가 및 결과 확인
+        let status = SecItemAdd(query as CFDictionary, nil)
+        guard status == errSecSuccess else {
+            // Keychain 저장 실패 시 로그 출력 (디버깅용)
+            #if DEBUG
+            print("⚠️ Keychain 저장 실패: \(status) - \(SecCopyErrorMessageString(status, nil) ?? "Unknown error" as CFString)")
+            #endif
+            return
+        }
     }
 
     // Keychain에서 `String`을 원본 그대로 읽기
