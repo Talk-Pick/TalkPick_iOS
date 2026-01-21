@@ -263,16 +263,20 @@ class TopicDetailView: UIView {
     }
     
     @objc func buttonTapped() {
-        let options: UIView.AnimationOptions = isFront ? .transitionFlipFromRight : .transitionFlipFromLeft
+        guard cardView.layer.animationKeys() == nil else { return }
         
         isFront.toggle()
         
-        UIView.transition(with: cardView,
-                          duration: 0.6,
-                          options: [options, .curveEaseInOut],
-                          animations: { [weak self] in
-                              self?.updateCardImage()
-                          },
-                          completion: nil)
+        let options: UIView.AnimationOptions = isFront ? .transitionFlipFromRight : .transitionFlipFromLeft
+        
+        UIView.transition(
+            with: cardView,
+            duration: 0.5,
+            options: [options],
+            animations: { [weak self] in
+                self?.updateCardImage()
+            },
+            completion: nil
+        )
     }
 }

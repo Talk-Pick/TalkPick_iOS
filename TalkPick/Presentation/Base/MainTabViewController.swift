@@ -46,8 +46,8 @@ class CustomTabBarItemView: UIView {
     }
 
     func setSelected(_ selected: Bool) {
-        imageView.tintColor = selected ? .black : .systemGray2
-        titleLabel.textColor = selected ? .black : .systemGray2
+        imageView.tintColor = selected ? .black : .gray200
+        titleLabel.textColor = selected ? .black : .gray200
     }
 }
 

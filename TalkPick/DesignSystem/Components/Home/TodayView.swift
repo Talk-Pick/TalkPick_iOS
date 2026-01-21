@@ -200,45 +200,36 @@ class TodayView: UIView {
         let targetSize = calculateTargetImageSize()
         let processor = DownsamplingImageProcessor(size: targetSize)
         
+        // 뒤집기 애니메이션 중이므로 fade transition 제거 (즉시 이미지 교체)
         cardView.kf.setImage(
             with: url,
-            placeholder: nil,
+            placeholder: cardView.image, // 이전 이미지를 placeholder로 사용
             options: [
                 .processor(processor),
                 .scaleFactor(UIScreen.main.scale),
-                .transition(.fade(0.2)),
                 .cacheOriginalImage,
                 .fromMemoryCacheOrRefresh,
                 .backgroundDecode,
                 .loadDiskFileSynchronously
-            ],
-            progressBlock: nil,
-            completionHandler: { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success:
-                    // 이미지 로딩 성공 시 alpha 애니메이션
-                    UIView.animate(withDuration: 0.2) {
-                        self.cardView.alpha = 1.0
-                    }
-                case .failure:
-                    break
-                }
-            }
+            ]
         )
     }
     
     @objc func buttonTapped() {
-        let options: UIView.AnimationOptions = isFront ? .transitionFlipFromRight : .transitionFlipFromLeft
+        guard cardView.layer.animationKeys() == nil else { return }
         
         isFront.toggle()
         
-        UIView.transition(with: cardView,
-                          duration: 0.6,
-                          options: [options, .curveEaseInOut],
-                          animations: { [weak self] in
-                              self?.updateCardImage()
-                          },
-                          completion: nil)
+        let options: UIView.AnimationOptions = isFront ? .transitionFlipFromLeft : .transitionFlipFromRight
+        
+        UIView.transition(
+            with: cardView,
+            duration: 0.5,
+            options: [options],
+            animations: { [weak self] in
+                self?.updateCardImage()
+            },
+            completion: nil
+        )
     }
 }
