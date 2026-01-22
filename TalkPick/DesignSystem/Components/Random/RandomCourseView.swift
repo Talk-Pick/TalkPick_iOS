@@ -17,7 +17,6 @@ class RandomCourseView: UIView {
     private let totalSteps: Int = 8
     private var currentStepNumber: Int = 1
     
-    private var selectedSituation: SituationView.SituationKind?
     private var selectedTopics: [TopicModel] = []
     
     private var currentStep: Step = .situation
@@ -167,10 +166,9 @@ class RandomCourseView: UIView {
     }
     
     private func bindViews() {
-        situationView.onSituationSelected = { [weak self] kind in
+        situationView.onSituationSelected = { [weak self] categoryTitle in
             guard let self = self else { return }
-            self.selectedSituation = kind
-            self.situationText = kind.koreanTitle
+            self.situationText = categoryTitle
             self.show(step: .topicSelect(step: 0))
         }
         

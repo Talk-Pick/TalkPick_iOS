@@ -1,6 +1,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 class TodayTopicCollectionViewCell: UICollectionViewCell {
     
@@ -88,13 +89,25 @@ class TodayTopicCollectionViewCell: UICollectionViewCell {
         labelLabel.text = topic.category
         titleLabel.text = topic.title
         
-        if let style = categoryStyles[topic.category] {
-            labelView.backgroundColor = style.bgColor
-            labelLabel.textColor = style.textColor
-            character.image = UIImage(named: style.imageName)
+        let style = categoryStyles[topic.category]
+        let bgColor = style?.bgColor ?? .gray50
+        let textColor = style?.textColor ?? .gray100
+        labelView.backgroundColor = bgColor
+        labelLabel.textColor = textColor
+        
+        if let url = URL(string: topic.keywordIconUrl) {
+            let processor = DownsamplingImageProcessor(size: CGSize(width: 88, height: 88))
+            character.kf.setImage(
+                with: url,
+                placeholder: UIImage(named: "talkpick_default"),
+                options: [
+                    .processor(processor),
+                    .scaleFactor(UIScreen.main.scale),
+                    .transition(.fade(0.2)),
+                    .cacheOriginalImage
+                ]
+            )
         } else {
-            labelView.backgroundColor = .gray50
-            labelLabel.textColor = .gray200
             character.image = UIImage(named: "talkpick_default")
         }
     }

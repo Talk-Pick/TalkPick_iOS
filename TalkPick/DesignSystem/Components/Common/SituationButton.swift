@@ -1,6 +1,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class SituationButton: UIControl {
     
@@ -31,9 +32,9 @@ final class SituationButton: UIControl {
         }
     }
     
-    init(color: UIColor, title: String, textColor: UIColor, image: UIImage?) {
+    init(color: UIColor, title: String, textColor: UIColor, imageUrl: String?) {
         super.init(frame: .zero)
-        setupView(color: color, title: title, textColor: textColor, image: image)
+        setupView(color: color, title: title, textColor: textColor, imageUrl: imageUrl)
         isAccessibilityElement = true
         accessibilityLabel = title
         accessibilityTraits = .button
@@ -43,7 +44,7 @@ final class SituationButton: UIControl {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupView(color: UIColor, title: String, textColor: UIColor, image: UIImage?) {
+    private func setupView(color: UIColor, title: String, textColor: UIColor, imageUrl: String?) {
         backgroundColor = color
         layer.cornerRadius = 20
         layer.shadowColor = UIColor.black.cgColor
@@ -55,9 +56,22 @@ final class SituationButton: UIControl {
         contentView.layer.cornerRadius = 17
         contentView.isUserInteractionEnabled = false
         
-        iconImageView.image = image
         iconImageView.contentMode = .scaleAspectFit
         iconImageView.isUserInteractionEnabled = false
+        
+        if let imageUrlString = imageUrl, let url = URL(string: imageUrlString) {
+            let processor = DownsamplingImageProcessor(size: CGSize(width: 56, height: 47))
+            iconImageView.kf.setImage(
+                with: url,
+                placeholder: nil,
+                options: [
+                    .processor(processor),
+                    .scaleFactor(UIScreen.main.scale),
+                    .transition(.fade(0.2)),
+                    .cacheOriginalImage
+                ]
+            )
+        }
         
         titleLabel.text = title
         titleLabel.numberOfLines = 2

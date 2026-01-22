@@ -53,10 +53,36 @@ class AuthInterceptor: RequestInterceptor {
         refreshToken(completion: completion)
     }
     
+    // 테스트용: refreshToken을 직접 호출
+    func testRefreshToken() {
+        print("=== Refresh Token 테스트 시작 ===")
+        refreshToken { success in
+            print("Refresh Token 결과: \(success ? "성공" : "실패")")
+            print("=== Refresh Token 테스트 종료 ===")
+        }
+    }
+    
+    // 테스트용: 액세스 토큰을 잘못된 값으로 설정하여 401 에러 유발
+    func simulateTokenExpiration() {
+        // 잘못된 토큰으로 설정하여 다음 API 호출 시 401 에러 발생
+        TokenProvider.shared.saveAccessToken("expired_token_for_testing")
+        print("액세스 토큰을 만료된 토큰으로 설정했습니다.")
+        print("다음 API 호출 시 401 에러가 발생하고 refreshToken이 자동으로 호출됩니다.")
+    }
+    
     // 액세스 토큰 갱신 (내부용)
     private func refreshToken(completion: @escaping (Bool) -> Void) {
         // 쿠키에서 리프레시 토큰 추출
         guard let refreshToken = getRefreshTokenFromCookie() else {
+            print("Refresh Token 실패: 쿠키에서 refreshToken을 찾을 수 없습니다.")
+            print("현재 저장된 쿠키:")
+            if let allCookies = HTTPCookieStorage.shared.cookies {
+                for cookie in allCookies {
+                    print("  - \(cookie.name): \(cookie.domain)")
+                }
+            } else {
+                print("  - 저장된 쿠키가 없습니다.")
+            }
             completion(false)
             return
         }
@@ -73,15 +99,41 @@ class AuthInterceptor: RequestInterceptor {
                    encoding: URLEncoding.default,
                    headers: headers)
         .validate(statusCode: 200..<300)
-        .responseDecodable(of: Token.self) { response in
+        .responseDecodable(of: APIResponse<Token>.self) { response in
             switch response.result {
             case .success(let data):
-                let newAccessToken = data.accessToken
+                let newAccessToken = data.data.accessToken
                 
                 TokenProvider.shared.saveAccessToken(newAccessToken)
                 
                 completion(true)
-            case .failure(_):
+            case .failure(let error):
+                // 서버 응답 확인을 위한 로깅
+                print("=== Refresh Token 실패 ===")
+                print("URL: \(url)")
+                
+                if let httpResponse = response.response {
+                    print("HTTP Status Code: \(httpResponse.statusCode)")
+                    print("Response Headers: \(httpResponse.allHeaderFields)")
+                } else {
+                    print("HTTP Response: nil")
+                }
+                
+                if let data = response.data, let responseString = String(data: data, encoding: .utf8) {
+                    print("Response Body: \(responseString)")
+                } else {
+                    print("Response Body: nil 또는 디코딩 실패")
+                }
+                
+                print("Error: \(error)")
+                if let afError = error as? AFError {
+                    print("AFError Details: \(afError)")
+                    if case .responseValidationFailed(let reason) = afError {
+                        print("Validation Failed Reason: \(reason)")
+                    }
+                }
+                print("========================")
+                
                 completion(false)
             }
         }

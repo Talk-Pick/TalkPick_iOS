@@ -78,9 +78,3 @@ struct TopicModel {
     let categoryColor: UIColor
     let imageName: String
 }
-
-struct Category: Codable {
-    let categoryId: Int
-    let title: String
-    let imageUrl: String
-}

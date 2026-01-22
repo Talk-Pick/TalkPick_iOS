@@ -94,27 +94,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     /// 자동 로그인 확인
     private func checkAutoLogin(completion: @escaping (Bool) -> Void) {
-        // 액세스 토큰이 있으면 먼저 토큰 갱신 시도 (리프레시 토큰은 쿠키로 관리)
+        // 액세스 토큰이 있으면 먼저 프로필 확인 (401 발생 시 AuthInterceptor가 자동으로 refreshToken 호출)
         if TokenProvider.shared.getAccessToken() != nil {
-            // AuthInterceptor의 토큰 갱신 로직 사용
-            let authInterceptor = AuthInterceptor()
-            authInterceptor.refreshAccessToken { [weak self] success in
-                guard let self = self else {
-                    completion(false)
-                    return
-                }
-                
-                if success {
-                    // 토큰 갱신 성공 시 프로필 확인
-                    self.verifyProfile(completion: completion)
-                } else {
-                    // 토큰 갱신 실패 시 프로필 확인으로 재시도 (쿠키의 리프레시 토큰으로 자동 갱신될 수 있음)
-                    self.verifyProfile(completion: completion)
-                }
-            }
-        } else {
-            // 액세스 토큰이 없으면 프로필 확인
+            // 프로필 확인으로 로그인 상태 검증 (401 발생 시 자동으로 refreshToken 처리됨)
             verifyProfile(completion: completion)
+        } else {
+            // 액세스 토큰이 없으면 로그인 화면으로
+            completion(false)
         }
     }
     
@@ -122,6 +108,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func verifyProfile(completion: @escaping (Bool) -> Void) {
         guard let token = TokenProvider.shared.getAccessToken(),
               !token.isEmpty else {
+            print("자동 로그인 실패: 액세스 토큰이 없습니다.")
             completion(false)
             return
         }
@@ -131,6 +118,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             .observe(on: MainScheduler.instance)
             .subscribe(
                 onSuccess: { _ in
+                    print("자동 로그인 성공: 프로필 확인 완료")
                     completion(true)
                 },
                 onFailure: { [weak self] error in
@@ -139,24 +127,41 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                         return
                     }
                     
+                    print("프로필 확인 실패: \(error)")
+                    
                     // 401 에러인지 확인 (토큰 만료)
                     if let afError = error as? AFError,
                        let responseCode = afError.responseCode,
                        responseCode == 401 {
-                        // 토큰 만료 시 AuthInterceptor의 토큰 갱신 로직 사용
-                        let authInterceptor = AuthInterceptor()
-                        authInterceptor.refreshAccessToken { success in
-                            if success {
-                                // 토큰 갱신 성공 시 프로필 확인 재시도
+                        print("401 에러 발생: 토큰 만료 또는 유효하지 않음")
+                        print("쿠키 확인 중...")
+                        
+                        // 쿠키 확인
+                        if let allCookies = HTTPCookieStorage.shared.cookies {
+                            print("저장된 쿠키 개수: \(allCookies.count)")
+                            for cookie in allCookies {
+                                print("  - \(cookie.name): \(cookie.domain) (expires: \(cookie.expiresDate?.description ?? "nil"))")
+                            }
+                        } else {
+                            print("저장된 쿠키가 없습니다.")
+                        }
+                        
+                        // AuthInterceptor가 이미 retry에서 refreshToken을 시도했을 수 있으므로
+                        // 잠시 대기 후 다시 확인
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            // 토큰이 갱신되었는지 확인
+                            if TokenProvider.shared.getAccessToken() != nil && TokenProvider.shared.getAccessToken() != token {
+                                print("토큰이 갱신되었습니다. 프로필 확인 재시도")
                                 self.verifyProfile(completion: completion)
                             } else {
-                                // 토큰 갱신 실패 시 로그아웃 처리
+                                print("토큰 갱신 실패 또는 쿠키에 refreshToken이 없습니다.")
                                 TokenProvider.shared.clearAccessToken()
                                 completion(false)
                             }
                         }
                     } else {
                         // 401이 아닌 다른 에러인 경우
+                        print("401이 아닌 다른 에러: \(error)")
                         TokenProvider.shared.clearAccessToken()
                         completion(false)
                     }

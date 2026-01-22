@@ -1,8 +1,12 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 class SituationView: UIView {
+    
+    private let topicViewModel = TopicViewModel()
+    private let disposeBag = DisposeBag()
     
     private let titleLabel: UILabel = {
         let lb = UILabel()
@@ -20,20 +24,18 @@ class SituationView: UIView {
         return uv
     }()
     
-    enum SituationKind: Int {
-        case dating, firstGroup, firstRoommate, icebreak, family, friend, lover, coworker
-    }
-    
-    var onSituationSelected: ((SituationKind) -> Void)?
+    var onSituationSelected: ((String) -> Void)?
     
     private var lastCalculatedWidth: CGFloat = 0
+    private var categories: [Category] = []
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .white
         setupViews()
         setupConstraints()
-        setupCardStack()
+        bindViewModel()
+        fetchCategories()
     }
     
     required init?(coder: NSCoder) {
@@ -58,24 +60,43 @@ class SituationView: UIView {
         }
     }
     
+    private func bindViewModel() {
+        topicViewModel.categories
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] categories in
+                guard let self = self else { return }
+                self.categories = categories
+                self.setupCardStack()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func fetchCategories() {
+        topicViewModel.getCategories()
+    }
+    
     private func setupCardStack() {
-        // 모든 상황 카드를 표시
-        let row1 = makeRow([
-            (.pink50, "소개팅/과팅", .pink100, "talkpick_situation1", .dating),
-            (.yellow50, "그룹 첫 모임", .yellow100, "talkpick_situation2", .firstGroup),
-            (.green50, "룸메 첫 만남", .green100 , "talkpick_situation3", .firstRoommate)
-        ])
-        let row2 = makeRow([
-            (.blue10, "기타/\n아이스브레이킹", .blue30, "talkpick_situation4", .icebreak),
-            (.purple50, "가족", .purple100, "talkpick_situation5", .family),
-            (.orange50, "친구", .orange100, "talkpick_situation6", .friend)
-        ])
-        let row3 = makeRow([
-            (.pink10, "연인", .pink30, "talkpick_situation7", .lover),
-            (.blue50, "동료", .blue100, "talkpick_situation8", .coworker)
-        ])
+        // 기존 카드 제거
+        cardStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
-        [row1, row2, row3].forEach { row in
+        guard !categories.isEmpty else { return }
+        
+        // 카드 개수에 따라 열당 카드 수 결정
+        // 6개 이하: 한 열에 2개씩
+        // 7개 이상: 한 열에 3개씩
+        let chunkSize = categories.count <= 6 ? 2 : 3
+        // 2개씩 배치할 때는 간격을 더 넓게 설정
+        let spacing: CGFloat = chunkSize == 2 ? 50 : 20
+        var rows: [UIView] = []
+        
+        for i in stride(from: 0, to: categories.count, by: chunkSize) {
+            let endIndex = min(i + chunkSize, categories.count)
+            let chunk = Array(categories[i..<endIndex])
+            let row = makeRow(from: chunk, startIndex: i, spacing: spacing)
+            rows.append(row)
+        }
+        
+        rows.forEach { row in
             cardStack.addArrangedSubview(row)
             row.snp.makeConstraints {
                 $0.leading.trailing.equalToSuperview()
@@ -92,22 +113,14 @@ class SituationView: UIView {
         guard availableWidth > 0, abs(availableWidth - lastCalculatedWidth) > 1 else { return }
         lastCalculatedWidth = availableWidth
         
-        // 각 row의 카드들에 동일한 너비 적용 (가장 많은 카드를 가진 row 기준)
-        var maxCardCount = 0
+        // 각 row의 실제 spacing을 가져와서 계산
         cardStack.arrangedSubviews.forEach { rowContainer in
             if let rowStack = rowContainer.subviews.first as? UIStackView {
-                maxCardCount = max(maxCardCount, rowStack.arrangedSubviews.count)
-            }
-        }
-        
-        // 가장 많은 카드를 가진 row 기준으로 카드 너비 계산
-        let spacing: CGFloat = 20
-        let totalSpacing = spacing * CGFloat(maxCardCount - 1)
-        let cardWidth = (availableWidth - totalSpacing) / CGFloat(maxCardCount)
-        
-        // 모든 row의 카드에 동일한 너비 적용
-        cardStack.arrangedSubviews.forEach { rowContainer in
-            if let rowStack = rowContainer.subviews.first as? UIStackView {
+                let cardCount = rowStack.arrangedSubviews.count
+                let rowSpacing = rowStack.spacing
+                let totalSpacing = rowSpacing * CGFloat(cardCount - 1)
+                let cardWidth = (availableWidth - totalSpacing) / CGFloat(cardCount)
+                
                 rowStack.arrangedSubviews.forEach { card in
                     if let card = card as? SituationButton {
                         card.snp.updateConstraints {
@@ -116,9 +129,7 @@ class SituationView: UIView {
                     }
                 }
                 
-                let cardCount = rowStack.arrangedSubviews.count
-                let rowTotalSpacing = spacing * CGFloat(cardCount - 1)
-                let contentWidth = cardWidth * CGFloat(cardCount) + rowTotalSpacing
+                let contentWidth = cardWidth * CGFloat(cardCount) + totalSpacing
                 rowStack.snp.updateConstraints {
                     $0.width.equalTo(contentWidth)
                 }
@@ -126,11 +137,11 @@ class SituationView: UIView {
         }
     }
     
-    private func makeRow(_ items: [(UIColor, String, UIColor, String, SituationKind)]) -> UIView {
+    private func makeRow(from categories: [Category], startIndex: Int, spacing: CGFloat) -> UIView {
         let containerView = UIView()
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.spacing = 20
+        stack.spacing = spacing
         stack.distribution = .fill
         stack.alignment = .center
         
@@ -138,15 +149,24 @@ class SituationView: UIView {
         
         // 초기 카드 너비 (나중에 layoutSubviews에서 업데이트됨)
         let initialCardWidth: CGFloat = 100
-        let spacing: CGFloat = 20
-        let totalCardWidth = initialCardWidth * CGFloat(items.count)
-        let totalSpacing = spacing * CGFloat(items.count - 1)
+        let totalCardWidth = initialCardWidth * CGFloat(categories.count)
+        let totalSpacing = spacing * CGFloat(categories.count - 1)
         let contentWidth = totalCardWidth + totalSpacing
         
         // 카드들 생성
-        for (color, title, textColor, image, kind) in items {
-            let card = SituationButton(color: color, title: title, textColor: textColor, image: UIImage(named: image))
-            card.tag = kind.rawValue  // 어떤 카드인지 식별
+        for (index, category) in categories.enumerated() {
+            let globalIndex = startIndex + index
+            let style = categoryStyles[category.title]
+            let bgColor = style?.bgColor ?? .gray50
+            let textColor = style?.textColor ?? .gray100
+            
+            let card = SituationButton(
+                color: bgColor,
+                title: category.title,
+                textColor: textColor,
+                imageUrl: category.imageUrl
+            )
+            card.tag = globalIndex  // categoryId를 tag로 사용
             card.addTarget(self, action: #selector(tapSituation(_:)), for: .touchUpInside)
             
             // 초기 너비와 높이 제약
@@ -173,22 +193,11 @@ class SituationView: UIView {
     }
     
     @objc private func tapSituation(_ sender: UIControl) {
-        guard let kind = SituationKind(rawValue: sender.tag) else { return }
-        onSituationSelected?(kind)  // 부모 VC로 이벤트 전달
-    }
-}
-
-extension SituationView.SituationKind {
-    var koreanTitle: String {
-        switch self {
-        case .dating:        return "소개팅/과팅"
-        case .firstGroup:    return "그룹 첫 모임"
-        case .firstRoommate: return "룸메 첫 만남"
-        case .icebreak:      return "기타/아이스브레이킹"
-        case .family:        return "가족"
-        case .friend:        return "친구"
-        case .lover:         return "연인"
-        case .coworker:      return "동료"
-        }
+        let index = sender.tag
+        guard index < categories.count else { return }
+        let category = categories[index]
+        
+        // Category.title을 직접 전달
+        onSituationSelected?(category.title)
     }
 }
