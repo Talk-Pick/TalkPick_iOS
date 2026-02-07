@@ -2,6 +2,7 @@
 import UIKit
 import SnapKit
 import RxSwift
+import SkeletonView
 
 class RandomCourseView: UIView {
     
@@ -183,6 +184,20 @@ class RandomCourseView: UIView {
                 guard let self = self, let topicId = self.currentTopicId else { return }
                 self.isLiked = likedTopics.contains(where: { $0.topicId == topicId })
                 self.updateLikeButton()
+            })
+            .disposed(by: disposeBag)
+        
+        topicViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                self?.detailView.hideDetailSkeleton()
+            })
+            .disposed(by: disposeBag)
+        
+        randomViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                self?.topicView.hideTopicSkeleton()
             })
             .disposed(by: disposeBag)
     }

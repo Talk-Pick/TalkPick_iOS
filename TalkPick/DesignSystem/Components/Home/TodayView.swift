@@ -2,6 +2,7 @@
 import UIKit
 import SnapKit
 import Kingfisher
+import SkeletonView
 
 class TodayView: UIView {
     
@@ -69,6 +70,20 @@ class TodayView: UIView {
     
     var isFront: Bool = true
     
+    private let contentSkeletonView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .clear
+        v.isHidden = true
+        return v
+    }()
+    
+    private let skeletonCardView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .gray50
+        v.layer.cornerRadius = 10
+        return v
+    }()
+    
     private var frontURL: URL?
     private var backURL: URL?
     
@@ -94,6 +109,8 @@ class TodayView: UIView {
         addSubview(cardView)
         addSubview(flipButton)
         addSubview(likeButton)
+        addSubview(contentSkeletonView)
+        contentSkeletonView.addSubview(skeletonCardView)
     }
     
     private func setupConstraints() {
@@ -148,6 +165,29 @@ class TodayView: UIView {
             $0.height.equalTo(51)
             $0.bottom.lessThanOrEqualTo(safeAreaLayoutGuide).inset(20)
         }
+        
+        contentSkeletonView.snp.makeConstraints {
+            $0.top.equalTo(labelView1.snp.top)
+            $0.leading.trailing.equalToSuperview().inset(18)
+            $0.bottom.equalTo(likeButton.snp.top).offset(-40)
+        }
+        
+        skeletonCardView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        contentSkeletonView.isSkeletonable = true
+        skeletonCardView.isSkeletonable = true
+    }
+    
+    func showContentSkeleton() {
+        contentSkeletonView.isHidden = false
+        contentSkeletonView.showAnimatedSkeleton()
+    }
+    
+    func hideContentSkeleton() {
+        contentSkeletonView.hideSkeleton()
+        contentSkeletonView.isHidden = true
     }
     
     func updateDetail(category: String, keyword: String, frontImageUrl: String, backImageUrl: String) {

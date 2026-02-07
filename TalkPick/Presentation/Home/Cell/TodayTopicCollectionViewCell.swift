@@ -86,6 +86,11 @@ class TodayTopicCollectionViewCell: UICollectionViewCell {
     }
     
     func prepare(topic: Topic) {
+        labelView.isHidden = false
+        labelLabel.isHidden = false
+        titleLabel.isHidden = false
+        character.isHidden = false
+        
         labelLabel.text = topic.category
         titleLabel.text = topic.title
         

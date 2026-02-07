@@ -2,6 +2,7 @@
 import UIKit
 import SnapKit
 import RxSwift
+import SkeletonView
 
 class SituationView: UIView {
     
@@ -26,6 +27,27 @@ class SituationView: UIView {
     
     var onSituationSelected: ((String) -> Void)?
     
+    private let cardSkeletonView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .clear
+        v.isHidden = true
+        return v
+    }()
+    
+    private let skeletonCard1: UIView = {
+        let v = UIView()
+        v.backgroundColor = .gray50
+        v.layer.cornerRadius = 10
+        return v
+    }()
+    
+    private let skeletonCard2: UIView = {
+        let v = UIView()
+        v.backgroundColor = .gray50
+        v.layer.cornerRadius = 10
+        return v
+    }()
+    
     private var lastCalculatedWidth: CGFloat = 0
     private var categories: [Category] = []
     
@@ -45,6 +67,9 @@ class SituationView: UIView {
     private func setupViews() {
         addSubview(titleLabel)
         addSubview(cardStack)
+        addSubview(cardSkeletonView)
+        cardSkeletonView.addSubview(skeletonCard1)
+        cardSkeletonView.addSubview(skeletonCard2)
     }
     
     private func setupConstraints() {
@@ -58,6 +83,39 @@ class SituationView: UIView {
             $0.top.equalTo(titleLabel.snp.bottom).offset(56)
             $0.leading.trailing.equalToSuperview().inset(24)
         }
+        
+        cardSkeletonView.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(56)
+            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.height.equalTo(350)
+        }
+        
+        skeletonCard1.snp.makeConstraints {
+            $0.top.leading.equalToSuperview()
+            $0.width.equalTo(100)
+            $0.height.equalTo(161)
+        }
+        
+        skeletonCard2.snp.makeConstraints {
+            $0.top.equalToSuperview()
+            $0.leading.equalTo(skeletonCard1.snp.trailing).offset(20)
+            $0.width.equalTo(100)
+            $0.height.equalTo(161)
+        }
+        
+        cardSkeletonView.isSkeletonable = true
+        skeletonCard1.isSkeletonable = true
+        skeletonCard2.isSkeletonable = true
+    }
+    
+    func showCardSkeleton() {
+        cardSkeletonView.isHidden = false
+        cardSkeletonView.showAnimatedSkeleton()
+    }
+    
+    func hideCardSkeleton() {
+        cardSkeletonView.hideSkeleton()
+        cardSkeletonView.isHidden = true
     }
     
     private func bindViewModel() {
@@ -65,13 +123,22 @@ class SituationView: UIView {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] categories in
                 guard let self = self else { return }
+                self.hideCardSkeleton()
                 self.categories = categories
                 self.setupCardStack()
+            })
+            .disposed(by: disposeBag)
+        
+        topicViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                self?.hideCardSkeleton()
             })
             .disposed(by: disposeBag)
     }
     
     private func fetchCategories() {
+        showCardSkeleton()
         topicViewModel.getCategories()
     }
     

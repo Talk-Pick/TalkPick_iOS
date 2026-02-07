@@ -1,6 +1,7 @@
 
 import UIKit
 import SnapKit
+import SkeletonView
 
 class MypageView: UIView {
     
@@ -12,6 +13,27 @@ class MypageView: UIView {
     let withdrawButton = UIButton(type: .system)
     
     var editMbtiView: EditMbtiView?
+    
+    private let profileSkeletonView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .clear
+        v.isHidden = true
+        return v
+    }()
+    
+    private let skeletonInfoView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .gray50
+        v.layer.cornerRadius = 10
+        return v
+    }()
+    
+    private let skeletonCollectionView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .gray50
+        v.layer.cornerRadius = 10
+        return v
+    }()
     
     override init(frame: CGRect) {
         // 1) 내 정보 섹션
@@ -68,6 +90,9 @@ class MypageView: UIView {
         addSubview(etcSectionView)
         addSubview(logOutButton)
         addSubview(withdrawButton)
+        addSubview(profileSkeletonView)
+        profileSkeletonView.addSubview(skeletonInfoView)
+        profileSkeletonView.addSubview(skeletonCollectionView)
     }
     
     private func setupLayout() {
@@ -104,6 +129,37 @@ class MypageView: UIView {
             $0.trailing.equalTo(etcSectionView)
             $0.bottom.lessThanOrEqualTo(safeAreaLayoutGuide.snp.bottom).inset(16)
         }
+        
+        profileSkeletonView.snp.makeConstraints {
+            $0.top.equalTo(infoSectionView.snp.top)
+            $0.leading.trailing.equalTo(infoSectionView)
+            $0.bottom.equalTo(collectionSectionView.snp.bottom)
+        }
+        
+        skeletonInfoView.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview()
+            $0.height.equalTo(120)
+        }
+        
+        skeletonCollectionView.snp.makeConstraints {
+            $0.top.equalTo(skeletonInfoView.snp.bottom).offset(30)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(90)
+        }
+        
+        profileSkeletonView.isSkeletonable = true
+        skeletonInfoView.isSkeletonable = true
+        skeletonCollectionView.isSkeletonable = true
+    }
+    
+    func showProfileSkeleton() {
+        profileSkeletonView.isHidden = false
+        profileSkeletonView.showAnimatedSkeleton()
+    }
+    
+    func hideProfileSkeleton() {
+        profileSkeletonView.hideSkeleton()
+        profileSkeletonView.isHidden = true
     }
     
     // 값 바꾸고 싶을 때

@@ -1,6 +1,7 @@
 
 import UIKit
 import SnapKit
+import SkeletonView
 
 class HomeView: UIView {
     
@@ -35,6 +36,28 @@ class HomeView: UIView {
         lb.font = .systemFont(ofSize: 22, weight: .heavy)
         lb.textColor = .black
         return lb
+    }()
+    
+    private let todayTopicSkeletonOverlay: UIView = {
+        let v = UIView()
+        v.backgroundColor = .clear
+        v.isHidden = true
+        return v
+    }()
+    
+    private let skeletonScrollView: UIScrollView = {
+        let sv = UIScrollView()
+        sv.showsHorizontalScrollIndicator = false
+        return sv
+    }()
+    
+    private let skeletonCardStack: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .horizontal
+        sv.spacing = 10
+        sv.alignment = .center  // 카드 높이 178pt 유지 (fill 시 오버레이 높이로 늘어남)
+        sv.distribution = .fill
+        return sv
     }()
     
     let todayTopicCollectionView: UICollectionView = {
@@ -135,6 +158,16 @@ class HomeView: UIView {
         setupConstraints()
     }
     
+    func showTodayTopicSkeleton() {
+        todayTopicSkeletonOverlay.isHidden = false
+        todayTopicSkeletonOverlay.showAnimatedSkeleton()
+    }
+    
+    func hideTodayTopicSkeleton() {
+        todayTopicSkeletonOverlay.hideSkeleton()
+        todayTopicSkeletonOverlay.isHidden = true
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -148,6 +181,9 @@ class HomeView: UIView {
         
         contentView.addSubview(todayLabel)
         contentView.addSubview(todayTopicCollectionView)
+        contentView.addSubview(todayTopicSkeletonOverlay)
+        todayTopicSkeletonOverlay.addSubview(skeletonScrollView)
+        skeletonScrollView.addSubview(skeletonCardStack)
         contentView.addSubview(randomLabel)
         contentView.addSubview(randomView)
         
@@ -191,11 +227,40 @@ class HomeView: UIView {
         todayTopicCollectionView.snp.makeConstraints {
             $0.top.equalTo(todayLabel.snp.bottom).offset(25)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(228)
+            $0.height.equalTo(178)
+        }
+        
+        todayTopicSkeletonOverlay.snp.makeConstraints {
+            $0.edges.equalTo(todayTopicCollectionView)
+        }
+        
+        skeletonScrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        for _ in 0..<5 {
+            let card = UIView()
+            card.backgroundColor = .gray50
+            card.layer.cornerRadius = 15
+            card.isSkeletonable = true
+            skeletonCardStack.addArrangedSubview(card)
+            card.snp.makeConstraints {
+                $0.width.equalTo(221)
+                $0.height.equalTo(178)
+            }
+        }
+        // 오버레이 자체는 스켈레톤 적용 안 함(전체 블록 방지), 개별 카드에만 적용
+        todayTopicSkeletonOverlay.isSkeletonable = false
+        
+        skeletonCardStack.snp.makeConstraints {
+            $0.leading.equalTo(skeletonScrollView.contentLayoutGuide).offset(24)
+            $0.trailing.equalTo(skeletonScrollView.contentLayoutGuide).inset(24)
+            $0.top.bottom.equalTo(skeletonScrollView.contentLayoutGuide)
+            $0.height.equalTo(skeletonScrollView.frameLayoutGuide)
         }
         
         randomLabel.snp.makeConstraints {
-            $0.top.equalTo(todayTopicCollectionView.snp.bottom).offset(2)
+            $0.top.equalTo(todayTopicCollectionView.snp.bottom).offset(52)
             $0.leading.equalToSuperview().offset(24)
             $0.height.equalTo(53)
             $0.width.equalTo(256)

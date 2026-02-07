@@ -2,6 +2,7 @@
 import UIKit
 import SnapKit
 import Kingfisher
+import SkeletonView
 
 class TopicDetailView: UIView {
     var onNext: (() -> Void)?
@@ -89,6 +90,20 @@ class TopicDetailView: UIView {
 
     var isFront: Bool = true
     
+    private let contentSkeletonView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .clear
+        v.isHidden = true
+        return v
+    }()
+    
+    private let skeletonCardView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .gray50
+        v.layer.cornerRadius = 10
+        return v
+    }()
+    
     private var frontURL: URL?
     private var backURL: URL?
 
@@ -111,6 +126,8 @@ class TopicDetailView: UIView {
         addSubview(cardView)
         addSubview(flipButton)
         addSubview(buttonsStack)
+        addSubview(contentSkeletonView)
+        contentSkeletonView.addSubview(skeletonCardView)
         
         likeButton.addTarget(self, action: #selector(toggleLike), for: .touchUpInside)
     }
@@ -161,6 +178,29 @@ class TopicDetailView: UIView {
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.height.equalTo(51)
         }
+        
+        contentSkeletonView.snp.makeConstraints {
+            $0.top.equalTo(labelView1.snp.top)
+            $0.leading.trailing.equalToSuperview().inset(18)
+            $0.bottom.equalTo(buttonsStack.snp.top).offset(-40)
+        }
+        
+        skeletonCardView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        contentSkeletonView.isSkeletonable = true
+        skeletonCardView.isSkeletonable = true
+    }
+    
+    func showDetailSkeleton() {
+        contentSkeletonView.isHidden = false
+        contentSkeletonView.showAnimatedSkeleton()
+    }
+    
+    func hideDetailSkeleton() {
+        contentSkeletonView.hideSkeleton()
+        contentSkeletonView.isHidden = true
     }
 
     func configure(stepIndex: Int) {
@@ -175,9 +215,12 @@ class TopicDetailView: UIView {
         cardView.alpha = 0
         frontURL = nil
         backURL = nil
+        
+        showDetailSkeleton()
     }
     
     func updateDetail(category: String, categoryBgColor: UIColor, categoryTextColor: UIColor, frontImageUrl: String, backImageUrl: String) {
+        hideDetailSkeleton()
         labelLabel1.text = category
         labelView1.backgroundColor = categoryBgColor
         labelLabel1.textColor = categoryTextColor

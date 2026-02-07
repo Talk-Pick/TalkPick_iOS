@@ -3,6 +3,7 @@ import UIKit
 import KakaoSDKCommon
 import KakaoSDKAuth
 import GoogleSignIn
+import SkeletonView
  
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -11,6 +12,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
+        
         KakaoSDK.initSDK(appKey: "b22931e9df6d3e96fbbfa03c2dcf630f")
         
         if let clientId = Bundle.main.object(forInfoDictionaryKey: "GIDClientID") as? String {

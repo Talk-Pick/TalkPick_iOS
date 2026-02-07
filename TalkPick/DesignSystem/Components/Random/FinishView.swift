@@ -52,7 +52,7 @@ class FinishView: UIView {
     
     private let submitButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("한줄평 남기기", for: .normal)
+        button.setTitle("완료", for: .normal)
         button.setTitleColor(.gray200, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         button.layer.cornerRadius = 12

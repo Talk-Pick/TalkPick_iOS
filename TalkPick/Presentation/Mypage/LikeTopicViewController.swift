@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import SkeletonView
 
 class LikeTopicViewController: UIViewController {
 
@@ -52,6 +53,7 @@ class LikeTopicViewController: UIViewController {
     }
     
     private func setAPI() {
+        likeTopicView.showListSkeleton()
         mypageViewModel.getLikedTopics(cursor: nil, size: "10")
     }
     
@@ -64,6 +66,7 @@ class LikeTopicViewController: UIViewController {
             .skip(1) // 초기 빈 배열은 무시하고 실제 API 응답만 처리
             .subscribe(onNext: { [weak self] likedTopics in
                 guard let self = self else { return }
+                self.likeTopicView.hideListSkeleton()
                 let isEmpty = likedTopics.isEmpty
                 self.likeTopicView.noLikeView.isHidden = !isEmpty
                 self.likeTopicView.likeTopicTableView.isHidden = isEmpty
@@ -88,7 +91,8 @@ class LikeTopicViewController: UIViewController {
         
         mypageViewModel.error
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { error in
+            .subscribe(onNext: { [weak self] error in
+                self?.likeTopicView.hideListSkeleton()
                 AlertController(message: error.userMessage).show()
             })
             .disposed(by: disposeBag)
