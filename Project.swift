@@ -8,7 +8,8 @@ let project = Project(
         .package(url: "https://github.com/Alamofire/Alamofire", from: "5.9.0"),
         .package(url: "https://github.com/kakao/kakao-ios-sdk", from: "2.21.0"),
         .package(url: "https://github.com/onevcat/Kingfisher", from: "8.0.0"),
-        .package(url: "https://github.com/google/GoogleSignIn-iOS", from: "7.0.0")
+        .package(url: "https://github.com/google/GoogleSignIn-iOS", from: "7.0.0"),
+        .package(url: "https://github.com/Juanpe/SkeletonView", from: "1.7.0")
     ],
     targets: [
         .target(
@@ -44,7 +45,8 @@ let project = Project(
                 .package(product: "KakaoSDKAuth"),
                 .package(product: "KakaoSDKUser"),
                 .package(product: "Kingfisher"),
-                .package(product: "GoogleSignIn")
+                .package(product: "GoogleSignIn"),
+                .package(product: "SkeletonView"),
             ]
         )
     ]

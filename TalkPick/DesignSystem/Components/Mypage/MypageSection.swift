@@ -464,8 +464,7 @@ final class NoLikeView: UIView {
     }()
     
     private let todayTopicView1 = TodayTopicView(title: "오늘의 톡픽 5개!")
-    private let todayTopicView2 = TodayTopicView(title: "대중들의 픽, 좋아요를\n가장 많이 받은 주제 모아보기")
-    private let todayTopicView3 = TodayTopicView(title: "랜덤 주제로 진행하는 것도 묘미\n랜덤 주제 코스")
+    private let todayTopicView2 = TodayTopicView(title: "랜덤 주제로 진행하는 것도 묘미\n랜덤 주제 코스")
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -484,7 +483,6 @@ final class NoLikeView: UIView {
         addSubview(subTitleLabel)
         addSubview(todayTopicView1)
         addSubview(todayTopicView2)
-        addSubview(todayTopicView3)
     }
     
     private func setupConstraints() {
@@ -514,12 +512,6 @@ final class NoLikeView: UIView {
         
         todayTopicView2.snp.makeConstraints {
             $0.top.equalTo(todayTopicView1.snp.bottom).offset(22)
-            $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(125)
-        }
-        
-        todayTopicView3.snp.makeConstraints {
-            $0.top.equalTo(todayTopicView2.snp.bottom).offset(22)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(125)
         }

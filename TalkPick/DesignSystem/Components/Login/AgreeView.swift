@@ -57,6 +57,7 @@ class AgreeView: UIView {
         let label = UILabel()
         label.text = "전체동의"
         label.font = .boldSystemFont(ofSize: 14)
+        label.textColor = .black
         return label
     }()
     
@@ -234,6 +235,7 @@ class AgreeView: UIView {
         let titleLabel = UILabel()
         titleLabel.text = title
         titleLabel.font = .boldSystemFont(ofSize: 14)
+        titleLabel.textColor = .black
         
         let arrowIcon = UIImageView()
         arrowIcon.image = UIImage(named: "talkpick_down")
@@ -256,7 +258,7 @@ class AgreeView: UIView {
         detailLabel.tag = 600
         detailLabel.numberOfLines = 0
         detailLabel.font = .systemFont(ofSize: 10, weight: .medium)
-        detailLabel.textColor = .gray
+        detailLabel.textColor = .gray100
         
         container.addSubview(headerView)
         container.addSubview(detailContainer)
