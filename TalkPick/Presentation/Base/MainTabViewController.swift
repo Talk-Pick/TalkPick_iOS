@@ -58,7 +58,8 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
     let items: [CustomTabBarItemView] = [
         CustomTabBarItemView(image: UIImage(named: "talkpick_tab1")?.withRenderingMode(.alwaysTemplate), title: "홈 화면"),
         CustomTabBarItemView(image: UIImage(named: "talkpick_tab2")?.withRenderingMode(.alwaysTemplate), title: "랜덤코스"),
-        CustomTabBarItemView(image: UIImage(named: "talkpick_tab3")?.withRenderingMode(.alwaysTemplate), title: "마이페이지")
+        CustomTabBarItemView(image: UIImage(named: "talkpick_tab3")?.withRenderingMode(.alwaysTemplate), title: "좋아요"),
+        CustomTabBarItemView(image: UIImage(named: "talkpick_tab4")?.withRenderingMode(.alwaysTemplate), title: "마이페이지")
     ]
     
     override func viewDidLoad() {
@@ -92,31 +93,20 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
             $0.height.equalTo(78)
         }
         
-        // 각 아이템을 직접 추가하고 제약 설정
-        for item in items {
-            customTabBarView.addSubview(item)
-            item.setContentHuggingPriority(.required, for: .horizontal)
-            item.setContentCompressionResistancePriority(.required, for: .horizontal)
-            item.snp.makeConstraints {
-                $0.top.bottom.equalToSuperview()
-                $0.height.equalTo(78)
-                $0.width.equalTo(50)
-            }
-        }
+        // 4개 탭 아이템을 중앙에 모아 배치
+        let tabStackView = UIStackView(arrangedSubviews: items)
+        tabStackView.axis = .horizontal
+        tabStackView.distribution = .fillEqually
+        tabStackView.alignment = .fill
+        tabStackView.spacing = 16
         
-        // 중앙 탭을 중앙에 고정
-        items[1].snp.makeConstraints {
+        customTabBarView.addSubview(tabStackView)
+        let itemWidth: CGFloat = 62
+        let totalWidth = itemWidth * 4 + 16 * 3  // 4개 아이템 + 3개 간격
+        tabStackView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-        }
-        
-        items[0].snp.makeConstraints {
-            $0.trailing.equalTo(items[1].snp.leading).offset(-72)
-            $0.leading.greaterThanOrEqualToSuperview().offset(15) // 최소 여백
-        }
-        
-        items[2].snp.makeConstraints {
-            $0.leading.equalTo(items[1].snp.trailing).offset(72)
-            $0.trailing.lessThanOrEqualToSuperview().offset(-15) // 최소 여백
+            $0.top.bottom.equalToSuperview()
+            $0.width.equalTo(totalWidth)
         }
         
         for (index, item) in items.enumerated() {
@@ -142,12 +132,14 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
     private func setupViewControllers() {
         let homeVC = HomeViewController()
         let randomVC = RandomViewController()
+        let likeVC = LikeTopicViewController()
         let mypageVC = MypageViewController()
         
         let navigationHome = UINavigationController(rootViewController: homeVC)
         let navigationRandom = UINavigationController(rootViewController: randomVC)
+        let navigationLike = UINavigationController(rootViewController: likeVC)
         let navigationMypage = UINavigationController(rootViewController: mypageVC)
 
-        viewControllers = [navigationHome, navigationRandom, navigationMypage]
+        viewControllers = [navigationHome, navigationRandom, navigationLike, navigationMypage]
     }
 }

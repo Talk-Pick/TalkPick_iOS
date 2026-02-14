@@ -79,9 +79,9 @@ class TutorialManager {
     private init() {}
     
     /// 테스트를 위한 튜토리얼 완료 상태 초기화 함수
-//    static func resetTutorial() {
-//        UserDefaults.standard.set(false, forKey: AppStorageKey.hasCompletedTutorial)
-//    }
+    static func resetTutorial() {
+        UserDefaults.standard.set(false, forKey: AppStorageKey.hasCompletedTutorial)
+    }
     
     func startTutorial(homeViewController: HomeViewController, tabBarController: MainTabViewController) {
         self.homeViewController = homeViewController
@@ -193,11 +193,12 @@ class TutorialManager {
         let collectionFrame = homeView.convert(homeView.todayTopicCollectionView.frame, to: overlay)
         
         let combinedFrame = labelFrame.union(collectionFrame)
+        let verticalPadding: CGFloat = 16  // 상하 여백
         let highlightFrame = CGRect(
             x: 0,
-            y: combinedFrame.minY - 12,
+            y: combinedFrame.minY - verticalPadding,
             width: overlay.frame.width,
-            height: combinedFrame.maxY - combinedFrame.minY - 20
+            height: combinedFrame.height + verticalPadding * 2
         )
         
         let excludeArea = highlightFrame.insetBy(dx: 3, dy: 3)
@@ -230,6 +231,10 @@ class TutorialManager {
     private func highlightTabBar(in overlay: UIView) {
         guard let tabBarVC = tabBarController as? MainTabViewController else { return }
         
+        // 레이아웃 확정 후 프레임 사용
+        tabBarVC.view.layoutIfNeeded()
+        tabBarVC.customTabBarView.layoutIfNeeded()
+        
         let tabBarHeight: CGFloat = 78
         let tabBarFrame = CGRect(
             x: 0,
@@ -241,8 +246,9 @@ class TutorialManager {
         var excludeAreas: [CGRect] = []
         
         for item in tabBarVC.items {
-            let itemFrameInTabBar = item.frame
-            let itemFrameInOverlay = tabBarVC.customTabBarView.convert(itemFrameInTabBar, to: overlay)
+            // item.frame은 superview(tabStackView) 좌표계 → overlay 좌표계로 변환
+            guard let itemSuperview = item.superview else { continue }
+            let itemFrameInOverlay = overlay.convert(item.frame, from: itemSuperview)
             
             let padding: CGFloat = 4
             let paddedFrame = itemFrameInOverlay.insetBy(dx: -padding, dy: -padding)
@@ -252,7 +258,7 @@ class TutorialManager {
             
             let highlightFrame = CGRect(
                 x: paddedFrame.midX - squareSize / 2,
-                y: paddedFrame.midY - squareSize / 2 - 3,
+                y: paddedFrame.midY - squareSize / 2,
                 width: squareSize,
                 height: squareSize
             )

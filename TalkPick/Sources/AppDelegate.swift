@@ -20,6 +20,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             GIDSignIn.sharedInstance.configuration = config
         }
         
+        TutorialManager.resetTutorial()
+        
         return true
     }
  

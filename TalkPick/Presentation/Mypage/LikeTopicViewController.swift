@@ -41,7 +41,14 @@ class LikeTopicViewController: UIViewController {
         if let tabBarVC = tabBarController as? MainTabViewController {
             tabBarVC.customTabBarView.isHidden = false
         }
+        updateBackButtonVisibility()
         setAPI()
+    }
+    
+    private func updateBackButtonVisibility() {
+        // 탭바 루트(세 번째 탭)일 때는 뒤로가기 버튼 숨김, Mypage에서 push로 진입 시 표시
+        let isRootOfNavigation = navigationController?.viewControllers.first == self
+        likeTopicView.navigationbarView.backButton.isHidden = isRootOfNavigation
     }
     
     private func setUI() {
