@@ -5,6 +5,7 @@ struct Category: Codable {
     let categoryId: Int
     let title: String
     let imageUrl: String
+    let color: String
 }
 
 struct CategoryStyle {

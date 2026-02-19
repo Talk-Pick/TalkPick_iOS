@@ -2,6 +2,10 @@ import ProjectDescription
 
 let project = Project(
     name: "TalkPick",
+    settings: .settings(configurations: [
+        .debug(name: "Debug", xcconfig: "Version.xcconfig"),
+        .release(name: "Release", xcconfig: "Version.xcconfig"),
+    ]),
     packages: [
         .package(url: "https://github.com/ReactiveX/RxSwift", from: "6.9.0"),
         .package(url: "https://github.com/SnapKit/SnapKit", from: "5.7.0"),

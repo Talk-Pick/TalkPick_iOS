@@ -3,7 +3,6 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
-import SkeletonView
 
 class MypageViewController: UIViewController {
     
@@ -61,7 +60,6 @@ class MypageViewController: UIViewController {
     
     private func setAPI() {
         bindViewModel()
-        mypageView.showProfileSkeleton()
         viewModel.getMyProfile()
     }
     
@@ -70,7 +68,6 @@ class MypageViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] profile in
                 guard let self = self else { return }
-                mypageView.hideProfileSkeleton()
                 mypageView.updateProfile(profile.nickname, profile.mbti ?? "미설정")
                 let editView = EditMbtiView(mbti: profile.mbti ?? "미설정",
                                             viewModel: viewModel)
@@ -97,7 +94,6 @@ class MypageViewController: UIViewController {
         viewModel.error
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] error in
-                self?.mypageView.hideProfileSkeleton()
                 AlertController(message: error.userMessage).show()
             })
             .disposed(by: disposeBag)

@@ -98,11 +98,11 @@ class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
         tabStackView.axis = .horizontal
         tabStackView.distribution = .fillEqually
         tabStackView.alignment = .fill
-        tabStackView.spacing = 16
+        tabStackView.spacing = 24
         
         customTabBarView.addSubview(tabStackView)
-        let itemWidth: CGFloat = 62
-        let totalWidth = itemWidth * 4 + 16 * 3  // 4개 아이템 + 3개 간격
+        let itemWidth: CGFloat = 60
+        let totalWidth = itemWidth * 4 + 24 * 3  // 4개 아이템 + 3개 간격
         tabStackView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.top.bottom.equalToSuperview()

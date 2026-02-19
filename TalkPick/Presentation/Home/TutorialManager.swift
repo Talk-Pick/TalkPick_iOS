@@ -51,7 +51,7 @@ enum TutorialStep {
     var tabBarImageSizes: [CGSize]? {
         switch self {
         case .tabBar:
-            return [CGSize(width: 227, height: 90), CGSize(width: 260, height: 215)] // 사용자가 설정할 크기들
+            return [CGSize(width: 227, height: 90), CGSize(width: 270, height: 250)] // 사용자가 설정할 크기들
         default:
             return nil
         }

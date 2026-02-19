@@ -63,9 +63,24 @@ platform :ios do
     )
   end
 
-  # TestFlight에 업로드
+  # Version.xcconfig에서 빌드 번호만 증가 (버전 번호는 유지)
+  lane :increment_version_config do
+    project_root = File.expand_path("..", __dir__)
+    version_file = File.join(project_root, "Version.xcconfig")
+    UI.user_error!("Version.xcconfig not found at #{version_file}") unless File.exist?(version_file)
+    content = File.read(version_file)
+    new_content = content.sub(/CURRENT_PROJECT_VERSION = (\d+)/) do
+      new_build = Regexp.last_match(1).to_i + 1
+      UI.message("빌드 번호: #{Regexp.last_match(1)} → #{new_build}")
+      "CURRENT_PROJECT_VERSION = #{new_build}"
+    end
+    File.write(version_file, new_content)
+  end
+
+  # TestFlight에 업로드 (빌드 번호 자동 증가 → 빌드 → 업로드)
   desc "Upload to TestFlight"
   lane :beta_upload do
+    increment_version_config
     beta
     upload_to_testflight(
       skip_waiting_for_build_processing: true
