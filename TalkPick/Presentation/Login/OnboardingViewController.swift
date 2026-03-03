@@ -30,15 +30,15 @@ class OnboardingViewController: UIViewController {
         currentImageView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.centerY.equalToSuperview()
-            $0.width.equalToSuperview().multipliedBy(1)
-            $0.height.equalToSuperview().multipliedBy(1)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalToSuperview().multipliedBy(0.6)
         }
         
         nextImageView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.centerY.equalToSuperview()
-            $0.width.equalToSuperview().multipliedBy(1)
-            $0.height.equalToSuperview().multipliedBy(1)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalToSuperview().multipliedBy(0.6)
         }
     }
     

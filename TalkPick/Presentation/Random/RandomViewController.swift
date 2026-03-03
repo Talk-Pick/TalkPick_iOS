@@ -49,7 +49,7 @@ class RandomViewController: UIViewController {
         super.viewWillAppear(animated)
         
         if let tabBarVC = tabBarController as? MainTabViewController {
-            tabBarVC.customTabBarView.isHidden = false
+            tabBarVC.tabBar.isHidden = false
         }
     }
     

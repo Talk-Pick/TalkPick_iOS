@@ -132,6 +132,7 @@ class FinishView: UIView {
             $0.top.equalTo(starsStackView.snp.bottom).offset(73)
             $0.leading.trailing.equalToSuperview().inset(80)
             $0.height.equalTo(55)
+            $0.bottom.lessThanOrEqualTo(safeAreaLayoutGuide).inset(20)
         }
     }
     

@@ -14,6 +14,7 @@ class LikeTopicViewController: UIViewController {
     private let likeTopicView = LikeTopicView()
     private let mypageViewModel: MyPageViewModel
     private let disposeBag = DisposeBag()
+    private var hasReceivedEmptyResponse = false
     
     init(mypageViewModel: MyPageViewModel = MyPageViewModel()) {
         self.mypageViewModel = mypageViewModel
@@ -39,7 +40,7 @@ class LikeTopicViewController: UIViewController {
         super.viewWillAppear(animated)
         
         if let tabBarVC = tabBarController as? MainTabViewController {
-            tabBarVC.customTabBarView.isHidden = false
+            tabBarVC.tabBar.isHidden = false
         }
         updateBackButtonVisibility()
         setAPI()
@@ -60,7 +61,10 @@ class LikeTopicViewController: UIViewController {
     }
     
     private func setAPI() {
-        likeTopicView.showListSkeleton()
+        // 데이터가 비어있다고 이미 확인된 경우 스켈레톤 표시하지 않음 (noLikeView만 표시)
+        if !hasReceivedEmptyResponse {
+            likeTopicView.showListSkeleton()
+        }
         mypageViewModel.getLikedTopics(cursor: nil, size: "10")
     }
     
@@ -75,6 +79,7 @@ class LikeTopicViewController: UIViewController {
                 guard let self = self else { return }
                 self.likeTopicView.hideListSkeleton()
                 let isEmpty = likedTopics.isEmpty
+                self.hasReceivedEmptyResponse = isEmpty
                 self.likeTopicView.noLikeView.isHidden = !isEmpty
                 self.likeTopicView.likeTopicTableView.isHidden = isEmpty
             })

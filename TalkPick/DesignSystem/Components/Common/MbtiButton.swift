@@ -71,6 +71,9 @@ final class MbtiButton: UIControl {
         titleLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         titleLabel.textColor = .gray100
         titleLabel.isUserInteractionEnabled = false
+        titleLabel.numberOfLines = 2
+        titleLabel.lineBreakMode = .byWordWrapping
+        titleLabel.textAlignment = .center
         
         addSubview(alphabetLabel)
         addSubview(titleLabel)
@@ -82,9 +85,10 @@ final class MbtiButton: UIControl {
         }
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(alphabetLabel.snp.bottom).offset(5)
-            $0.centerX.equalToSuperview()
-            $0.height.equalTo(14)
+            $0.leading.trailing.equalToSuperview().inset(8)
+            $0.height.greaterThanOrEqualTo(14)
         }
+        titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     }
     
     private func applyStyle() {

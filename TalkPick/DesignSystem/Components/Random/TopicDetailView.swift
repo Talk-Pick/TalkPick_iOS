@@ -177,6 +177,7 @@ class TopicDetailView: UIView {
             $0.top.equalTo(flipButton.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.height.equalTo(51)
+            $0.bottom.lessThanOrEqualTo(safeAreaLayoutGuide).inset(24)
         }
         
         contentSkeletonView.snp.makeConstraints {

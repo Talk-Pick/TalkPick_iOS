@@ -95,8 +95,7 @@ class TutorialManager {
     }
     
     private func showWelcomePopup() {
-        guard let homeVC = homeViewController,
-              let tabBarVC = tabBarController else { return }
+        guard let tabBarVC = tabBarController else { return }
         
         let tutorialView = TutorialView()
         tutorialView.delegate = self
@@ -207,8 +206,6 @@ class TutorialManager {
     }
     
     private func highlightRandomCourseSection(in overlay: UIView, homeView: HomeView) {
-        guard let tabBarVC = tabBarController else { return }
-        
         let labelFrame = homeView.convert(homeView.randomLabel.frame, to: overlay)
         let viewFrame = homeView.convert(homeView.randomView.frame, to: overlay)
         
@@ -229,13 +226,13 @@ class TutorialManager {
     }
     
     private func highlightTabBar(in overlay: UIView) {
-        guard let tabBarVC = tabBarController as? MainTabViewController else { return }
+        guard let tabBarVC = tabBarController else { return }
         
         // 레이아웃 확정 후 프레임 사용
         tabBarVC.view.layoutIfNeeded()
-        tabBarVC.customTabBarView.layoutIfNeeded()
+        tabBarVC.tabBar.layoutIfNeeded()
         
-        let tabBarHeight: CGFloat = 78
+        let tabBarHeight = tabBarVC.tabBar.frame.height
         let tabBarFrame = CGRect(
             x: 0,
             y: overlay.frame.height - tabBarHeight,
@@ -245,10 +242,14 @@ class TutorialManager {
         
         var excludeAreas: [CGRect] = []
         
-        for item in tabBarVC.items {
-            // item.frame은 superview(tabStackView) 좌표계 → overlay 좌표계로 변환
-            guard let itemSuperview = item.superview else { continue }
-            let itemFrameInOverlay = overlay.convert(item.frame, from: itemSuperview)
+        // 네이티브 UITabBar: 탭 버튼 뷰들을 x 좌표로 정렬
+        let tabBarItemViews = tabBarVC.tabBar.subviews
+            .filter { $0 is UIControl }
+            .sorted { $0.frame.origin.x < $1.frame.origin.x }
+        
+        for item in tabBarItemViews {
+            // item.frame은 tabBar 좌표계 → overlay 좌표계로 변환
+            let itemFrameInOverlay = overlay.convert(item.frame, from: item.superview)
             
             let padding: CGFloat = 4
             let paddedFrame = itemFrameInOverlay.insetBy(dx: -padding, dy: -padding)

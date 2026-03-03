@@ -75,6 +75,7 @@ class TopicView: UIView {
         cardStack.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(56)
             $0.leading.trailing.equalToSuperview().inset(24)
+            $0.bottom.lessThanOrEqualTo(safeAreaLayoutGuide).inset(24)
         }
         
         cardSkeletonView.snp.makeConstraints {
@@ -133,7 +134,6 @@ class TopicView: UIView {
             
             card.snp.makeConstraints {
                 $0.width.equalTo(164)
-                $0.height.equalTo(209)
             }
             
             stack.addArrangedSubview(card)

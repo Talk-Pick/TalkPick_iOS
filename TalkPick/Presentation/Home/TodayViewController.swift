@@ -41,7 +41,7 @@ class TodayViewController: UIViewController {
         super.viewWillAppear(animated)
         
         if let tabBarVC = tabBarController as? MainTabViewController {
-            tabBarVC.customTabBarView.isHidden = true
+            tabBarVC.tabBar.isHidden = true
         }
         
         setAPI()
