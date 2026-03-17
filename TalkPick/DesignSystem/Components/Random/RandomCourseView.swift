@@ -2,6 +2,7 @@
 import UIKit
 import SnapKit
 import RxSwift
+import SkeletonView
 
 class RandomCourseView: UIView {
     
@@ -17,7 +18,6 @@ class RandomCourseView: UIView {
     private let totalSteps: Int = 8
     private var currentStepNumber: Int = 1
     
-    private var selectedSituation: SituationView.SituationKind?
     private var selectedTopics: [TopicModel] = []
     
     private var currentStep: Step = .situation
@@ -167,10 +167,9 @@ class RandomCourseView: UIView {
     }
     
     private func bindViews() {
-        situationView.onSituationSelected = { [weak self] kind in
+        situationView.onSituationSelected = { [weak self] categoryTitle in
             guard let self = self else { return }
-            self.selectedSituation = kind
-            self.situationText = kind.koreanTitle
+            self.situationText = categoryTitle
             self.show(step: .topicSelect(step: 0))
         }
         
@@ -185,6 +184,20 @@ class RandomCourseView: UIView {
                 guard let self = self, let topicId = self.currentTopicId else { return }
                 self.isLiked = likedTopics.contains(where: { $0.topicId == topicId })
                 self.updateLikeButton()
+            })
+            .disposed(by: disposeBag)
+        
+        topicViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                self?.detailView.hideDetailSkeleton()
+            })
+            .disposed(by: disposeBag)
+        
+        randomViewModel.error
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                self?.topicView.hideTopicSkeleton()
             })
             .disposed(by: disposeBag)
     }

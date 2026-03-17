@@ -1,6 +1,7 @@
 
 import UIKit
 import RxSwift
+import SkeletonView
 
 class TodayViewController: UIViewController {
 
@@ -40,7 +41,7 @@ class TodayViewController: UIViewController {
         super.viewWillAppear(animated)
         
         if let tabBarVC = tabBarController as? MainTabViewController {
-            tabBarVC.customTabBarView.isHidden = true
+            tabBarVC.tabBar.isHidden = true
         }
         
         setAPI()
@@ -58,6 +59,7 @@ extension TodayViewController {
     
     private func setAPI() {
         setBind()
+        todayView.showContentSkeleton()
         topicViewModel.getTopicDetail(topicId: topicId)
         myPageViewModel.getLikedTopics(cursor: nil, size: "10")
     }
@@ -67,6 +69,7 @@ extension TodayViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] detail in
                 guard let self = self else { return }
+                todayView.hideContentSkeleton()
                 todayView.updateDetail(
                     category: detail.category,
                     keyword: detail.keywordName,
@@ -87,7 +90,8 @@ extension TodayViewController {
         
         topicViewModel.error
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { error in
+            .subscribe(onNext: { [weak self] error in
+                self?.todayView.hideContentSkeleton()
                 AlertController(message: error.userMessage).show()
             })
             .disposed(by: disposeBag)

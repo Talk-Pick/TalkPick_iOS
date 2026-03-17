@@ -2,13 +2,18 @@ import ProjectDescription
 
 let project = Project(
     name: "TalkPick",
+    settings: .settings(configurations: [
+        .debug(name: "Debug", xcconfig: "Version.xcconfig"),
+        .release(name: "Release", xcconfig: "Version.xcconfig"),
+    ]),
     packages: [
         .package(url: "https://github.com/ReactiveX/RxSwift", from: "6.9.0"),
         .package(url: "https://github.com/SnapKit/SnapKit", from: "5.7.0"),
         .package(url: "https://github.com/Alamofire/Alamofire", from: "5.9.0"),
         .package(url: "https://github.com/kakao/kakao-ios-sdk", from: "2.21.0"),
         .package(url: "https://github.com/onevcat/Kingfisher", from: "8.0.0"),
-        .package(url: "https://github.com/google/GoogleSignIn-iOS", from: "7.0.0")
+        .package(url: "https://github.com/google/GoogleSignIn-iOS", from: "7.0.0"),
+        .package(url: "https://github.com/Juanpe/SkeletonView", from: "1.7.0")
     ],
     targets: [
         .target(
@@ -44,7 +49,8 @@ let project = Project(
                 .package(product: "KakaoSDKAuth"),
                 .package(product: "KakaoSDKUser"),
                 .package(product: "Kingfisher"),
-                .package(product: "GoogleSignIn")
+                .package(product: "GoogleSignIn"),
+                .package(product: "SkeletonView"),
             ]
         )
     ]

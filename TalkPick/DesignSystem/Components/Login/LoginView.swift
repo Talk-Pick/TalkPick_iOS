@@ -4,6 +4,15 @@ import SnapKit
 
 class LoginView: UIView {
     
+    private let scrollView: UIScrollView = {
+        let sv = UIScrollView()
+        sv.showsVerticalScrollIndicator = false
+        sv.alwaysBounceVertical = true
+        return sv
+    }()
+    
+    private let contentView = UIView()
+    
     private let loginMainView = UIView()
     private let loginSubView = UIView()
     
@@ -83,7 +92,9 @@ class LoginView: UIView {
     }
     
     private func setupViews() {
-        addSubview(loginMainView)
+        addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        contentView.addSubview(loginMainView)
         loginMainView.addSubview(smallLogo)
         loginMainView.addSubview(mainLogo1)
         loginMainView.addSubview(loginButton)
@@ -94,33 +105,39 @@ class LoginView: UIView {
     }
     
     private func setupConstraints() {
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        contentView.snp.makeConstraints {
+            $0.edges.equalTo(scrollView)
+            $0.width.equalTo(scrollView)
+        }
         loginMainView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(49)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.edges.equalTo(contentView)
         }
         
         smallLogo.snp.makeConstraints {
-            $0.top.equalToSuperview()
+            $0.top.equalToSuperview().offset(49)
             $0.leading.equalToSuperview().offset(15)
             $0.height.equalTo(42)
             $0.width.equalTo(140)
         }
         
         mainLogo1.snp.makeConstraints {
-            $0.top.equalTo(smallLogo.snp.bottom).offset(100)
+            $0.top.equalTo(smallLogo.snp.bottom).offset(72)
             $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(342)
         }
         
         loginButton.snp.makeConstraints {
-            $0.bottom.equalToSuperview().offset(-148)
+            $0.top.greaterThanOrEqualTo(mainLogo1.snp.bottom).offset(60)
+            $0.bottom.equalToSuperview().offset(-120)
             $0.leading.trailing.equalToSuperview().inset(72)
             $0.height.equalTo(55)
         }
         loginButton.addTarget(self, action: #selector(setloginVisible), for: .touchUpInside)
         
         loginSubView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(158)
+            $0.top.equalToSuperview().offset(140)
             $0.leading.trailing.bottom.equalToSuperview()
         }
         loginSubView.isHidden = true
@@ -128,11 +145,11 @@ class LoginView: UIView {
         mainLogo2.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(342)
         }
         
         buttonsStack.snp.makeConstraints {
-            $0.bottom.equalToSuperview().offset(-91)
+            $0.top.greaterThanOrEqualTo(mainLogo2.snp.bottom).offset(24)
+            $0.bottom.equalToSuperview().offset(-80)
             $0.leading.trailing.equalToSuperview().inset(24)
         }
         appleButton.snp.makeConstraints {

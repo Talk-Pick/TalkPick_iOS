@@ -44,6 +44,7 @@ class LoginViewModel: BaseViewModel {
     private func performLogin(_ loginSingle: Single<Token>) -> Single<Bool> {
         return loginSingle
             .do(onSuccess: { [weak self] response in
+                print("토큰: \(response.accessToken)")
                 self?.tokenProvider.saveAccessToken(response.accessToken)
             })
             .map { _ in true }

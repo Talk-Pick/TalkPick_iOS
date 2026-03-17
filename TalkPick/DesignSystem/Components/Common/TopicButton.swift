@@ -92,11 +92,11 @@ final class TopicButton: UIControl {
         imageView.snp.makeConstraints {
             $0.top.equalTo(labelView.snp.bottom).offset(10)
             $0.centerX.equalToSuperview()
-            $0.size.equalTo(CGSize(width: 95, height: 91))
         }
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(imageView.snp.bottom).offset(13.5)
             $0.centerX.equalToSuperview()
+            $0.bottom.lessThanOrEqualTo(safeAreaLayoutGuide).inset(20)
         }
     }
 }

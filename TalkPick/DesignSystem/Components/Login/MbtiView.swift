@@ -74,7 +74,7 @@ class MbtiView: UIView {
     private func setupLayout() {
         addSubview(mbtiImageView)
         mbtiImageView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(132)
+            $0.top.equalToSuperview().offset(120)
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.height.equalTo(16)
         }
@@ -88,6 +88,7 @@ class MbtiView: UIView {
         
         [eBtn,iBtn,sBtn,nBtn,tBtn,fBtn,jBtn,pBtn].forEach {
             $0.snp.makeConstraints { $0.height.equalTo(79) }
+            $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
         }
         
         let row1 = horizontalRow(left: eBtn, right: iBtn)
@@ -104,7 +105,9 @@ class MbtiView: UIView {
         addSubview(vstack)
         vstack.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(38)
-            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.centerX.equalToSuperview()
+            $0.width.equalToSuperview().offset(-48).priority(.high)
+            $0.width.lessThanOrEqualTo(500)
         }
         
         addSubview(startButton)
@@ -115,7 +118,7 @@ class MbtiView: UIView {
             $0.top.greaterThanOrEqualTo(vstack.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview().inset(85)
             $0.height.equalTo(51)
-            $0.bottom.equalToSuperview().inset(160)
+            $0.bottom.equalToSuperview().inset(10)
         }
     }
     

@@ -31,6 +31,7 @@ class TopicUseCase: BaseUseCase, TopicUseCaseProtocol {
         return executeWithToken { token in
             self.topicRepository.getTodayTopic(token: token)
                 .map { $0.data }
+                .delay(.seconds(2), scheduler: MainScheduler.instance)
         }
     }
     

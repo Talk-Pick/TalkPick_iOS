@@ -1,12 +1,34 @@
 
 import UIKit
 import SnapKit
+import SkeletonView
 
 class TopicView: UIView {
     
     var onTopicSelected: ((TopicModel) -> Void)?
 
     private var topics: [TopicModel] = []
+    
+    private let cardSkeletonView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .clear
+        v.isHidden = true
+        return v
+    }()
+    
+    private let skeletonCard1: UIView = {
+        let v = UIView()
+        v.backgroundColor = .gray50
+        v.layer.cornerRadius = 10
+        return v
+    }()
+    
+    private let skeletonCard2: UIView = {
+        let v = UIView()
+        v.backgroundColor = .gray50
+        v.layer.cornerRadius = 10
+        return v
+    }()
     
     private let titleLabel: UILabel = {
         let lb = UILabel()
@@ -38,6 +60,9 @@ class TopicView: UIView {
     private func setupViews() {
         addSubview(titleLabel)
         addSubview(cardStack)
+        addSubview(cardSkeletonView)
+        cardSkeletonView.addSubview(skeletonCard1)
+        cardSkeletonView.addSubview(skeletonCard2)
     }
     
     private func setupConstraints() {
@@ -50,7 +75,41 @@ class TopicView: UIView {
         cardStack.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(56)
             $0.leading.trailing.equalToSuperview().inset(24)
+            $0.bottom.lessThanOrEqualTo(safeAreaLayoutGuide).inset(24)
         }
+        
+        cardSkeletonView.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(56)
+            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.height.equalTo(250)
+        }
+        
+        skeletonCard1.snp.makeConstraints {
+            $0.top.leading.equalToSuperview()
+            $0.width.equalTo(164)
+            $0.height.equalTo(209)
+        }
+        
+        skeletonCard2.snp.makeConstraints {
+            $0.top.equalToSuperview()
+            $0.leading.equalTo(skeletonCard1.snp.trailing).offset(13)
+            $0.width.equalTo(164)
+            $0.height.equalTo(209)
+        }
+        
+        cardSkeletonView.isSkeletonable = true
+        skeletonCard1.isSkeletonable = true
+        skeletonCard2.isSkeletonable = true
+    }
+    
+    func showTopicSkeleton() {
+        cardSkeletonView.isHidden = false
+        cardSkeletonView.showAnimatedSkeleton()
+    }
+    
+    func hideTopicSkeleton() {
+        cardSkeletonView.hideSkeleton()
+        cardSkeletonView.isHidden = true
     }
     
     private func makeRow(_ items: [TopicModel], startIndex: Int) -> UIStackView {
@@ -75,7 +134,6 @@ class TopicView: UIView {
             
             card.snp.makeConstraints {
                 $0.width.equalTo(164)
-                $0.height.equalTo(209)
             }
             
             stack.addArrangedSubview(card)
@@ -88,10 +146,17 @@ class TopicView: UIView {
         let titles = ["첫 번째 주제", "두 번째 주제", "세 번째 주제"]
         titleLabel.text = titles.indices.contains(stepIndex) ? titles[stepIndex] : ""
         self.topics = topics
-        rebuildStack()
+        if topics.isEmpty {
+            cardStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+            showTopicSkeleton()
+        } else {
+            hideTopicSkeleton()
+            rebuildStack()
+        }
     }
     
     private func rebuildStack() {
+        hideTopicSkeleton()
         cardStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
         // topics 배열을 2개씩 잘라서 row 만들기

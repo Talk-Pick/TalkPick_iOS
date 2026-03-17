@@ -1,153 +1,87 @@
 
 import UIKit
-import SnapKit
-
-class CustomTabBarItemView: UIView {
-
-    let imageView = UIImageView()
-    let titleLabel = UILabel()
-
-    init(image: UIImage?, title: String) {
-        super.init(frame: .zero)
-        setUI(image: image, title: title)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    private func setUI(image: UIImage?, title: String) {
-        imageView.image = image
-        imageView.contentMode = .scaleAspectFit
-        imageView.tintColor = .black
-
-        titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: 11, weight: .heavy)
-        titleLabel.textColor = .black
-        titleLabel.textAlignment = .center
-
-        let stackView = UIStackView(arrangedSubviews: [imageView, titleLabel])
-        stackView.axis = .vertical
-        stackView.alignment = .center
-        stackView.spacing = 6
-
-        addSubview(stackView)
-
-        stackView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(14)
-            $0.centerX.equalToSuperview()
-        }
-        imageView.snp.makeConstraints {
-            $0.width.height.equalTo(26)
-        }
-        titleLabel.snp.makeConstraints {
-            $0.height.equalTo(17)
-        }
-    }
-
-    func setSelected(_ selected: Bool) {
-        imageView.tintColor = selected ? .black : .gray200
-        titleLabel.textColor = selected ? .black : .gray200
-    }
-}
 
 class MainTabViewController: UITabBarController, UITabBarControllerDelegate {
-    
-    let customTabBarView = UIView()
-    
-    let items: [CustomTabBarItemView] = [
-        CustomTabBarItemView(image: UIImage(named: "talkpick_tab1")?.withRenderingMode(.alwaysTemplate), title: "홈 화면"),
-        CustomTabBarItemView(image: UIImage(named: "talkpick_tab2")?.withRenderingMode(.alwaysTemplate), title: "랜덤코스"),
-        CustomTabBarItemView(image: UIImage(named: "talkpick_tab3")?.withRenderingMode(.alwaysTemplate), title: "마이페이지")
+
+    private let tabItems: [(image: String, title: String)] = [
+        ("talkpick_tab1", "홈 화면"),
+        ("talkpick_tab2", "랜덤코스"),
+        ("talkpick_tab3", "좋아요"),
+        ("talkpick_tab4", "마이페이지")
     ]
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
+        setupTabBarAppearance()
         setupViewControllers()
-        setupCustomTabBar()
         selectedIndex = 0
-        updateSelectedState(index: 0)
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
-    
-    private func setupCustomTabBar() {
-        tabBar.isHidden = true
-        customTabBarView.backgroundColor = .white
-        
-        customTabBarView.layer.shadowColor = UIColor.black.cgColor
-        customTabBarView.layer.shadowOpacity = 0.1
-        customTabBarView.layer.shadowOffset = CGSize(width: 0, height: -4)
-        customTabBarView.layer.shadowRadius = 8
-        customTabBarView.layer.masksToBounds = false
-        
-        view.addSubview(customTabBarView)
-        customTabBarView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(78)
-        }
-        
-        // 각 아이템을 직접 추가하고 제약 설정
-        for item in items {
-            customTabBarView.addSubview(item)
-            item.setContentHuggingPriority(.required, for: .horizontal)
-            item.setContentCompressionResistancePriority(.required, for: .horizontal)
-            item.snp.makeConstraints {
-                $0.top.bottom.equalToSuperview()
-                $0.height.equalTo(78)
-                $0.width.equalTo(50)
-            }
-        }
-        
-        // 중앙 탭을 중앙에 고정
-        items[1].snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-        }
-        
-        items[0].snp.makeConstraints {
-            $0.trailing.equalTo(items[1].snp.leading).offset(-72)
-            $0.leading.greaterThanOrEqualToSuperview().offset(15) // 최소 여백
-        }
-        
-        items[2].snp.makeConstraints {
-            $0.leading.equalTo(items[1].snp.trailing).offset(72)
-            $0.trailing.lessThanOrEqualToSuperview().offset(-15) // 최소 여백
-        }
-        
-        for (index, item) in items.enumerated() {
-            item.tag = index
-            item.isUserInteractionEnabled = true
-            item.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tabItemTapped(_:))))
-        }
+
+    // iOS 네이티브 Liquid Glass 탭바 appearance 설정
+    private func setupTabBarAppearance() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()  // Liquid Glass: 블러 + 반투명
+
+        // 선택된 탭: 검은색
+        appearance.stackedLayoutAppearance.selected.iconColor = .black
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.black]
+
+        tabBar.standardAppearance = appearance
+        tabBar.scrollEdgeAppearance = appearance
+        tabBar.isHidden = false
     }
-    
-    @objc private func tabItemTapped(_ sender: UITapGestureRecognizer) {
-        guard let index = sender.view?.tag else { return }
-        
-        selectedIndex = index
-        updateSelectedState(index: index)
-    }
-    
-    private func updateSelectedState(index: Int) {
-        for (i, item) in items.enumerated() {
-            item.setSelected(i == index)
-        }
-    }
-    
+
     private func setupViewControllers() {
         let homeVC = HomeViewController()
         let randomVC = RandomViewController()
+        let likeVC = LikeTopicViewController()
         let mypageVC = MypageViewController()
-        
+
+        let viewControllers = [homeVC, randomVC, likeVC, mypageVC]
+
+        let imageSizes: [CGSize] = [
+            CGSize(width: 20, height: 20),  // 1번: 홈 화면
+            CGSize(width: 24, height: 20),  // 2번: 랜덤코스
+            CGSize(width: 20, height: 20),  // 3번: 좋아요
+            CGSize(width: 16, height: 20)   // 4번: 마이페이지
+        ]
+
+        for (index, vc) in viewControllers.enumerated() {
+            let item = tabItems[index]
+            let size = imageSizes[index]
+            let image = UIImage(named: item.image)?
+                .resized(to: size)
+                .withRenderingMode(.alwaysTemplate)
+            vc.tabBarItem = UITabBarItem(title: item.title, image: image, tag: index)
+        }
+
         let navigationHome = UINavigationController(rootViewController: homeVC)
         let navigationRandom = UINavigationController(rootViewController: randomVC)
+        let navigationLike = UINavigationController(rootViewController: likeVC)
         let navigationMypage = UINavigationController(rootViewController: mypageVC)
 
-        viewControllers = [navigationHome, navigationRandom, navigationMypage]
+        self.viewControllers = [navigationHome, navigationRandom, navigationLike, navigationMypage]
+    }
+
+    // 프로그래매틱 탭 전환 (외부 호출용)
+    func switchToTab(index: Int) {
+        guard let count = viewControllers?.count, (0..<count).contains(index) else { return }
+        selectedIndex = index
+    }
+}
+
+private extension UIImage {
+    func resized(to size: CGSize) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in
+            draw(in: CGRect(origin: .zero, size: size))
+        }
     }
 }

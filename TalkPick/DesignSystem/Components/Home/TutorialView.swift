@@ -102,7 +102,7 @@ class TutorialView: UIView {
     
     private func setupConstraints() {
         containerView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(249)
+            $0.centerY.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(24)
         }
         
@@ -126,9 +126,8 @@ class TutorialView: UIView {
         }
         
         touchImageView.snp.makeConstraints {
-            $0.top.equalTo(containerView.snp.bottom).offset(81)
-            $0.centerX.equalToSuperview()
-            $0.width.equalTo(227)
+            $0.top.equalTo(containerView.snp.bottom).offset(72)
+            $0.leading.trailing.equalToSuperview().inset(100)
             $0.height.equalTo(130)
         }
     }

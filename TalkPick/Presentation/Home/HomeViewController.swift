@@ -7,6 +7,7 @@ class HomeViewController: UIViewController {
     
     private let homeView = HomeView()
     private let topicViewModel: TopicViewModel
+    private let dataSource = TodayTopicDataSource()
     private let disposeBag = DisposeBag()
     
     init(topicViewModel: TopicViewModel = TopicViewModel()) {
@@ -33,7 +34,7 @@ class HomeViewController: UIViewController {
         super.viewWillAppear(animated)
         
         if let tabBarVC = tabBarController as? MainTabViewController {
-            tabBarVC.customTabBarView.isHidden = false
+            tabBarVC.tabBar.isHidden = false
         }
     }
     
@@ -48,6 +49,13 @@ class HomeViewController: UIViewController {
     private func setUI() {
         navigationController?.setNavigationBarHidden(true, animated: false)
         homeView.startButton.addTarget(self, action: #selector(randomTapped), for: .touchUpInside)
+        
+        dataSource.bind(topics: topicViewModel.todayTopics, to: homeView.todayTopicCollectionView)
+        dataSource.onItemSelected = { [weak self] topic in
+            guard let self = self else { return }
+            let todayVC = TodayViewController(topicId: topic.topicId)
+            self.navigationController?.pushViewController(todayVC, animated: true)
+        }
     }
     
     @objc private func randomTapped() {
@@ -59,28 +67,23 @@ class HomeViewController: UIViewController {
 extension HomeViewController {
     
     private func setAPI() {
+        homeView.showTodayTopicSkeleton()
         topicViewModel.getTodayTopic()
     }
     
     private func bindViewModel() {
         topicViewModel.todayTopics
             .observe(on: MainScheduler.instance)
-            .bind(to: homeView.todayTopicCollectionView.rx.items(cellIdentifier: TodayTopicCollectionViewCell.identifier, cellType: TodayTopicCollectionViewCell.self)) { index, item, cell in
-                cell.prepare(topic: item)
-            }
-            .disposed(by: disposeBag)
-        
-        homeView.todayTopicCollectionView.rx.modelSelected(Topic.self)
-            .subscribe(onNext: { [weak self] topicItem in
-                guard let self = self else { return }
-                let todayVC = TodayViewController(topicId: topicItem.topicId)
-                navigationController?.pushViewController(todayVC, animated: true)
+            .subscribe(onNext: { [weak self] topics in
+                guard !topics.isEmpty else { return }
+                self?.homeView.hideTodayTopicSkeleton()
             })
             .disposed(by: disposeBag)
         
         topicViewModel.error
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { error in
+            .subscribe(onNext: { [weak self] error in
+                self?.homeView.hideTodayTopicSkeleton()
                 AlertController(message: error.userMessage).show()
             })
             .disposed(by: disposeBag)

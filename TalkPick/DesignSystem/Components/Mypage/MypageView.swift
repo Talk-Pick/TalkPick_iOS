@@ -85,7 +85,7 @@ class MypageView: UIView {
         infoSectionView.actionButton.addTarget(self, action: #selector(edit_Tapped), for: .touchUpInside)
         
         collectionSectionView.snp.makeConstraints {
-            $0.top.equalTo(infoSectionView.snp.bottom).offset(30)
+            $0.top.equalTo(infoSectionView.snp.bottom).offset(20)
             $0.leading.trailing.equalTo(infoSectionView)
         }
         
@@ -95,12 +95,12 @@ class MypageView: UIView {
         }
         
         logOutButton.snp.makeConstraints {
-            $0.top.equalTo(etcSectionView.snp.bottom).offset(10)
+            $0.top.equalTo(etcSectionView.snp.bottom).offset(8)
             $0.trailing.equalTo(etcSectionView)
         }
         
         withdrawButton.snp.makeConstraints {
-            $0.top.equalTo(logOutButton.snp.bottom).offset(4)
+            $0.top.equalTo(logOutButton.snp.bottom)
             $0.trailing.equalTo(etcSectionView)
             $0.bottom.lessThanOrEqualTo(safeAreaLayoutGuide.snp.bottom).inset(16)
         }

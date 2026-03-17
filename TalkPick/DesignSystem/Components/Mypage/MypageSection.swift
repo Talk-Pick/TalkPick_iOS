@@ -389,7 +389,7 @@ final class TodayTopicView: UIView {
         return lb
     }()
     
-    private let actionButton: UIButton = {
+    let actionButton: UIButton = {
         let bt = UIButton(type: .system)
         bt.setTitle("보러가기", for: .normal)
         bt.setTitleColor(.gray200, for: .normal)
@@ -432,6 +432,7 @@ final class TodayTopicView: UIView {
         
         actionButton.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(10)
+            $0.bottom.equalToSuperview().inset(18)
             $0.centerX.equalToSuperview()
             $0.height.equalTo(35)
             $0.width.equalTo(103)
@@ -464,14 +465,14 @@ final class NoLikeView: UIView {
     }()
     
     private let todayTopicView1 = TodayTopicView(title: "오늘의 톡픽 5개!")
-    private let todayTopicView2 = TodayTopicView(title: "대중들의 픽, 좋아요를\n가장 많이 받은 주제 모아보기")
-    private let todayTopicView3 = TodayTopicView(title: "랜덤 주제로 진행하는 것도 묘미\n랜덤 주제 코스")
+    private let todayTopicView2 = TodayTopicView(title: "랜덤 주제로 진행하는 것도 묘미\n랜덤 주제 코스")
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .clear
         setupViews()
         setupConstraints()
+        setupTopicButtonActions()
     }
     
     required init?(coder: NSCoder) {
@@ -484,13 +485,34 @@ final class NoLikeView: UIView {
         addSubview(subTitleLabel)
         addSubview(todayTopicView1)
         addSubview(todayTopicView2)
-        addSubview(todayTopicView3)
+    }
+    
+    private func setupTopicButtonActions() {
+        todayTopicView1.actionButton.addTarget(self, action: #selector(todayTopic1Tapped), for: .touchUpInside)
+        todayTopicView2.actionButton.addTarget(self, action: #selector(todayTopic2Tapped), for: .touchUpInside)
+    }
+    
+    @objc private func todayTopic1Tapped() {
+        findMainTabViewController()?.switchToTab(index: 0)
+    }
+    
+    @objc private func todayTopic2Tapped() {
+        findMainTabViewController()?.switchToTab(index: 1)
+    }
+    
+    private func findMainTabViewController() -> MainTabViewController? {
+        var responder: UIResponder? = self
+        while let r = responder {
+            if let tab = r as? MainTabViewController { return tab }
+            responder = r.next
+        }
+        return nil
     }
     
     private func setupConstraints() {
         mainLogo.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.centerX.equalToSuperview().inset(16)
+            $0.centerX.equalToSuperview()
             $0.width.height.equalTo(90)
         }
         
@@ -509,19 +531,11 @@ final class NoLikeView: UIView {
         todayTopicView1.snp.makeConstraints {
             $0.top.equalTo(subTitleLabel.snp.bottom).offset(22)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(103)
         }
         
         todayTopicView2.snp.makeConstraints {
             $0.top.equalTo(todayTopicView1.snp.bottom).offset(22)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(125)
-        }
-        
-        todayTopicView3.snp.makeConstraints {
-            $0.top.equalTo(todayTopicView2.snp.bottom).offset(22)
-            $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(125)
         }
     }
 }

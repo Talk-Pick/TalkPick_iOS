@@ -52,7 +52,7 @@ class FinishView: UIView {
     
     private let submitButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("한줄평 남기기", for: .normal)
+        button.setTitle("완료", for: .normal)
         button.setTitleColor(.gray200, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         button.layer.cornerRadius = 12
@@ -132,6 +132,7 @@ class FinishView: UIView {
             $0.top.equalTo(starsStackView.snp.bottom).offset(73)
             $0.leading.trailing.equalToSuperview().inset(80)
             $0.height.equalTo(55)
+            $0.bottom.lessThanOrEqualTo(safeAreaLayoutGuide).inset(20)
         }
     }
     
@@ -162,29 +163,7 @@ class FinishView: UIView {
     
     @objc private func submitTapped() {
         randomViewModel.postRandomRate(id: randomId, rating: rating)
-        showCommentView()
-    }
-    
-    private func showCommentView() {
-        let commentView = CommentView()
-        
-        // 한줄평 제출 콜백
-        commentView.onCommentSubmitted = { [weak self] comment in
-            guard let self = self else { return }
-            
-            self.randomViewModel.postRandomComment(id: self.randomId, oneLine: comment)
-            self.onFinished?()
-        }
-                
-        addSubview(commentView)
-        commentView.alpha = 0
-        commentView.snp.makeConstraints { $0.edges.equalToSuperview() }
-        
-        UIView.animate(withDuration: 0.3) {
-            commentView.alpha = 1
-        } completion: { _ in
-            commentView.show()
-        }
+        onFinished?()
     }
     
     private func updateStars() {

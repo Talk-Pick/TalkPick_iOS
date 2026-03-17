@@ -8,6 +8,16 @@ class RandomViewController: UIViewController {
     private let images = ["talkpick_random1", "talkpick_random2", "talkpick_random3", "talkpick_random4", "talkpick_random5"]
     private var currentIndex = 0
     
+    private let scrollView: UIScrollView = {
+        let sv = UIScrollView()
+        sv.showsVerticalScrollIndicator = true
+        sv.showsHorizontalScrollIndicator = false
+        sv.alwaysBounceVertical = true
+        return sv
+    }()
+    
+    private let contentView = UIView()
+    
     private let pageControl = CustomPageControl()
     private let currentImageView = UIImageView()
     private let nextImageView = UIImageView()
@@ -39,7 +49,7 @@ class RandomViewController: UIViewController {
         super.viewWillAppear(animated)
         
         if let tabBarVC = tabBarController as? MainTabViewController {
-            tabBarVC.customTabBarView.isHidden = false
+            tabBarVC.tabBar.isHidden = false
         }
     }
     
@@ -57,11 +67,22 @@ class RandomViewController: UIViewController {
         pageControl.numberOfPages = images.count
         pageControl.currentPage = 0
         
-        view.addSubview(pageControl)
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
         
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalTo(scrollView.snp.width)
+        }
+        
+        contentView.addSubview(pageControl)
         pageControl.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.top.equalToSuperview().offset(93)
+            $0.top.equalToSuperview().offset(60)
         }
         
         currentImageView.image = UIImage(named: images[0])
@@ -69,22 +90,22 @@ class RandomViewController: UIViewController {
         
         nextImageView.contentMode = .scaleAspectFit
         
-        view.addSubview(currentImageView)
-        view.addSubview(nextImageView)
+        contentView.addSubview(currentImageView)
+        contentView.addSubview(nextImageView)
         
         currentImageView.snp.makeConstraints {
-            $0.top.equalTo(pageControl.snp.bottom).offset(44)
+            $0.top.equalTo(pageControl.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(503)
         }
         
         nextImageView.snp.makeConstraints {
-            $0.top.equalTo(pageControl.snp.bottom).offset(44)
+            $0.top.equalTo(pageControl.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(503)
         }
         
-        view.addSubview(slideImageView)
+        contentView.addSubview(slideImageView)
         slideImageView.isHidden = false
         slideImageView.snp.makeConstraints {
             $0.top.equalTo(currentImageView.snp.bottom).offset(-16)
@@ -92,11 +113,12 @@ class RandomViewController: UIViewController {
             $0.height.equalTo(29)
         }
         
-        view.addSubview(startButton)
+        contentView.addSubview(startButton)
         startButton.snp.makeConstraints {
             $0.top.equalTo(currentImageView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview().inset(24)
             $0.height.equalTo(51)
+            $0.bottom.equalToSuperview().offset(-80)
         }
     }
     
